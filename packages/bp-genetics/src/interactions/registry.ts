@@ -61,12 +61,16 @@ export class InteractionRegistry {
   ): {
     label: string;
     hasLethal: boolean;
+    hasRisk: boolean;
+    risks: string[];
     interactions: MatchedInteraction[];
     notes: string[];
   } {
     const matchedRules = this.findMatching(genotype);
     let label = baseLabel;
     let hasLethal = baseHasLethal;
+    let hasRisk = false;
+    const risks: string[] = [];
     const interactions: MatchedInteraction[] = [];
     const notes: string[] = [];
 
@@ -78,11 +82,15 @@ export class InteractionRegistry {
           setLabel: (l: string) => { label = l; },
           addNote: (n: string) => notes.push(n),
           setLethal: () => { hasLethal = true; },
+          setRisk: (msg?: string) => {
+            hasRisk = true;
+            if (msg) risks.push(msg);
+          },
         });
       }
     }
 
-    return { label, hasLethal, interactions, notes };
+    return { label, hasLethal, hasRisk, risks, interactions, notes };
   }
 }
 
@@ -91,6 +99,7 @@ interface EffectContext {
   setLabel(label: string): void;
   addNote(note: string): void;
   setLethal(): void;
+  setRisk(message?: string): void;
 }
 
 function applyEffect(effect: InteractionEffect, ctx: EffectContext): void {
@@ -106,6 +115,9 @@ function applyEffect(effect: InteractionEffect, ctx: EffectContext): void {
       break;
     case 'lethal':
       ctx.setLethal();
+      break;
+    case 'risky':
+      ctx.setRisk(effect.message);
       break;
   }
 }

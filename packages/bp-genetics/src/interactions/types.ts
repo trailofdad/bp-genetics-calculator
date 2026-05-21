@@ -14,12 +14,14 @@ export interface InteractionCondition {
  * - `append_label` — Append a short suffix to the existing label.
  * - `add_note`     — Add an informational note (surfaced to the consumer).
  * - `lethal`       — Mark the outcome as carrying a lethal combination.
+ * - `risky`        — Mark the outcome as carrying a risky combination. Optional message is added to `risks`.
  */
 export type InteractionEffect =
   | { type: 'rename'; label: string }
   | { type: 'append_label'; suffix: string }
   | { type: 'add_note'; message: string }
-  | { type: 'lethal' };
+  | { type: 'lethal' }
+  | { type: 'risky'; message?: string };
 
 /**
  * A declarative rule describing a genetic interaction.

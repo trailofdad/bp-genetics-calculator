@@ -12,6 +12,11 @@ export function buildGeneLabel(gene: Gene, copies: CopyCount): string | null {
     return copies === 2 ? gene.name : `100% Het ${gene.name}`;
   }
 
+  if (gene.type === 'dominant') {
+    // 2 copies = visually identical to 1 copy (no distinct super form)
+    return gene.name;
+  }
+
   // Codominant
   if (copies === 2) {
     return gene.superName ?? `Super ${gene.name}`;

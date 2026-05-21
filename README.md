@@ -9,7 +9,9 @@ Built with **React + TypeScript + Vite**, powered by the open-source [`bp-geneti
 ## Features
 
 - Select genes for two parents (recessive & codominant, including supers)
-- See all possible offspring combinations with percentage probabilities
+- **Reactive results** — offspring probabilities update instantly as you change genes; no Calculate button needed
+- **Recent genes** — last 5 selected genes shown as quick-select chips per parent, persisted across sessions
+- **Save pairings** — name and save any parent combination to localStorage; reload or delete from a side panel
 - Lethal super combinations are flagged automatically
 - BEL complex compound hets and neurological interaction notes surfaced inline
 - Fully typed, zero-dependency genetics engine — usable outside this UI
@@ -23,8 +25,11 @@ bp-calculator/           ← Vite + React front-end app
 ├── src/
 │   ├── App.tsx
 │   ├── components/
-│   │   ├── ParentSelector.tsx   ← gene picker UI for each parent
-│   │   └── ResultsDisplay.tsx   ← offspring outcome cards
+│   │   ├── ParentSelector.tsx      ← gene picker UI (recent genes, sorted selection)
+│   │   ├── ResultsDisplay.tsx      ← offspring outcome cards
+│   │   └── SavedPairingsPanel.tsx  ← slide-over panel for saved pairings
+│   ├── hooks/
+│   │   └── useSavedPairings.ts     ← localStorage CRUD for named pairings
 │   └── ...
 └── packages/
     └── bp-genetics/             ← open-source genetics library (MIT)
@@ -96,7 +101,10 @@ Contributions are welcome! See [AGENTS.md](./AGENTS.md) for guidance on common t
 | Add a new gene | One line in `packages/bp-genetics/src/genes/data.ts` |
 | Add a gene interaction | One `InteractionRule` object in `packages/bp-genetics/src/interactions/data.ts` |
 | Add a new BEL-complex gene | One entry in `BEL_COMPLEX_GENE_IDS` in `interactions/data.ts` |
-| Change UI layout | `src/components/` |
+| Change UI layout / gene picker | `src/components/ParentSelector.tsx` |
+| Change results display | `src/components/ResultsDisplay.tsx` |
+| Change save-pairing logic | `src/hooks/useSavedPairings.ts` |
+| Change save-pairing UI panel | `src/components/SavedPairingsPanel.tsx` |
 
 ---
 

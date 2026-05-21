@@ -21,6 +21,14 @@ export {
   defaultInteractionRegistry,
 } from './interactions/index';
 
+// ─── Combo names ──────────────────────────────────────────────────────────────
+export type { ComboCondition, ComboName } from './combos/index';
+export {
+  COMBO_NAMES,
+  ComboRegistry,
+  defaultComboRegistry,
+} from './combos/index';
+
 // ─── Engine ───────────────────────────────────────────────────────────────────
 export { crossGene, buildGeneLabel, buildGenotypeLabel } from './engine/index';
 export { calculateOffspring, formatProbability } from './engine/index';

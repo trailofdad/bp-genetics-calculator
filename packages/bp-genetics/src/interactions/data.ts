@@ -81,6 +81,10 @@ const SPIDER_CHAMPAGNE_NOTE: InteractionRule = {
         'Carries both Spider and Champagne — both genes independently cause neurological wobble. ' +
         'Consult a specialist before breeding.',
     },
+    {
+      type: 'risky',
+      message: 'Spider + Champagne combination — compounded neurological wobble risk.',
+    },
   ],
 };
 
@@ -103,6 +107,10 @@ const SPIDER_WOMA_NOTE: InteractionRule = {
       message:
         'Carries both Spider and Woma — both genes are associated with neurological wobble. ' +
         'Consult a specialist before breeding.',
+    },
+    {
+      type: 'risky',
+      message: 'Spider + Woma combination — compounded neurological wobble risk.',
     },
   ],
 };

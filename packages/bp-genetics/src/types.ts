@@ -1,14 +1,24 @@
-export type GeneType = 'recessive' | 'codominant';
+export type GeneType = 'recessive' | 'codominant' | 'dominant';
 
 export interface Gene {
   id: string;
   name: string;
   shortName: string;
   type: GeneType;
-  /** Display name when homozygous codominant (super form). Undefined for recessive genes. */
+  /** Alternative names or common abbreviations (used for search). */
+  aliases?: string[];
+  /** Display name when homozygous codominant (super form). Undefined for recessive/dominant genes. */
   superName?: string;
-  /** True when the homozygous form is lethal (e.g. Spider, Champagne, Woma). */
+  /**
+   * True when the homozygous form is lethal (e.g. Spider, Champagne, Woma).
+   * Applicable to codominant and dominant genes.
+   */
   lethalSuper?: boolean;
+  /**
+   * If set, this gene is considered individually risky when present.
+   * The value is a short human-readable note shown in the UI and surfaced on offspring outcomes.
+   */
+  riskNote?: string;
   category: string;
 }
 
@@ -51,8 +61,14 @@ export interface OffspringOutcome {
   label: string;
   /** True when any gene in this outcome produces a lethal super combination. */
   hasLethal: boolean;
+  /** True when any gene or interaction in this outcome is flagged as risky. */
+  hasRisk: boolean;
+  /** Aggregated risk messages from genes and interaction rules. */
+  risks: string[];
   /** Interaction rules that matched this outcome. */
   interactions: MatchedInteraction[];
   /** Aggregated informational notes from matched interactions. */
   notes: string[];
+  /** Common trade names that match this outcome's genotype (e.g. ["Bumblebee"]). Most specific first. */
+  comboNames: string[];
 }

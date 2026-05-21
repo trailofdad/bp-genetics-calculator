@@ -63,11 +63,23 @@ packages/bp-genetics/src/
 
 ```
 src/
-  App.tsx                   ← root component, holds parent state
+  App.tsx                        ← root component, holds parent state + save-pairing modal
   components/
-    ParentSelector.tsx      ← gene picker UI for each parent
-    ResultsDisplay.tsx      ← offspring outcome cards with notes
+    ParentSelector.tsx           ← gene picker UI for each parent (recent genes, sorted list)
+    ResultsDisplay.tsx           ← offspring outcome cards with notes
+    SavedPairingsPanel.tsx       ← slide-over panel listing saved pairings
+  hooks/
+    useSavedPairings.ts          ← CRUD hook for localStorage-backed saved pairings
 ```
+
+#### Key front-end behaviours
+
+| Behaviour | Where |
+|-----------|-------|
+| **Reactive calculation** | `App.tsx` — `calculateOffspring` runs via `useMemo` on every parent change; no manual Calculate button. |
+| **Recent genes** | `ParentSelector.tsx` — `useRecentGenes` hook, last 5 selected gene IDs per parent, persisted in `localStorage` under `recent-genes:<parentLabel>`. Clicking a recent chip adds the gene as Het if not already selected. Chips are colour-coded by gene type (violet = recessive, sky = codominant, rose = lethal). |
+| **Selected-first sorting** | `ParentSelector.tsx` — genes with copies > 0 are sorted to the top of the filtered list so copy-count buttons are immediately reachable. |
+| **Save pairing** | `App.tsx` + `useSavedPairings` hook — saves a named `{ parent1, parent2 }` snapshot to `localStorage` under key `saved-pairings`. `SavedPairingsPanel` renders a slide-over with load/delete per entry. |
 
 ---
 
@@ -81,7 +93,7 @@ Edit `packages/bp-genetics/src/genes/data.ts` and append a `Gene` object to the 
 {
   id: 'my_gene',          // snake_case, unique
   name: 'My Gene',        // human-readable display name
-  shortName: 'MyGn',      // ≤4 chars, shown in compact UI
+  shortName: 'MyGn',      // abbreviation used in compact contexts (recent-gene chips for names > 6 chars, active-gene chips in older UI)
   type: 'recessive',      // 'recessive' | 'codominant'
   category: 'Recessive',  // groups genes in the UI picker
   // For codominant genes, also add:
@@ -122,10 +134,28 @@ Available effect types:
 | `append_label` | Append a suffix to the existing label |
 | `add_note` | Add an informational note shown below the result |
 | `lethal` | Flag this outcome as carrying a lethal combination |
+| `risky` | Flag this outcome as carrying a risky combination. Optional `message` is added to `risks[]` |
+
+### Mark a gene as individually risky
+
+Set `riskNote` on the gene in `packages/bp-genetics/src/genes/data.ts`:
+
+```typescript
+{
+  id: 'my_gene',
+  name: 'My Gene',
+  // ...
+  riskNote: 'Short note explaining the risk — shown in gene list and on offspring outcome cards.',
+}
+```
+
+The note is automatically surfaced in the UI:
+- A **"risky"** orange badge appears next to the gene in the parent picker
+- Every offspring outcome containing that gene shows the note in an orange `⚠` list
 
 ---
 
-### Add a new BEL-complex gene
+
 
 Add the gene ID to `BEL_COMPLEX_GENE_IDS` in `packages/bp-genetics/src/interactions/data.ts`:
 
@@ -159,6 +189,17 @@ interface OffspringOutcome {
   notes: string[];
 }
 ```
+
+---
+
+## localStorage keys
+
+The app uses `localStorage` for client-side persistence. No server or auth is involved.
+
+| Key | Type | Owner | Description |
+|-----|------|-------|-------------|
+| `recent-genes:<parentLabel>` | `string[]` (gene IDs) | `useRecentGenes` in `ParentSelector.tsx` | Last 5 gene IDs selected for a given parent (e.g. `recent-genes:Parent 1`). Updated on every non-zero `setGene` call. |
+| `saved-pairings` | `SavedPairing[]` (JSON) | `useSavedPairings` in `hooks/useSavedPairings.ts` | Array of named `{ id, name, parent1, parent2, savedAt }` pairing snapshots. Newest first. |
 
 ---
 

@@ -3,8 +3,10 @@ import { crossGene } from './punnett';
 import { buildGenotypeLabel } from './labeler';
 import { defaultGeneRegistry } from '../genes/index';
 import { defaultInteractionRegistry } from '../interactions/index';
+import { defaultComboRegistry } from '../combos/index';
 import type { GeneRegistry } from '../genes/registry';
 import type { InteractionRegistry } from '../interactions/registry';
+import type { ComboRegistry } from '../combos/registry';
 
 interface CalculatorOptions {
   /** Gene registry used to resolve display names. Defaults to the bundled registry. */
@@ -15,6 +17,12 @@ interface CalculatorOptions {
    * Defaults to the bundled interaction registry.
    */
   interactionRegistry?: InteractionRegistry | null;
+  /**
+   * Combo name registry used to attach well-known trade names to outcomes.
+   * Pass `null` to disable combo matching entirely.
+   * Defaults to the bundled combo registry.
+   */
+  comboRegistry?: ComboRegistry | null;
 }
 
 /**
@@ -41,6 +49,10 @@ export function calculateOffspring(
     options.interactionRegistry === null
       ? null
       : (options.interactionRegistry ?? defaultInteractionRegistry);
+  const comboRegistry =
+    options.comboRegistry === null
+      ? null
+      : (options.comboRegistry ?? defaultComboRegistry);
 
   // Gather all gene IDs that are active in either parent
   const geneIds = [
@@ -54,8 +66,11 @@ export function calculateOffspring(
         probability: 1,
         label: 'Normal',
         hasLethal: false,
+        hasRisk: false,
+        risks: [],
         interactions: [],
         notes: [],
+        comboNames: [],
       },
     ];
   }
@@ -105,11 +120,26 @@ export function calculateOffspring(
       geneRegistry
     );
 
-    const { label, hasLethal, interactions, notes } = interactionRegistry
+    const { label, hasLethal, hasRisk: interactionHasRisk, risks: interactionRisks, interactions, notes } = interactionRegistry
       ? interactionRegistry.applyToLabel(genotype, baseLabel, baseHasLethal)
-      : { label: baseLabel, hasLethal: baseHasLethal, interactions: [], notes: [] };
+      : { label: baseLabel, hasLethal: baseHasLethal, hasRisk: false, risks: [], interactions: [], notes: [] };
 
-    mergedMap.set(key, { genotype, probability, label, hasLethal, interactions, notes });
+    // Collect gene-level riskNotes for genes present in this outcome
+    const geneRisks: string[] = [];
+    for (const [geneId, copies] of Object.entries(genotype)) {
+      if (copies === 0) continue;
+      const gene = geneRegistry.getById(geneId);
+      if (gene?.riskNote) geneRisks.push(gene.riskNote);
+    }
+
+    const risks = [...new Set([...geneRisks, ...interactionRisks])];
+    const hasRisk = interactionHasRisk || risks.length > 0;
+
+    const comboNames = comboRegistry
+      ? comboRegistry.findMatching(genotype).map(c => c.name)
+      : [];
+
+    mergedMap.set(key, { genotype, probability, label, hasLethal, hasRisk, risks, interactions, notes, comboNames });
   }
 
   return [...mergedMap.values()].sort((a, b) => b.probability - a.probability);
