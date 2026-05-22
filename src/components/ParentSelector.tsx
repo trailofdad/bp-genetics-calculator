@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, type ReactNode } from 'react'
 import { GENES, GENE_CATEGORIES, COMBO_NAMES } from 'bp-genetics'
 import type { CopyCount, ParentGenotype } from 'bp-genetics'
+import { CircleInfoIcon } from './icons/index'
 
 const RECENT_MAX = 5
 
@@ -79,25 +80,25 @@ function copyOptionLabel(
 
 /** Pastel chip style by gene type */
 function geneTypeChip(type: string, lethal?: boolean) {
-  if (lethal) return 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/20'
+  if (lethal) return 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/20'
   if (type === 'codominant')
-    return 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/20'
+    return 'bg-sky-500/15 text-sky-600 dark:text-sky-300 border border-sky-500/20'
   if (type === 'dominant')
-    return 'bg-teal-500/15 text-teal-700 dark:text-teal-300 border border-teal-500/20'
-  return 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/20'
+    return 'bg-teal-500/15 text-teal-600 dark:text-teal-300 border border-teal-500/20'
+  return 'bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/20'
 }
 
 /** Chip style for active-gene chips, matching the badge colour scheme */
 function copyChip(copies: CopyCount, type: string, lethalSuper?: boolean) {
   if (type === 'codominant') {
     if (lethalSuper && copies === 2)
-      return 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30'
-    return 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/25'
+      return 'bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/30'
+    return 'bg-sky-500/15 text-sky-600 dark:text-sky-300 border border-sky-500/25'
   }
   // recessive
   if (copies === 1)
-    return 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/20'
-  return 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/25'
+    return 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/20'
+  return 'bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25'
 }
 
 export function ParentSelector({
@@ -326,7 +327,7 @@ export function ParentSelector({
           onClick={() => setActiveCategory(null)}
           className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
             activeCategory === null
-              ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
+              ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300'
               : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
           }`}
         >
@@ -338,7 +339,7 @@ export function ParentSelector({
           }
           className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
             activeCategory === 'Combos'
-              ? 'border border-amber-500/30 bg-amber-500/20 text-amber-700 dark:text-amber-300'
+              ? 'border border-amber-500/30 bg-amber-500/20 text-amber-600 dark:text-amber-300'
               : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
           }`}
         >
@@ -352,7 +353,7 @@ export function ParentSelector({
             }
             className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               activeCategory === cat
-                ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
+                ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300'
                 : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
             }`}
           >
@@ -392,7 +393,7 @@ export function ParentSelector({
                     <span className="truncate text-sm font-medium text-foreground">
                       {combo.name}
                     </span>
-                    <span className="shrink-0 rounded border border-emerald-500/20 bg-emerald-500/15 px-1.5 py-px text-[10px] font-medium text-emerald-700 dark:text-emerald-300">
+                    <span className="shrink-0 rounded border border-emerald-500/20 bg-emerald-500/15 px-1.5 py-px text-[10px] font-medium text-emerald-600 dark:text-emerald-300">
                       combo
                     </span>
                     {isApplied && (
@@ -411,7 +412,7 @@ export function ParentSelector({
                   className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                     isApplied
                       ? 'cursor-default bg-emerald-500/10 text-emerald-600/50 dark:text-emerald-500/50'
-                      : 'border border-emerald-500/20 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25 hover:text-emerald-800 dark:hover:text-emerald-200'
+                      : 'border border-emerald-500/20 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/25 hover:text-emerald-800 dark:hover:text-emerald-200'
                   }`}
                 >
                   {isApplied ? '✓' : 'Apply'}
@@ -458,20 +459,7 @@ export function ParentSelector({
                             ? 'Dominant'
                             : 'Recessive'}
                     </span>
-                    <span className="flex h-3.5 w-3.5 cursor-default items-center justify-center rounded-full bg-muted text-muted-foreground">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        className="h-2.5 w-2.5"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </span>
+                    <CircleInfoIcon className="h-3.5 w-3.5 cursor-default text-muted-foreground/50" />
                     <span className="pointer-events-none absolute top-full left-0 z-50 mt-1 w-max max-w-[220px] rounded-md border border-border bg-popover px-2 py-1 text-[11px] text-popover-foreground/80 opacity-0 shadow-lg transition-opacity group-hover/badge:opacity-100">
                       {tooltipText}
                     </span>
@@ -495,8 +483,8 @@ export function ParentSelector({
                       className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
                         copies === val
                           ? val === 1
-                            ? 'border border-amber-500/30 bg-amber-500/20 text-amber-700 dark:text-amber-300'
-                            : 'border border-emerald-500/30 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                            ? 'border border-amber-500/30 bg-amber-500/20 text-amber-600 dark:text-amber-300'
+                            : 'border border-emerald-500/30 bg-emerald-500/20 text-emerald-600 dark:text-emerald-300'
                           : 'bg-muted/40 text-muted-foreground/40 hover:bg-muted hover:text-muted-foreground'
                       }`}
                     >

@@ -509,7 +509,7 @@ export function DashboardPage() {
                     className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
                     Load as Sire
-                    <ArrowRightIcon className="h-3.5 w-3.5" />
+                    <ArrowDownToBracketIcon className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() =>
@@ -520,7 +520,7 @@ export function DashboardPage() {
                     className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
                     Load as Dam
-                    <ArrowRightIcon className="h-3.5 w-3.5" />
+                    <ArrowDownToBracketIcon className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => navigate('/animals')}

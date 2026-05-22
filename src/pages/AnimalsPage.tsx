@@ -189,7 +189,7 @@ export function AnimalsPage() {
                         >
                           <span className="inline-flex items-center gap-1">
                             <span>Sire</span>
-                            <ArrowRightIcon className="h-3.5 w-3.5" />
+                            <ArrowDownToBracketIcon className="h-3.5 w-3.5" />
                           </span>
                         </button>
                       )}
@@ -205,7 +205,7 @@ export function AnimalsPage() {
                         >
                           <span className="inline-flex items-center gap-1">
                             <span>Dam</span>
-                            <ArrowRightIcon className="h-3.5 w-3.5" />
+                            <ArrowDownToBracketIcon className="h-3.5 w-3.5" />
                           </span>
                         </button>
                       )}

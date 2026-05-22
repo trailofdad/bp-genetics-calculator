@@ -5,6 +5,7 @@ import {
   XmarkIcon,
   FloppyDiskIcon,
   ArrowRotateLeftIcon,
+  ArrowDownToBracketIcon,
   FaSnakeIcon,
   MarsIcon,
   VenusIcon,
@@ -321,7 +322,7 @@ export function CalculatorPage() {
                         className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground/60 transition-colors hover:bg-muted/60 hover:text-foreground/80"
                       >
                         <span>Load Animal</span>
-                        <FolderOpenIcon className="h-3.5 w-3.5" />
+                        <ArrowDownToBracketIcon className="h-3.5 w-3.5" />
                       </button>
                     ) : undefined
                   }

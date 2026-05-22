@@ -2,7 +2,10 @@ import { useMemo, useState } from 'react'
 import {
   TriangleExclamationIcon,
   DnaIcon,
-  LayerGroupIcon,
+  ArrowDownWideShortIcon,
+  ArrowDownShortWideIcon,
+  ArrowDownZAIcon,
+  ArrowDownArrowUpIcon,
   CircleInfoIcon,
   StarIcon,
   BullseyeIcon,
@@ -24,7 +27,7 @@ interface Props {
   goalOutcomeKeys?: Set<string>
 }
 
-type SortKey = 'probability' | 'label' | 'traits'
+type SortKey = 'probability' | 'label' | 'label-desc' | 'traits' | 'traits-asc'
 
 function cardAccent(prob: number): { border: string; bar: string } {
   if (prob >= 0.5)
@@ -43,17 +46,17 @@ function GeneTag({ geneId, copies }: { geneId: string; copies: 0 | 1 | 2 }) {
   const isVisual = copies === 2
   const isCodominant = gene.type === 'codominant'
 
-  let cls = 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/20'
+  let cls = 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/20'
   let label = `Het ${gene.name}`
 
   if (isVisual && isCodominant) {
-    cls = 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20'
+    cls = 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border border-cyan-500/20'
     label = gene.superName ?? `Super ${gene.name}`
   } else if (isVisual) {
-    cls = 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20'
+    cls = 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20'
     label = gene.name
   } else if (isCodominant) {
-    cls = 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/20'
+    cls = 'bg-sky-500/15 text-sky-600 dark:text-sky-300 border border-sky-500/20'
     label = gene.name
   }
 
@@ -88,11 +91,20 @@ export function ResultsDisplay({
     const list = showLethal ? outcomes : outcomes.filter((o) => !o.hasLethal)
     if (sortKey === 'label')
       return [...list].sort((a, b) => a.label.localeCompare(b.label))
+    if (sortKey === 'label-desc')
+      return [...list].sort((a, b) => b.label.localeCompare(a.label))
     if (sortKey === 'traits') {
       return [...list].sort((a, b) => {
         const countA = Object.values(a.genotype).filter((c) => c > 0).length
         const countB = Object.values(b.genotype).filter((c) => c > 0).length
         return countB - countA || b.probability - a.probability
+      })
+    }
+    if (sortKey === 'traits-asc') {
+      return [...list].sort((a, b) => {
+        const countA = Object.values(a.genotype).filter((c) => c > 0).length
+        const countB = Object.values(b.genotype).filter((c) => c > 0).length
+        return countA - countB || b.probability - a.probability
       })
     }
     return [...list].sort((a, b) => b.probability - a.probability)
@@ -141,34 +153,50 @@ export function ResultsDisplay({
             </label>
           )}
           <div className="flex gap-1">
-            {(['probability', 'traits', 'label'] as SortKey[]).map((k) => (
-              <button
-                key={k}
-                onClick={() => setSortKey(k)}
-                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  sortKey === k
-                    ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
-                    : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
-                }`}
-              >
-                {k === 'probability' ? (
-                  <>
-                    By %
-                    <PercentIcon className="h-3.5 w-3.5" />
-                  </>
-                ) : k === 'traits' ? (
-                  <>
-                    By traits
-                    <LayerGroupIcon className="h-3.5 w-3.5" />
-                  </>
-                ) : (
-                  <>
-                    A–Z
-                    <ArrowDownAZIcon className="h-3.5 w-3.5" />
-                  </>
-                )}
-              </button>
-            ))}
+            {/* By probability — icon only */}
+            <button
+              onClick={() => setSortKey('probability')}
+              title="Sort by probability"
+              className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                sortKey === 'probability'
+                  ? 'border border-indigo-300 bg-indigo-100 text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/20 dark:text-indigo-300'
+                  : 'border border-gray-200 bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:border-border dark:bg-muted/50 dark:text-muted-foreground/70'
+              }`}
+            >
+              <PercentIcon className="h-3.5 w-3.5" />
+              <ArrowDownArrowUpIcon className="h-3.5 w-3.5" />
+            </button>
+
+            {/* By traits — toggles direction */}
+            <button
+              onClick={() => setSortKey(sortKey === 'traits' ? 'traits-asc' : 'traits')}
+              title={sortKey === 'traits-asc' ? 'Fewest traits first' : 'Most traits first'}
+              className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                sortKey === 'traits' || sortKey === 'traits-asc'
+                  ? 'border border-indigo-300 bg-indigo-100 text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/20 dark:text-indigo-300'
+                  : 'border border-gray-200 bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:border-border dark:bg-muted/50 dark:text-muted-foreground/70'
+              }`}
+            >
+              Traits
+              {sortKey === 'traits-asc'
+                ? <ArrowDownShortWideIcon className="h-3.5 w-3.5" />
+                : <ArrowDownWideShortIcon className="h-3.5 w-3.5" />}
+            </button>
+
+            {/* A–Z — icon only, toggles direction */}
+            <button
+              onClick={() => setSortKey(sortKey === 'label' ? 'label-desc' : 'label')}
+              title={sortKey === 'label-desc' ? 'Z to A' : 'A to Z'}
+              className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                sortKey === 'label' || sortKey === 'label-desc'
+                  ? 'border border-indigo-300 bg-indigo-100 text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/20 dark:text-indigo-300'
+                  : 'border border-gray-200 bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:border-border dark:bg-muted/50 dark:text-muted-foreground/70'
+              }`}
+            >
+              {sortKey === 'label-desc'
+                ? <ArrowDownZAIcon className="h-3.5 w-3.5" />
+                : <ArrowDownAZIcon className="h-3.5 w-3.5" />}
+            </button>
           </div>
         </div>
       </div>
@@ -199,7 +227,7 @@ export function ResultsDisplay({
                       {outcome.comboNames.map((name) => (
                         <span
                           key={name}
-                          className="inline-block rounded-md border border-emerald-500/25 bg-emerald-500/15 px-2 py-px text-[11px] font-semibold text-emerald-700 dark:text-emerald-300"
+                          className="inline-block rounded-md border border-emerald-500/25 bg-emerald-500/15 px-2 py-px text-[11px] font-semibold text-emerald-600 dark:text-emerald-300"
                         >
                           {name}
                         </span>
@@ -279,7 +307,7 @@ export function ResultsDisplay({
                         onClick={() => onToggleGoal(outcome)}
                         className={`flex h-7 w-7 items-center justify-center rounded-full border text-sm transition-colors ${
                           isGoal
-                            ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25'
+                            ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/25'
                             : 'border-border bg-muted/50 text-muted-foreground/60 hover:border-emerald-500/25 hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300'
                         }`}
                       >
@@ -295,7 +323,7 @@ export function ResultsDisplay({
                       }
                       className={`flex h-7 w-7 items-center justify-center rounded-full border text-sm transition-colors ${
                         isSaved
-                          ? 'border-amber-500/30 bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25'
+                          ? 'border-amber-500/30 bg-amber-500/15 text-amber-600 dark:text-amber-300 hover:bg-amber-500/25'
                           : 'border-border bg-muted/50 text-muted-foreground/60 hover:border-amber-500/25 hover:bg-amber-500/10 hover:text-amber-700 dark:hover:text-amber-300'
                       }`}
                     >
