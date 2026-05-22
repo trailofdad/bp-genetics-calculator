@@ -1,5 +1,5 @@
-import { type ReactNode } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { type ReactNode } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 
 const NAV_LINKS = [
   { to: '/', label: 'Dashboard', emoji: '🏠' },
@@ -7,23 +7,27 @@ const NAV_LINKS = [
   { to: '/calculator', label: 'Calculator', emoji: '🧬' },
   { to: '/pairings', label: 'Pairings', emoji: '⇄' },
   { to: '/help', label: 'Help', emoji: '?' },
-];
+]
 
 export function Layout({ children }: { children: ReactNode }) {
-  const location = useLocation();
-  const isPlayground = location.pathname.startsWith('/playground');
+  const location = useLocation()
+  const isPlayground = location.pathname.startsWith('/playground')
 
-  if (isPlayground) return <>{children}</>;
+  if (isPlayground) return <>{children}</>
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-slate-200 flex flex-col">
-      <header className="border-b border-white/5 px-4 py-3 sticky top-0 z-20 bg-[#0d1117]/95 backdrop-blur">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <NavLink to="/" className="flex items-center gap-2.5 shrink-0">
+    <div className="flex min-h-screen flex-col bg-[#0d1117] text-slate-200">
+      <header className="sticky top-0 z-20 border-b border-white/5 bg-[#0d1117]/95 px-4 py-3 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
             <span className="text-xl">🐍</span>
             <div>
-              <p className="text-sm font-semibold text-white tracking-tight leading-none">Ball Python</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">Genetics Calculator</p>
+              <p className="text-sm leading-none font-semibold tracking-tight text-white">
+                Ball Python
+              </p>
+              <p className="mt-0.5 text-[11px] text-slate-500">
+                Genetics Calculator
+              </p>
             </div>
           </NavLink>
 
@@ -34,10 +38,10 @@ export function Layout({ children }: { children: ReactNode }) {
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  `flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                     isActive
-                      ? 'bg-indigo-500/15 text-indigo-300 border border-indigo-500/25'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.05] border border-transparent'
+                      ? 'border border-indigo-500/25 bg-indigo-500/15 text-indigo-300'
+                      : 'border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200'
                   }`
                 }
               >
@@ -49,9 +53,9 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         {children}
       </main>
     </div>
-  );
+  )
 }

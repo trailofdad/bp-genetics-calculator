@@ -1,10 +1,10 @@
-import { BaseEdge, EdgeLabelRenderer, getBezierPath } from '@xyflow/react';
-import type { EdgeProps } from '@xyflow/react';
-import { formatProbability } from 'bp-genetics';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath } from '@xyflow/react'
+import type { EdgeProps } from '@xyflow/react'
+import { formatProbability } from 'bp-genetics'
 
 export interface BranchEdgeData {
-  label: string;
-  probability: number;
+  label: string
+  probability: number
 }
 
 export function BranchEdge({
@@ -24,7 +24,7 @@ export function BranchEdge({
     targetX,
     targetY,
     targetPosition,
-  });
+  })
 
   return (
     <>
@@ -41,17 +41,17 @@ export function BranchEdge({
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: 'all',
             }}
-            className="bg-[#1c2333] border border-indigo-500/20 rounded-lg px-2 py-0.5 flex flex-col items-center gap-px nodrag nopan"
+            className="nodrag nopan flex flex-col items-center gap-px rounded-lg border border-indigo-500/20 bg-[#1c2333] px-2 py-0.5"
           >
             <span className="text-[10px] font-semibold text-indigo-300">
               {formatProbability(data.probability)}
             </span>
-            <span className="text-[9px] text-slate-500 max-w-[100px] truncate text-center">
+            <span className="max-w-[100px] truncate text-center text-[9px] text-slate-500">
               {data.label}
             </span>
           </div>
         </EdgeLabelRenderer>
       )}
     </>
-  );
+  )
 }

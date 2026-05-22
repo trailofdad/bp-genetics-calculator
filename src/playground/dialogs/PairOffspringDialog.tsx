@@ -1,99 +1,114 @@
-import { useState, useMemo } from 'react';
-import type { OffspringOutcome, ParentGenotype } from 'bp-genetics';
-import { GENES } from 'bp-genetics';
+import { useState, useMemo } from 'react'
+import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
+import { GENES } from 'bp-genetics'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ParentSelector } from '../../components/ParentSelector';
-import type { SavedAnimal } from '../../hooks/useSavedAnimals';
+} from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { ParentSelector } from '../../components/ParentSelector'
+import type { SavedAnimal } from '../../hooks/useSavedAnimals'
 
 interface Props {
-  open: boolean;
-  offspring: OffspringOutcome | null;
-  savedAnimals: SavedAnimal[];
-  onSaveAnimal: (name: string, genotype: ParentGenotype) => void;
-  onConfirm: (pairedWith: ParentGenotype, pairedWithName: string) => void;
-  onClose: () => void;
+  open: boolean
+  offspring: OffspringOutcome | null
+  savedAnimals: SavedAnimal[]
+  onSaveAnimal: (name: string, genotype: ParentGenotype) => void
+  onConfirm: (pairedWith: ParentGenotype, pairedWithName: string) => void
+  onClose: () => void
 }
 
-type TabId = 'animals' | 'custom';
+type TabId = 'animals' | 'custom'
 
 function genotypePreview(genotype: ParentGenotype): string {
   const parts = Object.entries(genotype)
     .filter(([, c]) => c > 0)
     .map(([id, copies]) => {
-      const gene = GENES.find(g => g.id === id);
-      if (!gene) return id;
-      const label = gene.name.length > 8 ? gene.shortName : gene.name;
-      return copies === 1 ? `Het ${label}` : label;
-    });
-  return parts.length ? parts.join(', ') : 'Normal';
+      const gene = GENES.find((g) => g.id === id)
+      if (!gene) return id
+      const label = gene.name.length > 8 ? gene.shortName : gene.name
+      return copies === 1 ? `Het ${label}` : label
+    })
+  return parts.length ? parts.join(', ') : 'Normal'
 }
 
-export function PairOffspringDialog({ open, offspring, savedAnimals, onSaveAnimal, onConfirm, onClose }: Props) {
-  const defaultTab: TabId = savedAnimals.length > 0 ? 'animals' : 'custom';
+export function PairOffspringDialog({
+  open,
+  offspring,
+  savedAnimals,
+  onSaveAnimal,
+  onConfirm,
+  onClose,
+}: Props) {
+  const defaultTab: TabId = savedAnimals.length > 0 ? 'animals' : 'custom'
 
-  const [tab, setTab] = useState<TabId>(defaultTab);
-  const [selectedAnimalId, setSelectedAnimalId] = useState<string | null>(null);
-  const [customGenotype, setCustomGenotype] = useState<ParentGenotype>({});
-  const [customName, setCustomName] = useState('');
+  const [tab, setTab] = useState<TabId>(defaultTab)
+  const [selectedAnimalId, setSelectedAnimalId] = useState<string | null>(null)
+  const [customGenotype, setCustomGenotype] = useState<ParentGenotype>({})
+  const [customName, setCustomName] = useState('')
 
   const selectedAnimal = useMemo(
-    () => savedAnimals.find(a => a.id === selectedAnimalId) ?? null,
-    [savedAnimals, selectedAnimalId],
-  );
+    () => savedAnimals.find((a) => a.id === selectedAnimalId) ?? null,
+    [savedAnimals, selectedAnimalId]
+  )
 
   function handleConfirm() {
-    if (!offspring) return;
+    if (!offspring) return
     if (tab === 'animals' && selectedAnimal) {
-      onConfirm(selectedAnimal.genotype, selectedAnimal.name);
+      onConfirm(selectedAnimal.genotype, selectedAnimal.name)
     } else if (tab === 'custom') {
-      const name = customName.trim();
-      onSaveAnimal(name, customGenotype);
-      onConfirm(customGenotype, name);
+      const name = customName.trim()
+      onSaveAnimal(name, customGenotype)
+      onConfirm(customGenotype, name)
     }
   }
 
   const canConfirm =
-    tab === 'animals' ? !!selectedAnimal :
-    customName.trim() !== '';
+    tab === 'animals' ? !!selectedAnimal : customName.trim() !== ''
 
   const tabs: { id: TabId; label: string }[] = [
-    ...(savedAnimals.length > 0 ? [{ id: 'animals' as TabId, label: '🐍 Saved Animals' }] : []),
+    ...(savedAnimals.length > 0
+      ? [{ id: 'animals' as TabId, label: '🐍 Saved Animals' }]
+      : []),
     { id: 'custom', label: '✎ New Animal' },
-  ];
+  ]
 
   return (
-    <Dialog open={open} onOpenChange={v => { if (!v) onClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) onClose()
+      }}
+    >
       <DialogContent
         showCloseButton={false}
-        className="bg-[#1c2333] border border-white/10 ring-0 text-slate-200 max-w-md p-0 gap-0 overflow-hidden"
+        className="max-w-md gap-0 overflow-hidden border border-white/10 bg-[#1c2333] p-0 text-slate-200 ring-0"
       >
         {/* Header */}
         <DialogHeader className="px-5 pt-5 pb-0">
-          <DialogTitle className="text-sm font-semibold text-white leading-snug">
+          <DialogTitle className="text-sm leading-snug font-semibold text-white">
             Pair offspring
-            <span className="ml-1.5 text-indigo-300 font-normal">"{offspring?.label}"</span>
+            <span className="ml-1.5 font-normal text-indigo-300">
+              "{offspring?.label}"
+            </span>
           </DialogTitle>
-          <p className="text-[11px] text-slate-500 mt-0.5">
+          <p className="mt-0.5 text-[11px] text-slate-500">
             Choose a mate to branch the breeding tree.
           </p>
         </DialogHeader>
 
         {/* Tab bar */}
         <div className="flex gap-1 px-5 pt-4">
-          {tabs.map(t => (
+          {tabs.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+              className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                 tab === t.id
-                  ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
-                  : 'bg-white/[0.03] text-slate-500 border-white/5 hover:bg-white/[0.06] hover:text-slate-300'
+                  ? 'border-indigo-500/30 bg-indigo-500/20 text-indigo-300'
+                  : 'border-white/5 bg-white/3 text-slate-500 hover:bg-white/6 hover:text-slate-300'
               }`}
             >
               {t.label}
@@ -102,24 +117,27 @@ export function PairOffspringDialog({ open, offspring, savedAnimals, onSaveAnima
         </div>
 
         {/* Body */}
-        <div className="px-5 pt-3 pb-5 flex flex-col gap-3">
-
+        <div className="flex flex-col gap-3 px-5 pt-3 pb-5">
           {/* Saved Animals */}
           {tab === 'animals' && (
             <ScrollArea className="h-52">
               <div className="flex flex-col gap-1.5 pr-2">
-                {savedAnimals.map(a => (
+                {savedAnimals.map((a) => (
                   <button
                     key={a.id}
                     onClick={() => setSelectedAnimalId(a.id)}
-                    className={`text-left rounded-xl px-3 py-2.5 border transition-colors ${
+                    className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
                       selectedAnimalId === a.id
-                        ? 'bg-indigo-500/15 border-indigo-500/40'
-                        : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.06]'
+                        ? 'border-indigo-500/40 bg-indigo-500/15'
+                        : 'border-white/5 bg-white/3 hover:bg-white/6'
                     }`}
                   >
-                    <p className="text-xs font-medium text-slate-200">{a.name}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">{genotypePreview(a.genotype)}</p>
+                    <p className="text-xs font-medium text-slate-200">
+                      {a.name}
+                    </p>
+                    <p className="mt-0.5 text-[10px] text-slate-500">
+                      {genotypePreview(a.genotype)}
+                    </p>
                   </button>
                 ))}
               </div>
@@ -133,8 +151,8 @@ export function PairOffspringDialog({ open, offspring, savedAnimals, onSaveAnima
                 type="text"
                 placeholder="Animal name (required)…"
                 value={customName}
-                onChange={e => setCustomName(e.target.value)}
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-colors"
+                onChange={(e) => setCustomName(e.target.value)}
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-200 transition-colors placeholder:text-slate-600 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
                 autoFocus
               />
               <ScrollArea className="h-44">
@@ -151,17 +169,17 @@ export function PairOffspringDialog({ open, offspring, savedAnimals, onSaveAnima
           )}
 
           {/* Footer actions */}
-          <div className="flex items-center justify-end gap-2 pt-1 border-t border-white/5">
+          <div className="flex items-center justify-end gap-2 border-t border-white/5 pt-1">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 bg-white/5 hover:bg-white/10 border border-white/5 transition-colors"
+              className="rounded-xl border border-white/5 bg-white/5 px-4 py-2 text-xs font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirm}
               disabled={!canConfirm}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 border border-transparent transition-colors disabled:opacity-40 disabled:pointer-events-none"
+              className="rounded-xl border border-transparent bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-500 disabled:pointer-events-none disabled:opacity-40"
             >
               Add Branch
             </button>
@@ -169,6 +187,5 @@ export function PairOffspringDialog({ open, offspring, savedAnimals, onSaveAnima
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
-

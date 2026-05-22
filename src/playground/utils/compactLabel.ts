@@ -1,5 +1,5 @@
-import { GENES } from 'bp-genetics';
-import type { CopyCount } from 'bp-genetics';
+import { GENES } from 'bp-genetics'
+import type { CopyCount } from 'bp-genetics'
 
 /** Stable string key for a genotype — ignores zero-copy entries and sorts by gene ID. */
 export function genotypeKey(genotype: Record<string, CopyCount>): string {
@@ -7,9 +7,9 @@ export function genotypeKey(genotype: Record<string, CopyCount>): string {
     Object.fromEntries(
       Object.entries(genotype)
         .filter(([, c]) => c > 0)
-        .sort(([a], [b]) => a.localeCompare(b)),
-    ),
-  );
+        .sort(([a], [b]) => a.localeCompare(b))
+    )
+  )
 }
 
 /**
@@ -19,22 +19,22 @@ export function genotypeKey(genotype: Record<string, CopyCount>): string {
  * - Super codominant form is rendered as "Sup {shortName}"
  */
 export function buildCompactLabel(genotype: Record<string, CopyCount>): string {
-  const parts: string[] = [];
+  const parts: string[] = []
 
   for (const [geneId, copies] of Object.entries(genotype)) {
-    if (copies === 0) continue;
-    const gene = GENES.find(g => g.id === geneId);
-    if (!gene) continue;
+    if (copies === 0) continue
+    const gene = GENES.find((g) => g.id === geneId)
+    if (!gene) continue
 
-    const sn = gene.shortName;
+    const sn = gene.shortName
 
     if (gene.type === 'recessive') {
-      parts.push(copies === 2 ? sn : `Het ${sn}`);
+      parts.push(copies === 2 ? sn : `Het ${sn}`)
     } else {
       // Codominant
-      parts.push(copies === 2 ? `Sup ${sn}` : sn);
+      parts.push(copies === 2 ? `Sup ${sn}` : sn)
     }
   }
 
-  return parts.length > 0 ? parts.join(', ') : 'Normal';
+  return parts.length > 0 ? parts.join(', ') : 'Normal'
 }
