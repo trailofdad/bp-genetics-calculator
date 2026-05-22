@@ -6,10 +6,12 @@ export interface PlaygroundNode {
   parent1Name: string
   parent2: ParentGenotype
   parent2Name: string
+  pairingId?: string
   /** Each entry = one offspring genotype the user chose to extend into a new pairing */
   childEdges: PlaygroundEdge[]
   /** User-supplied aliases keyed by genotypeKey(outcome.genotype). null removes an alias. */
   offspringAliases?: Record<string, string>
+  flaggedOutcomeKeys?: string[]
 }
 
 export interface PlaygroundEdge {

@@ -10,6 +10,7 @@ export interface PairingNodeData {
   node: PlaygroundNode
   onPairOffspring: (outcome: OffspringOutcome) => void
   onRenameOutcome: (genotypeKey: string, alias: string | null) => void
+  onFlagOutcome: (genotypeKey: string) => void
   isRoot: boolean
 }
 
@@ -23,7 +24,8 @@ function probabilityBadgeClass(prob: number) {
   return 'bg-white/5 text-slate-400 border-white/10'
 }
 
-const MAX_SHOWN = 8
+const DEFAULT_SHOWN = 8
+const FLAGGED_COLLAPSED_SHOWN = 3
 
 function OutcomeLabel({
   label,
@@ -54,7 +56,7 @@ function OutcomeLabel({
     if (trimmed && trimmed !== label) {
       onRename(gKey, trimmed)
     } else if (!trimmed) {
-      onRename(gKey, null) // clear alias
+      onRename(gKey, null)
     }
     setEditing(false)
   }
@@ -99,7 +101,7 @@ function OutcomeLabel({
 }
 
 export function PairingNode({ data }: { data: PairingNodeData }) {
-  const { node, onPairOffspring, onRenameOutcome, isRoot } = data
+  const { node, onPairOffspring, onRenameOutcome, onFlagOutcome, isRoot } = data
   const [showAll, setShowAll] = useState(false)
 
   const outcomes = useMemo(
@@ -107,16 +109,41 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
     [node.parent1, node.parent2]
   )
 
-  const visible = showAll ? outcomes : outcomes.slice(0, MAX_SHOWN)
-  const hiddenCount = outcomes.length - MAX_SHOWN
+  const flaggedKeys = useMemo(
+    () => new Set(node.flaggedOutcomeKeys ?? []),
+    [node.flaggedOutcomeKeys]
+  )
 
-  const pairedChildGenotypes = new Set(
-    node.childEdges.map((e) => JSON.stringify(e.offspringGenotype))
+  const { flaggedOutcomes, unflaggedOutcomes } = useMemo(() => {
+    const flagged: OffspringOutcome[] = []
+    const unflagged: OffspringOutcome[] = []
+
+    outcomes.forEach((outcome) => {
+      if (flaggedKeys.has(genotypeKey(outcome.genotype))) {
+        flagged.push(outcome)
+      } else {
+        unflagged.push(outcome)
+      }
+    })
+
+    return { flaggedOutcomes: flagged, unflaggedOutcomes: unflagged }
+  }, [flaggedKeys, outcomes])
+
+  const collapsedShown =
+    flaggedOutcomes.length > 0 ? FLAGGED_COLLAPSED_SHOWN : DEFAULT_SHOWN
+  const visibleUnflagged = showAll
+    ? unflaggedOutcomes
+    : unflaggedOutcomes.slice(0, collapsedShown)
+  const visible = [...flaggedOutcomes, ...visibleUnflagged]
+  const hiddenCount = unflaggedOutcomes.length - visibleUnflagged.length
+
+  const pairedChildGenotypes = useMemo(
+    () => new Set(node.childEdges.map((edge) => genotypeKey(edge.offspringGenotype))),
+    [node.childEdges]
   )
 
   return (
     <div className="w-72 overflow-hidden rounded-2xl border border-white/10 bg-[#161b27] shadow-2xl">
-      {/* Target handle — everything except root can receive edges */}
       {!isRoot && (
         <Handle
           type="target"
@@ -125,7 +152,6 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
         />
       )}
 
-      {/* Header: parents */}
       <div className="border-b border-white/5 px-4 pt-3 pb-2">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-xs leading-snug font-semibold text-slate-200">
@@ -141,21 +167,23 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
         </p>
       </div>
 
-      {/* Offspring list */}
       <div className="flex flex-col gap-1 px-3 py-2">
-        {visible.map((outcome, i) => {
-          const alreadyPaired = pairedChildGenotypes.has(
-            JSON.stringify(outcome.genotype)
-          )
+        {visible.map((outcome) => {
           const gKey = genotypeKey(outcome.genotype)
+          const alreadyPaired = pairedChildGenotypes.has(gKey)
           const alias = node.offspringAliases?.[gKey]
           const compactLabel = buildCompactLabel(outcome.genotype)
           const showProbability = outcome.probability < 1
+          const isFlagged = flaggedKeys.has(gKey)
 
           return (
             <div
-              key={i}
-              className="group flex items-center justify-between gap-2 rounded-lg border border-white/5 bg-white/3 px-2 py-1.5"
+              key={gKey}
+              className={`group flex items-center justify-between gap-2 rounded-lg border px-2 py-1.5 ${
+                isFlagged
+                  ? 'border-amber-500/20 bg-amber-500/8'
+                  : 'border-white/5 bg-white/3'
+              }`}
             >
               <div className="flex min-w-0 flex-1 items-center gap-1.5">
                 {showProbability && (
@@ -180,23 +208,36 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
                   )}
                 </div>
               </div>
-              {!outcome.hasLethal && (
+              <div className="flex shrink-0 items-center gap-1">
                 <button
-                  onClick={() => onPairOffspring(outcome)}
-                  title={
-                    alreadyPaired
-                      ? 'Already paired — add another'
-                      : 'Pair this offspring'
-                  }
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-colors ${
-                    alreadyPaired
-                      ? 'border border-indigo-500/40 bg-indigo-500/30 text-indigo-300 hover:bg-indigo-500/50'
-                      : 'border border-white/10 bg-white/5 text-slate-500 opacity-0 group-hover:opacity-100 hover:border-indigo-500/30 hover:bg-indigo-500/20 hover:text-indigo-300'
+                  onClick={() => onFlagOutcome(gKey)}
+                  title={isFlagged ? 'Unflag outcome' : 'Flag outcome'}
+                  className={`flex h-5 w-5 items-center justify-center rounded-full border text-[11px] transition-colors ${
+                    isFlagged
+                      ? 'border-amber-500/30 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25'
+                      : 'border-white/10 bg-white/5 text-slate-500 hover:border-amber-500/25 hover:bg-amber-500/10 hover:text-amber-300'
                   }`}
                 >
-                  {alreadyPaired ? '↗' : '+'}
+                  {isFlagged ? '★' : '☆'}
                 </button>
-              )}
+                {!outcome.hasLethal && (
+                  <button
+                    onClick={() => onPairOffspring(outcome)}
+                    title={
+                      alreadyPaired
+                        ? 'Already paired — add another'
+                        : 'Pair this offspring'
+                    }
+                    className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold transition-colors ${
+                      alreadyPaired
+                        ? 'border border-indigo-500/40 bg-indigo-500/30 text-indigo-300 hover:bg-indigo-500/50'
+                        : 'border border-white/10 bg-white/5 text-slate-500 opacity-0 group-hover:opacity-100 hover:border-indigo-500/30 hover:bg-indigo-500/20 hover:text-indigo-300'
+                    }`}
+                  >
+                    {alreadyPaired ? '↗' : '+'}
+                  </button>
+                )}
+              </div>
             </div>
           )
         })}
@@ -206,10 +247,10 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
             onClick={() => setShowAll(true)}
             className="py-1 text-center text-[11px] text-slate-600 transition-colors hover:text-slate-400"
           >
-            +{hiddenCount} more outcomes
+            Show {hiddenCount} more
           </button>
         )}
-        {showAll && outcomes.length > MAX_SHOWN && (
+        {showAll && unflaggedOutcomes.length > collapsedShown && (
           <button
             onClick={() => setShowAll(false)}
             className="py-1 text-center text-[11px] text-slate-600 transition-colors hover:text-slate-400"
@@ -219,7 +260,6 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
         )}
       </div>
 
-      {/* Source handle — child edges attach here */}
       <Handle
         type="source"
         position={Position.Bottom}

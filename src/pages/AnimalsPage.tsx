@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
 import { ParentSelector } from '../components/ParentSelector'
 import { ImportModal } from '../components/ImportModal'
@@ -18,10 +18,20 @@ interface AnimalModalState {
 export function AnimalsPage() {
   const { animals, saveAnimal, updateAnimal, removeAnimal } = useAppContext()
   const navigate = useNavigate()
+  const location = useLocation()
   const [modal, setModal] = useState<AnimalModalState | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
-  const [importOpen, setImportOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(
+    !!(location.state as { openImport?: boolean } | null)?.openImport
+  )
   const nameInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if ((location.state as { openImport?: boolean } | null)?.openImport) {
+      navigate(location.pathname, { replace: true, state: null })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (modal !== null) {

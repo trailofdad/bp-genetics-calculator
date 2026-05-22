@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { GENES } from 'bp-genetics'
 import type { ParentGenotype } from 'bp-genetics'
 import { importCSV } from '../utils/csvImport'
@@ -167,7 +167,6 @@ export function ImportModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [formatLabel, setFormatLabel] = useState<string | null>(null)
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set())
-  const fileRef = useRef<HTMLInputElement>(null)
 
   const parse = useCallback((text: string) => {
     setCsv(text)
@@ -190,15 +189,6 @@ export function ImportModal({
       )
     }
   }, [])
-
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => parse((ev.target?.result as string) ?? '')
-    reader.readAsText(file)
-    e.target.value = ''
-  }
 
   function handleSave(animal: ImportedAnimal) {
     onSaveAnimal(animal.name, animal.genotype)
@@ -246,22 +236,6 @@ export function ImportModal({
 
         {/* Input area */}
         <div className="flex flex-shrink-0 flex-col gap-3 border-b border-white/5 px-6 py-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Paste CSV or</span>
-            <button
-              onClick={() => fileRef.current?.click()}
-              className="rounded-lg border border-white/5 bg-white/5 px-2.5 py-1 text-xs text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200"
-            >
-              Upload file
-            </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".csv,text/csv"
-              className="hidden"
-              onChange={handleFile}
-            />
-          </div>
           <textarea
             value={csv}
             onChange={(e) => parse(e.target.value)}
@@ -276,7 +250,7 @@ export function ImportModal({
         <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-6 py-4">
           {animals.length === 0 && !errorMsg && (
             <p className="py-8 text-center text-xs text-slate-600">
-              Paste or upload a CSV to see animals here.
+              Paste a CSV above to see animals here.
             </p>
           )}
           {animals.map((animal) => (

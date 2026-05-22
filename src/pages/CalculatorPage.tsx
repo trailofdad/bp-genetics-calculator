@@ -1,20 +1,21 @@
 import { useMemo, useState, useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
+import { calculateOffspring } from 'bp-genetics'
 import { ParentSelector } from '../components/ParentSelector'
 import { ResultsDisplay } from '../components/ResultsDisplay'
 import { GenotypePreview } from '../components/GenotypePreview'
 import { useAppContext } from '../context/AppContext'
-import type { ParentGenotype } from 'bp-genetics'
-import { calculateOffspring } from 'bp-genetics'
 import type { SavedAnimal } from '../hooks/useSavedAnimals'
 import type { SavedPairing } from '../hooks/useSavedPairings'
+import { genotypeKey } from '../playground/utils/compactLabel'
 
 type LocationState = {
   loadAnimal?: SavedAnimal
   slot?: 'parent1' | 'parent2'
   loadPairing?: Pick<
     SavedPairing,
-    'parent1' | 'parent2' | 'parent1AnimalId' | 'parent2AnimalId'
+    'id' | 'parent1' | 'parent2' | 'parent1AnimalId' | 'parent2AnimalId'
   >
 } | null
 
@@ -35,11 +36,26 @@ function initFromState(state: LocationState) {
   const parent2AnimalId =
     state?.loadPairing?.parent2AnimalId ??
     (state?.slot === 'parent2' ? state?.loadAnimal?.id : undefined)
-  return { parent1, parent2, parent1AnimalId, parent2AnimalId }
+  const currentPairingId = state?.loadPairing?.id
+
+  return {
+    parent1,
+    parent2,
+    parent1AnimalId,
+    parent2AnimalId,
+    currentPairingId,
+  }
 }
 
 export function CalculatorPage() {
-  const { animals, saveAnimal, savePairing } = useAppContext()
+  const {
+    animals,
+    saveAnimal,
+    savePairing,
+    savedOffspring,
+    saveOffspring,
+    removeSavedOffspring,
+  } = useAppContext()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -54,24 +70,24 @@ export function CalculatorPage() {
   const [parent2AnimalId, setParent2AnimalId] = useState<string | undefined>(
     init.parent2AnimalId
   )
+  const [currentPairingId, setCurrentPairingId] = useState<string | undefined>(
+    init.currentPairingId
+  )
 
   const [saveModalOpen, setSaveModalOpen] = useState(false)
   const [saveName, setSaveName] = useState('')
   const saveInputRef = useRef<HTMLInputElement>(null)
 
-  // "Save animal" modal
   const [saveAnimalModal, setSaveAnimalModal] = useState<{
     genotype: ParentGenotype
     name: string
   } | null>(null)
   const saveAnimalInputRef = useRef<HTMLInputElement>(null)
 
-  // "Load animal" picker
   const [loadAnimalPicker, setLoadAnimalPicker] = useState<
     'parent1' | 'parent2' | null
   >(null)
 
-  // Clear location state so a refresh doesn't re-apply it
   useEffect(() => {
     if (locationState) {
       navigate(location.pathname, { replace: true, state: null })
@@ -99,16 +115,34 @@ export function CalculatorPage() {
     Object.values(parent1).some((c) => c > 0) ||
     Object.values(parent2).some((c) => c > 0)
 
+  const savedOutcomeKeys = useMemo(() => {
+    if (!currentPairingId) return new Set<string>()
+    return new Set(
+      savedOffspring
+        .filter((entry) => entry.pairingId === currentPairingId)
+        .map((entry) => entry.genotypeKey)
+    )
+  }, [currentPairingId, savedOffspring])
+
   function handleReset() {
     setParent1({})
     setParent2({})
     setParent1AnimalId(undefined)
     setParent2AnimalId(undefined)
+    setCurrentPairingId(undefined)
   }
 
   function handleSaveConfirm() {
-    savePairing(saveName, parent1, parent2, parent1AnimalId, parent2AnimalId)
+    const pairingId = savePairing(
+      saveName,
+      parent1,
+      parent2,
+      parent1AnimalId,
+      parent2AnimalId
+    )
+    setSaveName('')
     setSaveModalOpen(false)
+    setCurrentPairingId(pairingId)
   }
 
   function handleSaveAnimalConfirm() {
@@ -125,7 +159,25 @@ export function CalculatorPage() {
       setParent2(animal.genotype)
       setParent2AnimalId(animal.id)
     }
+    setCurrentPairingId(undefined)
     setLoadAnimalPicker(null)
+  }
+
+  function handleSaveOffspring(outcome: OffspringOutcome) {
+    if (!currentPairingId) return
+
+    const outcomeKey = genotypeKey(outcome.genotype)
+    const existing = savedOffspring.find(
+      (entry) =>
+        entry.pairingId === currentPairingId && entry.genotypeKey === outcomeKey
+    )
+
+    if (existing) {
+      removeSavedOffspring(existing.id)
+      return
+    }
+
+    saveOffspring(currentPairingId, outcome)
   }
 
   const parentConfigs = [
@@ -136,6 +188,7 @@ export function CalculatorPage() {
       onChange: (g: ParentGenotype) => {
         setParent1(g)
         setParent1AnimalId(undefined)
+        setCurrentPairingId(undefined)
       },
       animalId: parent1AnimalId,
       slot: 'parent1' as const,
@@ -147,6 +200,7 @@ export function CalculatorPage() {
       onChange: (g: ParentGenotype) => {
         setParent2(g)
         setParent2AnimalId(undefined)
+        setCurrentPairingId(undefined)
       },
       animalId: parent2AnimalId,
       slot: 'parent2' as const,
@@ -155,7 +209,6 @@ export function CalculatorPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Parents grid */}
       <div className="grid gap-4 md:grid-cols-2">
         {parentConfigs.map(
           ({ label, sex, genotype, onChange, animalId, slot }) => {
@@ -166,7 +219,6 @@ export function CalculatorPage() {
                 key={label}
                 className="flex flex-col gap-3 rounded-2xl border border-white/5 bg-[#161b27] p-5"
               >
-                {/* Linked animal badge */}
                 {linkedAnimal && (
                   <div className="flex items-center gap-2 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1.5">
                     <span className="text-xs font-medium text-indigo-300">
@@ -219,7 +271,6 @@ export function CalculatorPage() {
         )}
       </div>
 
-      {/* Actions */}
       {hasGenes && (
         <div className="flex items-center justify-center gap-3">
           <button
@@ -240,12 +291,15 @@ export function CalculatorPage() {
         </div>
       )}
 
-      {/* Results */}
       <div className="min-h-40 rounded-2xl border border-white/5 bg-[#161b27] p-5">
         <h2 className="mb-4 text-sm font-semibold tracking-tight text-slate-300">
           Offspring Outcomes
         </h2>
-        <ResultsDisplay outcomes={outcomes} />
+        <ResultsDisplay
+          outcomes={outcomes}
+          onSaveOffspring={currentPairingId ? handleSaveOffspring : undefined}
+          savedOutcomeKeys={currentPairingId ? savedOutcomeKeys : undefined}
+        />
       </div>
 
       <p className="pb-4 text-center text-xs text-slate-600">
@@ -254,7 +308,6 @@ export function CalculatorPage() {
         decisions, consult a specialist.
       </p>
 
-      {/* Save Pairing modal */}
       {saveModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-white/10 bg-[#1c2333] p-6 shadow-2xl">
@@ -289,7 +342,6 @@ export function CalculatorPage() {
         </div>
       )}
 
-      {/* Save Animal modal */}
       {saveAnimalModal !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-white/10 bg-[#1c2333] p-6 shadow-2xl">
@@ -331,7 +383,6 @@ export function CalculatorPage() {
         </div>
       )}
 
-      {/* Load Animal picker */}
       {loadAnimalPicker !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-white/10 bg-[#1c2333] p-6 shadow-2xl">

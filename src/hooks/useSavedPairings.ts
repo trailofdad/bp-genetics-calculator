@@ -41,7 +41,7 @@ export function useSavedPairings() {
       parent2: ParentGenotype,
       parent1AnimalId?: string,
       parent2AnimalId?: string
-    ) => {
+    ): string => {
       const entry: SavedPairing = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         name: name.trim() || 'Untitled Pairing',
@@ -56,6 +56,7 @@ export function useSavedPairings() {
         persist(next)
         return next
       })
+      return entry.id
     },
     []
   )

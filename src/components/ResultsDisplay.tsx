@@ -2,14 +2,17 @@ import { useMemo, useState } from 'react'
 import type { OffspringOutcome } from 'bp-genetics'
 import { formatProbability } from 'bp-genetics'
 import { GENES, geneById } from 'bp-genetics'
+import { genotypeKey } from '../playground/utils/compactLabel'
 
 interface Props {
   outcomes: OffspringOutcome[]
+  onSaveOffspring?: (outcome: OffspringOutcome) => void
+  savedOutcomeIds?: Set<string>
+  savedOutcomeKeys?: Set<string>
 }
 
 type SortKey = 'probability' | 'label' | 'traits'
 
-/** Card accent color based on probability tier */
 function cardAccent(prob: number): { border: string; bar: string } {
   if (prob >= 0.5)
     return { border: 'border-emerald-500/20', bar: 'bg-emerald-500' }
@@ -20,7 +23,6 @@ function cardAccent(prob: number): { border: string; bar: string } {
   return { border: 'border-white/5', bar: 'bg-slate-600' }
 }
 
-/** Pastel gene tag for an outcome result card */
 function GeneTag({ geneId, copies }: { geneId: string; copies: 0 | 1 | 2 }) {
   const gene = geneById(geneId)
   if (!gene || copies === 0) return null
@@ -51,9 +53,16 @@ function GeneTag({ geneId, copies }: { geneId: string; copies: 0 | 1 | 2 }) {
   )
 }
 
-export function ResultsDisplay({ outcomes }: Props) {
+export function ResultsDisplay({
+  outcomes,
+  onSaveOffspring,
+  savedOutcomeIds,
+  savedOutcomeKeys,
+}: Props) {
   const [sortKey, setSortKey] = useState<SortKey>('probability')
   const [showLethal, setShowLethal] = useState(true)
+
+  const savedKeys = savedOutcomeKeys ?? savedOutcomeIds
 
   const totalGenes = useMemo(
     () => [...new Set(outcomes.flatMap((o) => Object.keys(o.genotype)))],
@@ -92,7 +101,6 @@ export function ResultsDisplay({ outcomes }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Summary bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <span className="text-sm font-semibold text-slate-300">
@@ -139,19 +147,20 @@ export function ResultsDisplay({ outcomes }: Props) {
         </div>
       </div>
 
-      {/* Outcome cards */}
       <div className="flex flex-col gap-1.5">
-        {sorted.map((outcome, i) => {
+        {sorted.map((outcome) => {
           const { border, bar } = cardAccent(outcome.probability)
           const pct = outcome.probability / totalProb
+          const gKey = genotypeKey(outcome.genotype)
+          const isSaved = savedKeys?.has(gKey) ?? false
+
           return (
             <div
-              key={i}
+              key={gKey}
               className={`relative overflow-hidden rounded-xl border bg-white/3 px-4 py-3 ${border} ${
                 outcome.hasLethal ? 'opacity-50' : ''
               }`}
             >
-              {/* Probability bar */}
               <div
                 className={`absolute top-0 bottom-0 left-0 ${bar} opacity-10`}
                 style={{ width: `${pct * 100}%` }}
@@ -194,9 +203,7 @@ export function ResultsDisplay({ outcomes }: Props) {
                             copies={copies as 0 | 1 | 2}
                           />
                         ))}
-                      {Object.values(outcome.genotype).every(
-                        (c) => c === 0
-                      ) && (
+                      {Object.values(outcome.genotype).every((c) => c === 0) && (
                         <span className="text-xs text-slate-600">
                           No visible morphs
                         </span>
@@ -230,16 +237,32 @@ export function ResultsDisplay({ outcomes }: Props) {
                     </ul>
                   )}
                 </div>
-                <span className="shrink-0 text-base font-semibold text-slate-300 tabular-nums">
-                  {formatProbability(outcome.probability)}
-                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-base font-semibold text-slate-300 tabular-nums">
+                    {formatProbability(outcome.probability)}
+                  </span>
+                  {onSaveOffspring && (
+                    <button
+                      onClick={() => onSaveOffspring(outcome)}
+                      title={
+                        isSaved ? 'Remove saved offspring' : 'Save offspring'
+                      }
+                      className={`flex h-7 w-7 items-center justify-center rounded-full border text-sm transition-colors ${
+                        isSaved
+                          ? 'border-amber-500/30 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25'
+                          : 'border-white/10 bg-white/5 text-slate-500 hover:border-amber-500/25 hover:bg-amber-500/10 hover:text-amber-300'
+                      }`}
+                    >
+                      {isSaved ? '★' : '☆'}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           )
         })}
       </div>
 
-      {/* Gene key */}
       {totalGenes.length > 0 && (
         <div className="mt-1 rounded-xl border border-white/5 bg-white/2 p-3">
           <p className="mb-2 text-[10px] font-semibold tracking-widest text-slate-600 uppercase">

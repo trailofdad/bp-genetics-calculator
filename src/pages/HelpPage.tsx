@@ -1,4 +1,13 @@
+import { useState } from 'react'
+
 export function HelpPage() {
+  const [confirmReset, setConfirmReset] = useState(false)
+
+  function handleReset() {
+    localStorage.clear()
+    window.location.reload()
+  }
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-10 pb-16">
       {/* Page header */}
@@ -94,8 +103,7 @@ export function HelpPage() {
                 .
               </li>
               <li>
-                Either paste the CSV text directly or click{' '}
-                <Kbd>Upload file</Kbd> to pick the file.
+                Either paste the CSV text directly into the text area.
               </li>
               <li>
                 The app automatically detects <strong>CLTCH</strong> and{' '}
@@ -208,6 +216,29 @@ export function HelpPage() {
         </SubSection>
       </Section>
 
+      {/* ── Data ────────────────────────────────────────────────── */}
+      <Section emoji="🗄️" title="Your Data">
+        <p>
+          All data — animals, pairings, saved offspring, and playground projects
+          — is stored locally in your browser's <code className="rounded bg-white/5 px-1">localStorage</code>.
+          Nothing is sent to a server.
+        </p>
+        <SubSection title="Reset all data">
+          <p className="text-sm text-slate-400">
+            If you want to start fresh, use the button below to permanently
+            delete everything stored by this app. This cannot be undone.
+          </p>
+          <div>
+            <button
+              onClick={() => setConfirmReset(true)}
+              className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-400 transition-colors hover:border-rose-500/40 hover:bg-rose-500/20"
+            >
+              🗑 Reset All Data…
+            </button>
+          </div>
+        </SubSection>
+      </Section>
+
       {/* ── Playground ──────────────────────────────────────────── */}
       <Section emoji="🌿" title="Playground">
         <p>
@@ -285,6 +316,39 @@ export function HelpPage() {
           </ul>
         </SubSection>
       </Section>
+
+      {/* Confirm reset modal */}
+      {confirmReset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-white/10 bg-[#1c2333] p-6 shadow-2xl">
+            <div>
+              <h3 className="text-sm font-semibold text-white">Reset all data?</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+                This will permanently delete all your saved animals, pairings,
+                offspring flags, and playground projects. The page will reload
+                and you'll start fresh.{' '}
+                <span className="font-medium text-rose-400">
+                  This cannot be undone.
+                </span>
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setConfirmReset(false)}
+                className="rounded-lg border border-white/5 bg-white/5 px-4 py-2 text-sm text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReset}
+                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-500"
+              >
+                Reset Everything
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

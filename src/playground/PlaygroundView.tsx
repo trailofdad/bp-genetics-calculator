@@ -20,16 +20,14 @@ import type { SavedAnimal } from '../hooks/useSavedAnimals'
 import { usePlaygroundState } from './usePlaygroundState'
 import { PairingNode, type PairingNodeData } from './nodes/PairingNode'
 import { BranchEdge } from './edges/BranchEdge'
-
 import { PairOffspringDialog } from './dialogs/PairOffspringDialog'
 
-const NODE_WIDTH = 288 // w-72
-const NODE_HEIGHT = 340 // approximate, dagre uses this for spacing
+const NODE_WIDTH = 288
+const NODE_HEIGHT = 360
 
 const nodeTypes = { pairingNode: PairingNode }
 const edgeTypes = { branchEdge: BranchEdge }
 
-/** Convert the flat node map into React Flow nodes + edges with dagre layout */
 function buildGraph(
   project: PlaygroundProject,
   onPairOffspring: (nodeId: string, outcome: OffspringOutcome) => void,
@@ -37,7 +35,8 @@ function buildGraph(
     nodeId: string,
     genotypeKey: string,
     alias: string | null
-  ) => void
+  ) => void,
+  onFlagOutcome: (nodeId: string, genotypeKey: string) => void
 ): { nodes: Node[]; edges: Edge[] } {
   const g = new dagre.graphlib.Graph()
   g.setDefaultEdgeLabel(() => ({}))
@@ -49,12 +48,10 @@ function buildGraph(
     marginy: 40,
   })
 
-  // Register all nodes with dagre
   Object.keys(project.nodes).forEach((id) => {
     g.setNode(id, { width: NODE_WIDTH, height: NODE_HEIGHT })
   })
 
-  // Register edges with dagre
   Object.values(project.nodes).forEach((node) => {
     node.childEdges.forEach((edge) => {
       g.setEdge(node.id, edge.childNodeId)
@@ -70,6 +67,7 @@ function buildGraph(
       isRoot: node.id === project.rootNodeId,
       onPairOffspring: (outcome) => onPairOffspring(node.id, outcome),
       onRenameOutcome: (gKey, alias) => onRenameOutcome(node.id, gKey, alias),
+      onFlagOutcome: (gKey) => onFlagOutcome(node.id, gKey),
     }
     return {
       id: node.id,
@@ -114,7 +112,7 @@ export function PlaygroundView({
   onBack,
   onSave,
 }: Props) {
-  const { project, addChildPairing, renameOutcome } =
+  const { project, addChildPairing, renameOutcome, toggleFlagOutcome } =
     usePlaygroundState(initialProject)
 
   const [pendingPair, setPendingPair] = useState<{
@@ -136,20 +134,28 @@ export function PlaygroundView({
     [renameOutcome]
   )
 
+  const handleFlagOutcome = useCallback(
+    (nodeId: string, gKey: string) => {
+      toggleFlagOutcome(nodeId, gKey)
+    },
+    [toggleFlagOutcome]
+  )
+
   const { nodes: layoutNodes, edges: layoutEdges } = buildGraph(
     project,
     handlePairOffspring,
-    handleRenameOutcome
+    handleRenameOutcome,
+    handleFlagOutcome
   )
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutEdges)
 
-  // Re-layout whenever the project graph changes
   useEffect(() => {
     const { nodes: ln, edges: le } = buildGraph(
       project,
       handlePairOffspring,
-      handleRenameOutcome
+      handleRenameOutcome,
+      handleFlagOutcome
     )
     setNodes(ln)
     setEdges(le)
@@ -172,7 +178,6 @@ export function PlaygroundView({
 
   return (
     <div className="flex h-screen flex-col bg-[#0d1117]">
-      {/* Toolbar */}
       <div className="z-10 flex shrink-0 items-center justify-between border-b border-white/5 bg-[#0d1117] px-4 py-3">
         <div className="flex items-center gap-3">
           <button
@@ -198,7 +203,6 @@ export function PlaygroundView({
         </button>
       </div>
 
-      {/* Canvas */}
       <div className="relative flex-1">
         <ReactFlow
           nodes={nodes}
@@ -227,7 +231,6 @@ export function PlaygroundView({
           />
         </ReactFlow>
 
-        {/* Legend */}
         <div className="pointer-events-none absolute top-3 right-3 flex flex-col gap-1 rounded-xl border border-white/5 bg-[#161b27]/90 px-3 py-2 text-[10px] text-slate-500 backdrop-blur-sm">
           <span className="text-[11px] font-semibold text-slate-400">
             How to use
@@ -237,6 +240,9 @@ export function PlaygroundView({
             <span className="font-mono text-slate-300">+</span> to branch
           </span>
           <span>
+            Starred outcomes stay pinned at the top of each node
+          </span>
+          <span>
             Already-branched outcomes show{' '}
             <span className="font-mono text-indigo-300">↗</span>
           </span>
@@ -244,7 +250,6 @@ export function PlaygroundView({
         </div>
       </div>
 
-      {/* Pair offspring dialog */}
       <PairOffspringDialog
         key={
           pendingPair

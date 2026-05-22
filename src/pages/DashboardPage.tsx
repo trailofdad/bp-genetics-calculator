@@ -55,12 +55,22 @@ export function DashboardPage() {
             <p className="text-xs text-slate-600">
               Head to the Animals page to add your first snake.
             </p>
+          <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/animals')}
               className="mt-1 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-500"
             >
               Add Animal
             </button>
+            <button
+              onClick={() =>
+                navigate('/animals', { state: { openImport: true } })
+              }
+              className="mt-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              Import Animals
+            </button>
+          </div>
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

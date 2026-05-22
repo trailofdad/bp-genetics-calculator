@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
-import type { PlaygroundProject, PlaygroundNode, PlaygroundEdge } from './types'
 import type { ParentGenotype, OffspringOutcome } from 'bp-genetics'
+import type { PlaygroundProject, PlaygroundNode, PlaygroundEdge } from './types'
 import { buildCompactLabel } from './utils/compactLabel'
 
 function makeId() {
@@ -10,7 +10,6 @@ function makeId() {
 export function usePlaygroundState(initial: PlaygroundProject) {
   const [project, setProject] = useState<PlaygroundProject>(initial)
 
-  /** Add a new child pairing branching from an offspring of parentNodeId */
   const addChildPairing = useCallback(
     (
       parentNodeId: string,
@@ -58,7 +57,6 @@ export function usePlaygroundState(initial: PlaygroundProject) {
     []
   )
 
-  /** Remove a child pairing (and its entire subtree) */
   const removeChildPairing = useCallback(
     (parentNodeId: string, edgeId: string) => {
       setProject((prev) => {
@@ -67,7 +65,6 @@ export function usePlaygroundState(initial: PlaygroundProject) {
         )
         if (!edge) return prev
 
-        // Collect all descendant node IDs to remove
         const toRemove = new Set<string>()
         const queue = [edge.childNodeId]
         while (queue.length) {
@@ -93,7 +90,6 @@ export function usePlaygroundState(initial: PlaygroundProject) {
     []
   )
 
-  /** Set or clear a user alias for an offspring genotype within a node */
   const renameOutcome = useCallback(
     (nodeId: string, gKey: string, alias: string | null) => {
       setProject((prev) => {
@@ -118,11 +114,39 @@ export function usePlaygroundState(initial: PlaygroundProject) {
     []
   )
 
+  const toggleFlagOutcome = useCallback((nodeId: string, gKey: string) => {
+    setProject((prev) => {
+      const node = prev.nodes[nodeId]
+      if (!node) return prev
+
+      const nextFlagged = new Set(node.flaggedOutcomeKeys ?? [])
+      if (nextFlagged.has(gKey)) {
+        nextFlagged.delete(gKey)
+      } else {
+        nextFlagged.add(gKey)
+      }
+
+      return {
+        ...prev,
+        savedAt: new Date().toISOString(),
+        nodes: {
+          ...prev.nodes,
+          [nodeId]: {
+            ...node,
+            flaggedOutcomeKeys:
+              nextFlagged.size > 0 ? [...nextFlagged] : undefined,
+          },
+        },
+      }
+    })
+  }, [])
+
   return {
     project,
     setProject,
     addChildPairing,
     removeChildPairing,
     renameOutcome,
+    toggleFlagOutcome,
   }
 }
