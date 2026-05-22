@@ -155,7 +155,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
         <Handle
           type="target"
           position={Position.Top}
-          className="!h-2.5 !w-2.5 !border-indigo-500 !bg-indigo-400"
+          className="h-2.5! w-2.5! border-indigo-500! bg-indigo-400!"
         />
       )}
 
@@ -301,7 +301,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!h-2.5 !w-2.5 !border-indigo-500 !bg-indigo-400"
+        className="h-2.5! w-2.5! border-indigo-500! bg-indigo-400!"
       />
     </div>
   )
