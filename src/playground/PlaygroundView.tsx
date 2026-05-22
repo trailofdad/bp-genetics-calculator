@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   ReactFlow,
   Background,
@@ -15,12 +15,14 @@ import dagre from '@dagrejs/dagre'
 import '@xyflow/react/dist/style.css'
 
 import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
+import { calculateOffspring } from 'bp-genetics'
 import type { PlaygroundProject } from './types'
 import type { SavedAnimal } from '../hooks/useSavedAnimals'
 import { usePlaygroundState } from './usePlaygroundState'
 import { PairingNode, type PairingNodeData } from './nodes/PairingNode'
 import { BranchEdge } from './edges/BranchEdge'
 import { PairOffspringDialog } from './dialogs/PairOffspringDialog'
+import { genotypeKey } from './utils/compactLabel'
 
 const NODE_WIDTH = 288
 const NODE_HEIGHT = 360
@@ -162,6 +164,19 @@ export function PlaygroundView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project])
 
+  const pendingNode = pendingPair
+    ? project.nodes[pendingPair.nodeId]
+    : null
+
+  const flaggedOffspring = useMemo<OffspringOutcome[]>(() => {
+    if (!pendingNode) return []
+    const keys = new Set(pendingNode.flaggedOutcomeKeys ?? [])
+    if (keys.size === 0) return []
+    return calculateOffspring(pendingNode.parent1, pendingNode.parent2).filter(
+      (o) => keys.has(genotypeKey(o.genotype))
+    )
+  }, [pendingNode])
+
   function handleDialogConfirm(
     pairedWith: ParentGenotype,
     pairedWithName: string
@@ -258,6 +273,7 @@ export function PlaygroundView({
         }
         open={!!pendingPair}
         offspring={pendingPair?.outcome ?? null}
+        flaggedOffspring={flaggedOffspring}
         savedAnimals={savedAnimals}
         onSaveAnimal={saveAnimal}
         onConfirm={handleDialogConfirm}

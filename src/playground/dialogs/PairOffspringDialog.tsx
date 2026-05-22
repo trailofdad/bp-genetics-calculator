@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
-import { GENES } from 'bp-genetics'
+import { GENES, formatProbability } from 'bp-genetics'
 import {
   Dialog,
   DialogContent,
@@ -14,13 +14,14 @@ import type { SavedAnimal } from '../../hooks/useSavedAnimals'
 interface Props {
   open: boolean
   offspring: OffspringOutcome | null
+  flaggedOffspring: OffspringOutcome[]
   savedAnimals: SavedAnimal[]
   onSaveAnimal: (name: string, genotype: ParentGenotype) => void
   onConfirm: (pairedWith: ParentGenotype, pairedWithName: string) => void
   onClose: () => void
 }
 
-type TabId = 'animals' | 'custom'
+type TabId = 'animals' | 'flagged' | 'custom'
 
 function genotypePreview(genotype: ParentGenotype): string {
   const parts = Object.entries(genotype)
@@ -37,15 +38,26 @@ function genotypePreview(genotype: ParentGenotype): string {
 export function PairOffspringDialog({
   open,
   offspring,
+  flaggedOffspring,
   savedAnimals,
   onSaveAnimal,
   onConfirm,
   onClose,
 }: Props) {
-  const defaultTab: TabId = savedAnimals.length > 0 ? 'animals' : 'custom'
+  const defaultTab: TabId =
+    savedAnimals.length > 0
+      ? 'animals'
+      : flaggedOffspring.length > 0
+        ? 'flagged'
+        : 'custom'
 
   const [tab, setTab] = useState<TabId>(defaultTab)
   const [selectedAnimalId, setSelectedAnimalId] = useState<string | null>(null)
+  const [selectedFlaggedKey, setSelectedFlaggedKey] = useState<string | null>(
+    flaggedOffspring.length > 0
+      ? JSON.stringify(flaggedOffspring[0].genotype)
+      : null
+  )
   const [customGenotype, setCustomGenotype] = useState<ParentGenotype>({})
   const [customName, setCustomName] = useState('')
 
@@ -54,9 +66,21 @@ export function PairOffspringDialog({
     [savedAnimals, selectedAnimalId]
   )
 
+  const selectedFlaggedOutcome = useMemo(
+    () =>
+      selectedFlaggedKey
+        ? (flaggedOffspring.find(
+            (o) => JSON.stringify(o.genotype) === selectedFlaggedKey
+          ) ?? null)
+        : null,
+    [flaggedOffspring, selectedFlaggedKey]
+  )
+
   function handleConfirm() {
     if (!offspring) return
-    if (tab === 'animals' && selectedAnimal) {
+    if (tab === 'flagged' && selectedFlaggedOutcome) {
+      onConfirm(selectedFlaggedOutcome.genotype, selectedFlaggedOutcome.label)
+    } else if (tab === 'animals' && selectedAnimal) {
       onConfirm(selectedAnimal.genotype, selectedAnimal.name)
     } else if (tab === 'custom') {
       const name = customName.trim()
@@ -66,11 +90,18 @@ export function PairOffspringDialog({
   }
 
   const canConfirm =
-    tab === 'animals' ? !!selectedAnimal : customName.trim() !== ''
+    tab === 'flagged'
+      ? !!selectedFlaggedOutcome
+      : tab === 'animals'
+        ? !!selectedAnimal
+        : customName.trim() !== ''
 
   const tabs: { id: TabId; label: string }[] = [
     ...(savedAnimals.length > 0
       ? [{ id: 'animals' as TabId, label: '🐍 Saved Animals' }]
+      : []),
+    ...(flaggedOffspring.length > 0
+      ? [{ id: 'flagged' as TabId, label: '★ Flagged' }]
       : []),
     { id: 'custom', label: '✎ New Animal' },
   ]
@@ -118,6 +149,37 @@ export function PairOffspringDialog({
 
         {/* Body */}
         <div className="flex flex-col gap-3 px-5 pt-3 pb-5">
+          {/* Flagged Offspring */}
+          {tab === 'flagged' && (
+            <ScrollArea className="h-52">
+              <div className="flex flex-col gap-1.5 pr-2">
+                {flaggedOffspring.map((o) => {
+                  const key = JSON.stringify(o.genotype)
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedFlaggedKey(key)}
+                      className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                        selectedFlaggedKey === key
+                          ? 'border-amber-500/40 bg-amber-500/15'
+                          : 'border-white/5 bg-white/3 hover:bg-white/6'
+                      }`}
+                    >
+                      <p className="text-xs font-medium text-slate-200">
+                        {o.label}
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-slate-500">
+                        {o.probability < 1
+                          ? formatProbability(o.probability)
+                          : '100%'}
+                      </p>
+                    </button>
+                  )
+                })}
+              </div>
+            </ScrollArea>
+          )}
+
           {/* Saved Animals */}
           {tab === 'animals' && (
             <ScrollArea className="h-52">
