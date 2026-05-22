@@ -4,8 +4,8 @@ import { useTheme } from '../context/ThemeContext'
 import {
   DashboardIcon,
   DnaIcon,
-  ArrowsLeftRightIcon,
-  CodeForkIcon,
+  DiagramVennIcon,
+  DiagramProjectIcon,
   CircleQuestionIcon,
   SunIcon,
   MoonIcon,
@@ -13,13 +13,14 @@ import {
   XmarkIcon,
   FaSnakeIcon,
 } from './icons/index'
+import dsnLogo from '../assets/images/dsn-logo.png'
 
 const NAV_LINKS = [
   { to: '/', label: 'Dashboard', Icon: DashboardIcon },
   { to: '/animals', label: 'Animals', Icon: FaSnakeIcon },
   { to: '/calculator', label: 'Calculator', Icon: DnaIcon },
-  { to: '/pairings', label: 'Pairings', Icon: ArrowsLeftRightIcon },
-  { to: '/projects', label: 'Projects', Icon: CodeForkIcon },
+  { to: '/pairings', label: 'Pairings', Icon: DiagramVennIcon },
+  { to: '/projects', label: 'Projects', Icon: DiagramProjectIcon },
   { to: '/help', label: 'Help', Icon: CircleQuestionIcon },
 ]
 
@@ -34,15 +35,13 @@ export function Layout({ children }: { children: ReactNode }) {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 xl:max-w-7xl 2xl:max-w-screen-2xl 2xl:px-6">
           {/* Logo */}
           <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <DnaIcon className="h-4.5 w-4.5 text-primary" />
-            </div>
+            <img src={dsnLogo} alt="DSN Ball Pythons" className="h-9 w-9 rounded-lg object-contain" />
             <div>
               <p className="text-sm font-semibold leading-none tracking-tight text-foreground">
-                Ball Python
+                DSN Ball Pythons
               </p>
               <p className="mt-0.5 text-[11px] text-muted-foreground">
-                Genetics Calculator
+                Project Planner
               </p>
             </div>
           </NavLink>

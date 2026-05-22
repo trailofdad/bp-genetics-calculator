@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import {
   TriangleExclamationIcon,
   DnaIcon,
+  LayerGroupIcon,
   CircleInfoIcon,
   StarIcon,
   BullseyeIcon,
@@ -158,7 +159,7 @@ export function ResultsDisplay({
                 ) : k === 'traits' ? (
                   <>
                     By traits
-                    <DnaIcon className="h-3.5 w-3.5" />
+                    <LayerGroupIcon className="h-3.5 w-3.5" />
                   </>
                 ) : (
                   <>

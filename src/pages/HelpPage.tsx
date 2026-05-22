@@ -2,8 +2,8 @@ import { useState } from 'react'
 import type React from 'react'
 import {
   DnaIcon,
-  ArrowsLeftRightIcon,
-  CodeForkIcon,
+  DiagramVennIcon,
+  DiagramProjectIcon,
   DatabaseIcon,
   LightbulbIcon,
   TriangleExclamationIcon,
@@ -110,7 +110,7 @@ export function HelpPage() {
       </Section>
 
       {/* Pairings */}
-      <Section Icon={ArrowsLeftRightIcon} title="Pairings">
+      <Section Icon={DiagramVennIcon} title="Pairings">
         <p>
           The <strong>Pairings</strong> page stores named pairings you&apos;ve created in the Calculator. Think of it as your breeding season plan.
         </p>
@@ -129,7 +129,7 @@ export function HelpPage() {
       </Section>
 
       {/* Projects */}
-      <Section Icon={CodeForkIcon} title="Projects">
+      <Section Icon={DiagramProjectIcon} title="Projects">
         <p>
           The <strong>Projects</strong> page lets you build a multi-generation visual breeding tree. Starting from any pairing, you can branch offspring forward to see how traits carry through multiple generations.
         </p>

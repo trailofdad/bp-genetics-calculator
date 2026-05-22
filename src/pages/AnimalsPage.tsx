@@ -3,10 +3,11 @@ import {
   ArrowRightIcon,
   PencilIcon,
   PlusIcon,
-  ArrowUpFromBracketIcon,
+  ArrowDownToBracketIcon,
   XmarkIcon,
   FloppyDiskIcon,
   TrashCanIcon,
+  CircleXmarkIcon,
   FaSnakeIcon,
   MarsIcon,
   VenusIcon,
@@ -99,7 +100,7 @@ export function AnimalsPage() {
             className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <span>Import</span>
-            <ArrowUpFromBracketIcon className="h-4 w-4" />
+            <ArrowDownToBracketIcon className="h-4 w-4" />
           </button>
           <button
             onClick={openAdd}
@@ -220,7 +221,7 @@ export function AnimalsPage() {
                         className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/40 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
                         title="Delete"
                       >
-                        <XmarkIcon className="h-3.5 w-3.5" />
+                        <CircleXmarkIcon className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </td>

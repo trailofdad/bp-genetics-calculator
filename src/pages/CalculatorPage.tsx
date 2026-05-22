@@ -1,7 +1,7 @@
 import { useMemo, useState, useRef, useEffect } from 'react'
 import {
   FolderOpenIcon,
-  CodeForkIcon,
+  DiagramProjectIcon,
   XmarkIcon,
   FloppyDiskIcon,
   ArrowRotateLeftIcon,
@@ -367,7 +367,7 @@ export function CalculatorPage() {
             className="flex items-center gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-emerald-500/10"
           >
             <span>Open in Projects</span>
-            <CodeForkIcon className="h-4 w-4" />
+            <DiagramProjectIcon className="h-4 w-4" />
           </button>
           <button
             onClick={handleReset}

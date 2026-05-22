@@ -1,15 +1,18 @@
 import { Fragment, useMemo, useState } from 'react'
 import {
-  ArrowsLeftRightIcon,
+  DiagramVennIcon,
+  DiagramProjectIcon,
   NotebookIcon,
   PlusIcon,
-  SeedlingIcon,
   StarIcon,
   XmarkIcon,
   ArrowRightIcon,
   EyeSlashIcon,
   FloppyDiskIcon,
   TrashCanIcon,
+  CircleXmarkIcon,
+  MarsIcon,
+  VenusIcon,
 } from '../components/icons/index'
 import { useNavigate } from 'react-router-dom'
 import { formatProbability } from 'bp-genetics'
@@ -98,7 +101,7 @@ export function PairingsPage() {
 
       {pairings.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-12 text-center">
-          <ArrowsLeftRightIcon className="h-8 w-8 text-muted-foreground" />
+          <DiagramVennIcon className="h-8 w-8 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">No pairings saved yet.</p>
           <p className="text-xs text-muted-foreground/40">
             Use the Calculator to build and save a pairing.
@@ -120,10 +123,10 @@ export function PairingsPage() {
                   Name
                 </th>
                 <th className="hidden px-4 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground/60 uppercase sm:table-cell">
-                  Sire ♂
+                  <span className="inline-flex items-center gap-1">Sire <MarsIcon className="h-3 w-3 text-sky-400/80" /></span>
                 </th>
                 <th className="hidden px-4 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground/60 uppercase sm:table-cell">
-                  Dam ♀
+                  <span className="inline-flex items-center gap-1">Dam <VenusIcon className="h-3 w-3 text-rose-400/80" /></span>
                 </th>
                 <th className="hidden px-4 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground/60 uppercase md:table-cell">
                   Saved
@@ -218,7 +221,7 @@ export function PairingsPage() {
                             className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20"
                             title="Open in Projects"
                           >
-                            <SeedlingIcon className="h-3.5 w-3.5" />
+                            <DiagramProjectIcon className="h-3.5 w-3.5" />
                           </button>
                           {savedCount > 0 && (
                             <button
@@ -255,7 +258,7 @@ export function PairingsPage() {
                             className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/40 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
                             title="Delete"
                           >
-                            <XmarkIcon className="h-3.5 w-3.5" />
+                            <CircleXmarkIcon className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       </td>
@@ -293,7 +296,7 @@ export function PairingsPage() {
                                     className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
                                     title="Delete saved offspring"
                                   >
-                                    <XmarkIcon className="h-3.5 w-3.5" />
+                                    <CircleXmarkIcon className="h-3.5 w-3.5" />
                                   </button>
                                 </div>
                               ))}

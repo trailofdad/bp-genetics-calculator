@@ -4,16 +4,20 @@ import { createFaIcon } from './createFaIcon'
 export const DashboardIcon    = createFaIcon('gauge')
 export const DnaIcon          = createFaIcon('dna')
 export const ArrowsLeftRightIcon = createFaIcon('arrows-left-right')
+export const UnionIcon          = createFaIcon('union')
+export const DiagramVennIcon    = createFaIcon('diagram-venn')
 export const CodeForkIcon     = createFaIcon('code-fork')
+export const DiagramProjectIcon = createFaIcon('diagram-project')
 export const CircleQuestionIcon = createFaIcon('circle-question')
 
 // ── Theme toggle ──────────────────────────────────────────────────────────────
-export const SunIcon          = createFaIcon('sun')
+export const SunIcon          = createFaIcon('sun-bright')
 export const MoonIcon         = createFaIcon('moon')
 
 // ── Controls ──────────────────────────────────────────────────────────────────
 export const BarsIcon         = createFaIcon('bars')
 export const XmarkIcon        = createFaIcon('xmark')
+export const CircleXmarkIcon  = createFaIcon('circle-xmark')
 export const PlusIcon         = createFaIcon('plus')
 export const ChevronDownIcon  = createFaIcon('chevron-down')
 export const CheckIcon        = createFaIcon('check')
@@ -21,8 +25,11 @@ export const CheckIcon        = createFaIcon('check')
 // ── Actions ───────────────────────────────────────────────────────────────────
 export const PencilIcon       = createFaIcon('pencil')
 export const TrashCanIcon     = createFaIcon('trash-can')
+export const DeleteLeftIcon     = createFaIcon('delete-left')
 export const FolderOpenIcon   = createFaIcon('folder-open')
 export const ArrowUpFromBracketIcon = createFaIcon('arrow-up-from-bracket')
+export const ArrowDownToBracketIcon = createFaIcon('arrow-down-to-bracket')
+export const LayerGroupIcon         = createFaIcon('layer-group')
 export const ArrowRightIcon   = createFaIcon('arrow-right')
 export const NotebookIcon     = createFaIcon('notebook')
 export const FloppyDiskIcon    = createFaIcon('floppy-disk')
@@ -50,4 +57,4 @@ export const VenusIcon      = createFaIcon('venus')
 export const VenusMarsIcon  = createFaIcon('venus-mars')
 
 // ── Animals (snake) ───────────────────────────────────────────────────────────
-export { FaSnakeIcon } from './FaSnakeIcon'
+export const FaSnakeIcon = createFaIcon('snake')

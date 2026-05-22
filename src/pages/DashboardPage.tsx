@@ -4,14 +4,15 @@ import {
   CheckIcon,
   ChevronDownIcon,
   DnaIcon,
-  ArrowsLeftRightIcon,
-  CodeForkIcon,
+  DiagramVennIcon,
+  DiagramProjectIcon,
   BullseyeIcon,
   PencilIcon,
   XmarkIcon,
+  CircleXmarkIcon,
   ArrowRightIcon,
   PlusIcon,
-  ArrowUpFromBracketIcon,
+  ArrowDownToBracketIcon,
   ArrowRotateLeftIcon,
   ArrowUpRightFromSquareIcon,
   FaSnakeIcon,
@@ -120,14 +121,14 @@ export function DashboardPage() {
           navigate={navigate}
         />
         <StatCard
-          Icon={ArrowsLeftRightIcon}
+          Icon={DiagramVennIcon}
           label="Pairings"
           value={pairings.length}
           to="/pairings"
           navigate={navigate}
         />
         <StatCard
-          Icon={CodeForkIcon}
+          Icon={DiagramProjectIcon}
           label="Projects"
           value={projects.length}
           to="/projects"
@@ -338,7 +339,7 @@ export function DashboardPage() {
                 >
                   {/* Project header */}
                   <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-                    <CodeForkIcon className="h-4 w-4 text-muted-foreground" />
+                    <DiagramProjectIcon className="h-4 w-4 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-foreground">
                         {project.name}
@@ -478,7 +479,7 @@ export function DashboardPage() {
                 className="mt-1 inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-4 py-2 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
               >
                 Import Animals
-                <ArrowUpFromBracketIcon className="h-3.5 w-3.5" />
+                <ArrowDownToBracketIcon className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -669,6 +670,8 @@ function GoalRow({
   onRemove: () => void
   onLoadPairing?: () => void
 }) {
+  const [confirming, setConfirming] = useState(false)
+
   return (
     <div
       className={`flex items-center gap-3 px-4 py-3 transition-colors ${
@@ -701,40 +704,60 @@ function GoalRow({
         )}
       </div>
       <div className="flex shrink-0 items-center gap-1.5">
-        <button
-          onClick={onToggle}
-          title={goal.achieved ? 'Reopen goal' : 'Mark as achieved'}
-          className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-            goal.achieved
-              ? 'border-border bg-muted/40 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
-              : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
-          }`}
-        >
-          {goal.achieved ? (
-            <span className="inline-flex items-center gap-1">
-              Reopen
-              <ArrowRotateLeftIcon className="h-3.5 w-3.5" />
-            </span>
-          ) : (
-            <CheckIcon className="h-3.5 w-3.5" />
-          )}
-        </button>
-        {onLoadPairing && (
-          <button
-            onClick={onLoadPairing}
-            title="Open pairing in Calculator"
-            className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
-          >
-            <DnaIcon className="h-3.5 w-3.5" />
-          </button>
+        {confirming ? (
+          <>
+            <span className="text-[11px] text-muted-foreground/60">Remove goal?</span>
+            <button
+              onClick={() => setConfirming(false)}
+              className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground/80"
+            >
+              <XmarkIcon className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={onRemove}
+              className="rounded-lg border border-rose-500/25 bg-rose-500/15 px-2.5 py-1 text-xs font-medium text-rose-400 transition-colors hover:bg-rose-500/25"
+            >
+              Remove
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={onToggle}
+              title={goal.achieved ? 'Reopen goal' : 'Mark as achieved'}
+              className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
+                goal.achieved
+                  ? 'border-border bg-muted/40 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
+                  : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+              }`}
+            >
+              {goal.achieved ? (
+                <span className="inline-flex items-center gap-1">
+                  Reopen
+                  <ArrowRotateLeftIcon className="h-3.5 w-3.5" />
+                </span>
+              ) : (
+                <CheckIcon className="h-3.5 w-3.5" />
+              )}
+            </button>
+            {onLoadPairing && (
+              <button
+                onClick={onLoadPairing}
+                title="Open pairing in Calculator"
+                className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
+              >
+                <DnaIcon className="h-3.5 w-3.5" />
+              </button>
+            )}
+            <button
+              onClick={() => setConfirming(true)}
+              title="Remove goal"
+              className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/40 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
+            >
+              <CircleXmarkIcon className="h-3.5 w-3.5" />
+            </button>
+          </>
         )}
-        <button
-          onClick={onRemove}
-          title="Remove goal"
-          className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/40 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
-        >
-          <XmarkIcon className="h-3.5 w-3.5" />
-        </button>
       </div>
     </div>
   )
