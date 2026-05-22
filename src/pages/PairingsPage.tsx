@@ -1,5 +1,19 @@
 import { Fragment, useMemo, useState } from 'react'
-import { ArrowLeftRight, NotebookPen, Plus, Sprout, Star, X } from 'lucide-react'
+import {
+  DiagramVennIcon,
+  DiagramProjectIcon,
+  NotebookIcon,
+  PlusIcon,
+  StarIcon,
+  XmarkIcon,
+  ArrowRightIcon,
+  EyeSlashIcon,
+  FloppyDiskIcon,
+  TrashCanIcon,
+  CircleXmarkIcon,
+  MarsIcon,
+  VenusIcon,
+} from '../components/icons/index'
 import { useNavigate } from 'react-router-dom'
 import { formatProbability } from 'bp-genetics'
 import { useAppContext } from '../context/AppContext'
@@ -80,23 +94,24 @@ export function PairingsPage() {
           onClick={() => navigate('/calculator')}
           className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
         >
-          <Plus className="h-4 w-4" strokeWidth={1.75} />
           <span>New Pairing</span>
+          <PlusIcon className="h-4 w-4" />
         </button>
       </div>
 
       {pairings.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-12 text-center">
-          <ArrowLeftRight className="h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
+          <DiagramVennIcon className="h-8 w-8 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">No pairings saved yet.</p>
           <p className="text-xs text-muted-foreground/40">
             Use the Calculator to build and save a pairing.
           </p>
           <button
             onClick={() => navigate('/calculator')}
-            className="mt-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
           >
             Go to Calculator
+            <ArrowRightIcon className="h-3.5 w-3.5" />
           </button>
         </div>
       ) : (
@@ -108,10 +123,10 @@ export function PairingsPage() {
                   Name
                 </th>
                 <th className="hidden px-4 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground/60 uppercase sm:table-cell">
-                  Sire ♂
+                  <span className="inline-flex items-center gap-1">Sire <MarsIcon className="h-3 w-3 text-sky-400/80" /></span>
                 </th>
                 <th className="hidden px-4 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground/60 uppercase sm:table-cell">
-                  Dam ♀
+                  <span className="inline-flex items-center gap-1">Dam <VenusIcon className="h-3 w-3 text-rose-400/80" /></span>
                 </th>
                 <th className="hidden px-4 py-3 text-left text-xs font-medium tracking-wide text-muted-foreground/60 uppercase md:table-cell">
                   Saved
@@ -139,7 +154,7 @@ export function PairingsPage() {
                           </span>
                           {savedCount > 0 && (
                             <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-300">
-                              <Star className="h-3 w-3 fill-current" strokeWidth={1.75} />
+                              <StarIcon className="h-3 w-3 fill-current" />
                               <span>{savedCount}</span>
                             </span>
                           )}
@@ -195,25 +210,36 @@ export function PairingsPage() {
                                 state: { loadPairing: pairing },
                               })
                             }
-                            className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
+                            className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
                             title="Load in Calculator"
                           >
                             Load
+                            <ArrowRightIcon className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => handleOpenProject(pairing)}
                             className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20"
                             title="Open in Projects"
                           >
-                            <Sprout className="h-3.5 w-3.5" strokeWidth={1.75} />
+                            <DiagramProjectIcon className="h-3.5 w-3.5" />
                           </button>
                           {savedCount > 0 && (
                             <button
                               onClick={() => toggleSavedOffspring(pairing.id)}
-                              className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
+                              className="inline-flex items-center gap-1 rounded-lg border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
                               title="Toggle saved offspring"
                             >
-                              {expanded ? 'Hide saved' : 'Saved offspring'}
+                              {expanded ? (
+                                <>
+                                  Hide saved
+                                  <EyeSlashIcon className="h-3.5 w-3.5" />
+                                </>
+                              ) : (
+                                <>
+                                  Saved offspring
+                                  <StarIcon className="h-3.5 w-3.5" />
+                                </>
+                              )}
                             </button>
                           )}
                           <button
@@ -225,14 +251,14 @@ export function PairingsPage() {
                             }`}
                             title={pairing.notes ? 'Edit notes' : 'Add notes'}
                           >
-                            <NotebookPen className="h-3.5 w-3.5" strokeWidth={1.75} />
+                            <NotebookIcon className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => setConfirmDelete(pairing.id)}
                             className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/40 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
                             title="Delete"
                           >
-                            <X className="h-3.5 w-3.5" strokeWidth={1.75} />
+                            <CircleXmarkIcon className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       </td>
@@ -270,7 +296,7 @@ export function PairingsPage() {
                                     className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
                                     title="Delete saved offspring"
                                   >
-                                    <X className="h-3.5 w-3.5" strokeWidth={1.75} />
+                                    <CircleXmarkIcon className="h-3.5 w-3.5" />
                                   </button>
                                 </div>
                               ))}
@@ -305,7 +331,7 @@ export function PairingsPage() {
                     className="text-muted-foreground/60 transition-colors hover:text-foreground"
                     aria-label="Close"
                   >
-                    <X className="h-4 w-4" strokeWidth={1.75} />
+                    <XmarkIcon className="h-4 w-4" />
                   </button>
                 </div>
                 <textarea
@@ -319,15 +345,17 @@ export function PairingsPage() {
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => setEditingNotesId(null)}
-                    className="rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
                     Cancel
+                    <XmarkIcon className="h-4 w-4" />
                   </button>
                   <button
                     onClick={saveNotes}
-                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
                   >
                     Save Notes
+                    <FloppyDiskIcon className="h-4 w-4" />
                   </button>
                 </div>
               </div>
@@ -347,7 +375,7 @@ export function PairingsPage() {
                 className="text-muted-foreground/60 transition-colors hover:text-foreground"
                 aria-label="Close"
               >
-                <X className="h-4 w-4" strokeWidth={1.75} />
+                <XmarkIcon className="h-4 w-4" />
               </button>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -360,15 +388,17 @@ export function PairingsPage() {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 Cancel
+                <XmarkIcon className="h-4 w-4" />
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
-                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-rose-500"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-rose-500"
               >
                 Delete
+                <TrashCanIcon className="h-4 w-4" />
               </button>
             </div>
           </div>

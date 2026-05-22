@@ -1,26 +1,27 @@
 import { useState, type ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
-import {
-  LayoutDashboard,
-  Dna,
-  ArrowLeftRight,
-  GitFork,
-  HelpCircle,
-  Sun,
-  Moon,
-  Menu,
-  X,
-} from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
-import { SnakeIcon } from './icons/SnakeIcon'
+import {
+  DashboardIcon,
+  DnaIcon,
+  DiagramVennIcon,
+  DiagramProjectIcon,
+  CircleQuestionIcon,
+  SunIcon,
+  MoonIcon,
+  BarsIcon,
+  XmarkIcon,
+  FaSnakeIcon,
+} from './icons/index'
+import dsnLogo from '../assets/images/dsn-logo.png'
 
 const NAV_LINKS = [
-  { to: '/', label: 'Dashboard', Icon: LayoutDashboard },
-  { to: '/animals', label: 'Animals', Icon: SnakeIcon },
-  { to: '/calculator', label: 'Calculator', Icon: Dna },
-  { to: '/pairings', label: 'Pairings', Icon: ArrowLeftRight },
-  { to: '/projects', label: 'Projects', Icon: GitFork },
-  { to: '/help', label: 'Help', Icon: HelpCircle },
+  { to: '/', label: 'Dashboard', Icon: DashboardIcon },
+  { to: '/animals', label: 'Animals', Icon: FaSnakeIcon },
+  { to: '/calculator', label: 'Calculator', Icon: DnaIcon },
+  { to: '/pairings', label: 'Pairings', Icon: DiagramVennIcon },
+  { to: '/projects', label: 'Projects', Icon: DiagramProjectIcon },
+  { to: '/help', label: 'Help', Icon: CircleQuestionIcon },
 ]
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -31,18 +32,16 @@ export function Layout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* ── Top header ─────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 border-b border-border bg-card/90 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 xl:max-w-7xl 2xl:max-w-screen-2xl 2xl:px-6">
           {/* Logo */}
           <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Dna className="h-4.5 w-4.5 text-primary" strokeWidth={1.75} />
-            </div>
+            <img src={dsnLogo} alt="DSN Ball Pythons" className="h-9 w-9 rounded-lg object-contain" />
             <div>
               <p className="text-sm font-semibold leading-none tracking-tight text-foreground">
-                Ball Python
+                DSN Ball Pythons
               </p>
               <p className="mt-0.5 text-[11px] text-muted-foreground">
-                Genetics Calculator
+                Project Planner
               </p>
             </div>
           </NavLink>
@@ -62,7 +61,7 @@ export function Layout({ children }: { children: ReactNode }) {
                   }`
                 }
               >
-                <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                <Icon className="h-4 w-4" />
                 <span>{label}</span>
               </NavLink>
             ))}
@@ -77,9 +76,9 @@ export function Layout({ children }: { children: ReactNode }) {
               className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               {theme === 'dark' ? (
-                <Sun className="h-4 w-4" strokeWidth={1.75} />
+                <SunIcon className="h-4 w-4" />
               ) : (
-                <Moon className="h-4 w-4" strokeWidth={1.75} />
+                <MoonIcon className="h-4 w-4" />
               )}
             </button>
 
@@ -89,7 +88,7 @@ export function Layout({ children }: { children: ReactNode }) {
               aria-label="Open navigation menu"
               className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
             >
-              <Menu className="h-4 w-4" strokeWidth={1.75} />
+              <BarsIcon className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -111,7 +110,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 onClick={() => setMobileOpen(false)}
                 className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                <X className="h-4 w-4" strokeWidth={1.75} />
+                <XmarkIcon className="h-4 w-4" />
               </button>
             </div>
             <nav className="flex flex-col gap-1 p-3">
@@ -129,7 +128,7 @@ export function Layout({ children }: { children: ReactNode }) {
                     }`
                   }
                 >
-                  <Icon className="h-4.5 w-4.5" strokeWidth={1.75} />
+                  <Icon className="h-4.5 w-4.5" />
                   <span>{label}</span>
                 </NavLink>
               ))}
@@ -139,9 +138,10 @@ export function Layout({ children }: { children: ReactNode }) {
       )}
 
       {/* ── Page content ───────────────────────────────────────────────── */}
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 xl:max-w-7xl xl:py-8 2xl:max-w-screen-2xl 2xl:px-6 2xl:py-10">
         {children}
       </main>
     </div>
   )
 }
+

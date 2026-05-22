@@ -1,21 +1,27 @@
 import { useMemo, useState } from 'react'
 import type React from 'react'
 import {
-  Check,
-  ChevronDown,
-  Dna,
-  ArrowLeftRight,
-  GitFork,
-  Target,
-  Pencil,
-  X,
-} from 'lucide-react'
+  CheckIcon,
+  ChevronDownIcon,
+  DnaIcon,
+  DiagramVennIcon,
+  DiagramProjectIcon,
+  BullseyeIcon,
+  PencilIcon,
+  XmarkIcon,
+  CircleXmarkIcon,
+  ArrowRightIcon,
+  PlusIcon,
+  ArrowDownToBracketIcon,
+  ArrowRotateLeftIcon,
+  ArrowUpRightFromSquareIcon,
+  FaSnakeIcon,
+} from '../components/icons/index'
 import { useNavigate } from 'react-router-dom'
 import { geneById, formatProbability } from 'bp-genetics'
 import { useAppContext } from '../context/AppContext'
 import { GenotypePreview } from '../components/GenotypePreview'
 import { formatDate } from '../utils/formatDate'
-import { SnakeIcon } from '../components/icons/SnakeIcon'
 
 export function DashboardPage() {
   const {
@@ -108,28 +114,28 @@ export function DashboardPage() {
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard
-          Icon={SnakeIcon}
+          Icon={FaSnakeIcon}
           label="Animals"
           value={animals.length}
           to="/animals"
           navigate={navigate}
         />
         <StatCard
-          Icon={ArrowLeftRight}
+          Icon={DiagramVennIcon}
           label="Pairings"
           value={pairings.length}
           to="/pairings"
           navigate={navigate}
         />
         <StatCard
-          Icon={GitFork}
+          Icon={DiagramProjectIcon}
           label="Projects"
           value={projects.length}
           to="/projects"
           navigate={navigate}
         />
         <StatCard
-          Icon={Target}
+          Icon={BullseyeIcon}
           label={achievedGoals.length > 0 ? `Goals · ${achievedGoals.length} achieved` : 'Goals'}
           value={activeGoals.length}
           to="/calculator"
@@ -159,9 +165,10 @@ export function DashboardPage() {
               </div>
               <button
                 onClick={() => navigate('/animals')}
-                className="text-xs text-indigo-400 transition-colors hover:text-indigo-300"
+                className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
               >
-                Manage →
+                Manage
+                <ArrowRightIcon className="h-3.5 w-3.5" />
               </button>
             </div>
             {traitStats.length === 0 ? (
@@ -313,9 +320,10 @@ export function DashboardPage() {
           action={
             <button
               onClick={() => navigate('/calculator')}
-              className="text-xs text-indigo-400 transition-colors hover:text-indigo-300"
+              className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
             >
-              New goal →
+              New goal
+              <PlusIcon className="h-3.5 w-3.5" />
             </button>
           }
         >
@@ -331,7 +339,7 @@ export function DashboardPage() {
                 >
                   {/* Project header */}
                   <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-                    <GitFork className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
+                    <DiagramProjectIcon className="h-4 w-4 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-foreground">
                         {project.name}
@@ -343,15 +351,16 @@ export function DashboardPage() {
                     <div className="flex shrink-0 items-center gap-2">
                       {goals.length > 0 && (
                         <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-                          <Target className="h-3 w-3" strokeWidth={1.75} />
+                          <BullseyeIcon className="h-3 w-3" />
                           <span>{goals.length}</span>
                         </span>
                       )}
                       <button
                         onClick={() => navigate('/projects', { state: { project } })}
-                        className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground/80"
+                        className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground/80"
                       >
-                        Open
+                       Open
+                       <ArrowUpRightFromSquareIcon className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </div>
@@ -409,16 +418,17 @@ export function DashboardPage() {
             {/* Empty state — projects but no goals yet */}
             {projects.length > 0 && projectGoals.length === 0 && (
               <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-card px-6 py-8 text-center">
-                <Target className="h-8 w-8 text-muted-foreground" strokeWidth={1.75} />
+                <BullseyeIcon className="h-8 w-8 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">No goals set yet</p>
                 <p className="text-xs text-muted-foreground/40">
                   Open the Calculator, run a cross, and use the goal button on any outcome.
                 </p>
                 <button
                   onClick={() => navigate('/calculator')}
-                  className="mt-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
                 >
                   Go to Calculator
+                  <ArrowRightIcon className="h-3.5 w-3.5" />
                 </button>
               </div>
             )}
@@ -433,15 +443,25 @@ export function DashboardPage() {
         action={
           <button
             onClick={() => navigate('/animals')}
-            className="text-xs text-indigo-400 transition-colors hover:text-indigo-300"
+            className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
           >
-            {animals.length > 6 ? `View all ${animals.length} →` : 'Manage →'}
+            {animals.length > 6 ? (
+              <>
+                {`View all ${animals.length}`}
+                <ArrowRightIcon className="h-3.5 w-3.5" />
+              </>
+            ) : (
+              <>
+                Manage
+                <ArrowRightIcon className="h-3.5 w-3.5" />
+              </>
+            )}
           </button>
         }
       >
         {animals.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-8 text-center">
-            <SnakeIcon className="h-8 w-8 text-muted-foreground" strokeWidth={1.75} />
+            <FaSnakeIcon className="h-8 w-8 text-muted-foreground" variant="thin" />
             <p className="text-sm text-muted-foreground">No animals saved yet.</p>
             <p className="text-xs text-muted-foreground/40">
               Head to the Animals page to add your first snake.
@@ -449,15 +469,17 @@ export function DashboardPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('/animals')}
-                className="mt-1 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
+                className="mt-1 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
               >
                 Add Animal
+                <PlusIcon className="h-3.5 w-3.5" />
               </button>
               <button
                 onClick={() => navigate('/animals', { state: { openImport: true } })}
-                className="mt-1 rounded-xl border border-border bg-muted/50 px-4 py-2 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                className="mt-1 inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-4 py-2 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
               >
                 Import Animals
+                <ArrowDownToBracketIcon className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -484,9 +506,10 @@ export function DashboardPage() {
                         state: { loadAnimal: animal, slot: 'parent1' },
                       })
                     }
-                    className="flex-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
                     Load as Sire
+                    <ArrowRightIcon className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() =>
@@ -494,16 +517,17 @@ export function DashboardPage() {
                         state: { loadAnimal: animal, slot: 'parent2' },
                       })
                     }
-                    className="flex-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
                     Load as Dam
+                    <ArrowRightIcon className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => navigate('/animals')}
                     className="rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     title="Edit"
                   >
-                    <Pencil className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    <PencilIcon className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
@@ -520,9 +544,10 @@ export function DashboardPage() {
           action={
             <button
               onClick={() => navigate('/pairings')}
-              className="text-xs text-indigo-400 transition-colors hover:text-indigo-300"
+              className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
             >
-              View all →
+              View all
+              <ArrowRightIcon className="h-3.5 w-3.5" />
             </button>
           }
         >
@@ -547,9 +572,10 @@ export function DashboardPage() {
                     onClick={() =>
                       navigate('/calculator', { state: { loadPairing: p } })
                     }
-                    className="shrink-0 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
+                    className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
                   >
                     Load
+                    <ArrowRightIcon className="h-3.5 w-3.5" />
                   </button>
                 </div>
               )
@@ -578,7 +604,9 @@ function useCollapsed(key: string, defaultValue = false) {
       const next = !c
       try {
         localStorage.setItem(`dashboard-collapsed-${key}`, String(next))
-      } catch {}
+      } catch (e) {
+        void e
+      }
       return next
     })
   }
@@ -618,11 +646,10 @@ function CollapsibleSection({
               <p className="mt-0.5 text-xs text-muted-foreground/60">{subtitle}</p>
             )}
           </div>
-          <ChevronDown
+          <ChevronDownIcon
             className={`h-3.5 w-3.5 text-muted-foreground/40 transition-transform duration-200 ${
               collapsed ? '-rotate-90' : ''
             }`}
-            strokeWidth={1.75}
           />
         </button>
         {action}
@@ -643,6 +670,8 @@ function GoalRow({
   onRemove: () => void
   onLoadPairing?: () => void
 }) {
+  const [confirming, setConfirming] = useState(false)
+
   return (
     <div
       className={`flex items-center gap-3 px-4 py-3 transition-colors ${
@@ -660,7 +689,7 @@ function GoalRow({
           </p>
           {goal.achieved && (
             <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-              <Check className="h-3 w-3" strokeWidth={1.75} />
+              <CheckIcon className="h-3 w-3" />
               <span>Achieved</span>
             </span>
           )}
@@ -675,37 +704,60 @@ function GoalRow({
         )}
       </div>
       <div className="flex shrink-0 items-center gap-1.5">
-        <button
-          onClick={onToggle}
-          title={goal.achieved ? 'Reopen goal' : 'Mark as achieved'}
-          className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-            goal.achieved
-              ? 'border-border bg-muted/40 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
-              : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
-          }`}
-        >
-          {goal.achieved ? (
-            'Reopen'
-          ) : (
-            <Check className="h-3.5 w-3.5" strokeWidth={1.75} />
-          )}
-        </button>
-        {onLoadPairing && (
-          <button
-            onClick={onLoadPairing}
-            title="Open pairing in Calculator"
-            className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
-          >
-            <Dna className="h-3.5 w-3.5" strokeWidth={1.75} />
-          </button>
+        {confirming ? (
+          <>
+            <span className="text-[11px] text-muted-foreground/60">Remove goal?</span>
+            <button
+              onClick={() => setConfirming(false)}
+              className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground/80"
+            >
+              <XmarkIcon className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={onRemove}
+              className="rounded-lg border border-rose-500/25 bg-rose-500/15 px-2.5 py-1 text-xs font-medium text-rose-400 transition-colors hover:bg-rose-500/25"
+            >
+              Remove
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={onToggle}
+              title={goal.achieved ? 'Reopen goal' : 'Mark as achieved'}
+              className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
+                goal.achieved
+                  ? 'border-border bg-muted/40 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
+                  : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+              }`}
+            >
+              {goal.achieved ? (
+                <span className="inline-flex items-center gap-1">
+                  Reopen
+                  <ArrowRotateLeftIcon className="h-3.5 w-3.5" />
+                </span>
+              ) : (
+                <CheckIcon className="h-3.5 w-3.5" />
+              )}
+            </button>
+            {onLoadPairing && (
+              <button
+                onClick={onLoadPairing}
+                title="Open pairing in Calculator"
+                className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
+              >
+                <DnaIcon className="h-3.5 w-3.5" />
+              </button>
+            )}
+            <button
+              onClick={() => setConfirming(true)}
+              title="Remove goal"
+              className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/40 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
+            >
+              <CircleXmarkIcon className="h-3.5 w-3.5" />
+            </button>
+          </>
         )}
-        <button
-          onClick={onRemove}
-          title="Remove goal"
-          className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/40 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
-        >
-          <X className="h-3.5 w-3.5" strokeWidth={1.75} />
-        </button>
       </div>
     </div>
   )
@@ -736,7 +788,7 @@ function StatCard({
   navigate,
   accent,
 }: {
-  Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
+  Icon: React.ComponentType<{ className?: string }>
   label: string
   value: number | null
   to: string
@@ -754,7 +806,7 @@ function StatCard({
     >
       <div className="flex items-center gap-2">
         <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${accent === 'emerald' ? 'bg-emerald-500/15' : 'bg-muted'}`}>
-          <Icon className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.75} />
+          <Icon className="h-3.5 w-3.5 text-muted-foreground" />
         </div>
         <p className="text-lg font-bold leading-none text-foreground">
           {value !== null ? value : '→'}

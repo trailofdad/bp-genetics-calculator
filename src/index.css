@@ -2,6 +2,10 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "./assets/fonts/font-awesome/v7.2.0/css/fontawesome.css";
+@import "./assets/fonts/font-awesome/v7.2.0/css/solid.css";
+@import "./assets/fonts/font-awesome/v7.2.0/css/regular.css";
+@import "./assets/fonts/font-awesome/v7.2.0/css/thin.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -144,5 +148,12 @@
   }
   html {
     @apply font-sans;
+    font-size: 16px;
+  }
+  @media (min-width: 1280px) {
+    html { font-size: 17px; }
+  }
+  @media (min-width: 1536px) {
+    html { font-size: 18px; }
   }
 }

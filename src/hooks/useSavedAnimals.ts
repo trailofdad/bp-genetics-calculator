@@ -2,9 +2,12 @@ import { useState, useCallback } from 'react'
 import type { ParentGenotype } from 'bp-genetics'
 import { loadFromStorage, persistToStorage } from '../lib/storage'
 
+export type AnimalSex = 'male' | 'female'
+
 export interface SavedAnimal {
   id: string
   name: string
+  sex?: AnimalSex
   genotype: ParentGenotype
   savedAt: string
 }
@@ -16,10 +19,11 @@ export function useSavedAnimals() {
     loadFromStorage<SavedAnimal>(STORAGE_KEY)
   )
 
-  const saveAnimal = useCallback((name: string, genotype: ParentGenotype) => {
+  const saveAnimal = useCallback((name: string, genotype: ParentGenotype, sex?: AnimalSex) => {
     const entry: SavedAnimal = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       name: name.trim() || 'Untitled Animal',
+      sex,
       genotype,
       savedAt: new Date().toISOString(),
     }
@@ -31,11 +35,11 @@ export function useSavedAnimals() {
   }, [])
 
   const updateAnimal = useCallback(
-    (id: string, name: string, genotype: ParentGenotype) => {
+    (id: string, name: string, genotype: ParentGenotype, sex?: AnimalSex) => {
       setAnimals((prev) => {
         const next = prev.map((a) =>
           a.id === id
-            ? { ...a, name: name.trim() || 'Untitled Animal', genotype }
+            ? { ...a, name: name.trim() || 'Untitled Animal', sex, genotype }
             : a
         )
         persistToStorage(STORAGE_KEY, next)

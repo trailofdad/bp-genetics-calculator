@@ -19,4 +19,13 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  // All exports in the icons barrel are React components produced by createFaIcon().
+  // The react-refresh rule can't see through the factory call, so suppress the
+  // false positives for this file only.
+  {
+    files: ['src/components/icons/index.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

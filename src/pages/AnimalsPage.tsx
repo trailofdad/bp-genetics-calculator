@@ -1,19 +1,31 @@
 import { useState, useRef, useEffect } from 'react'
-import { ArrowRight, Pencil, Plus, Upload, X } from 'lucide-react'
-import { SnakeIcon } from '../components/icons/SnakeIcon'
+import {
+  ArrowRightIcon,
+  PencilIcon,
+  PlusIcon,
+  ArrowDownToBracketIcon,
+  XmarkIcon,
+  FloppyDiskIcon,
+  TrashCanIcon,
+  CircleXmarkIcon,
+  FaSnakeIcon,
+  MarsIcon,
+  VenusIcon,
+} from '../components/icons/index'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
 import { ParentSelector } from '../components/ParentSelector'
 import { ImportModal } from '../components/ImportModal'
 import { GenotypePreview } from '../components/GenotypePreview'
 import { formatDate } from '../utils/formatDate'
-import type { SavedAnimal } from '../hooks/useSavedAnimals'
+import type { SavedAnimal, AnimalSex } from '../hooks/useSavedAnimals'
 import type { ParentGenotype } from 'bp-genetics'
 
 interface AnimalModalState {
   mode: 'add' | 'edit'
   animal?: SavedAnimal
   name: string
+  sex?: AnimalSex
   genotype: ParentGenotype
 }
 
@@ -42,7 +54,7 @@ export function AnimalsPage() {
   }, [modal])
 
   function openAdd() {
-    setModal({ mode: 'add', name: '', genotype: {} })
+    setModal({ mode: 'add', name: '', sex: undefined, genotype: {} })
   }
 
   function openEdit(animal: SavedAnimal) {
@@ -50,6 +62,7 @@ export function AnimalsPage() {
       mode: 'edit',
       animal,
       name: animal.name,
+      sex: animal.sex,
       genotype: { ...animal.genotype },
     })
   }
@@ -57,9 +70,9 @@ export function AnimalsPage() {
   function handleSave() {
     if (!modal) return
     if (modal.mode === 'add') {
-      saveAnimal(modal.name, modal.genotype)
+      saveAnimal(modal.name, modal.genotype, modal.sex)
     } else if (modal.animal) {
-      updateAnimal(modal.animal.id, modal.name, modal.genotype)
+      updateAnimal(modal.animal.id, modal.name, modal.genotype, modal.sex)
     }
     setModal(null)
   }
@@ -86,15 +99,15 @@ export function AnimalsPage() {
             onClick={() => setImportOpen(true)}
             className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <Upload className="h-4 w-4" strokeWidth={1.75} />
             <span>Import</span>
+            <ArrowDownToBracketIcon className="h-4 w-4" />
           </button>
           <button
             onClick={openAdd}
             className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
           >
-            <Plus className="h-4 w-4" strokeWidth={1.75} />
             <span>Add Animal</span>
+            <PlusIcon className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -102,16 +115,17 @@ export function AnimalsPage() {
       {/* Table / empty state */}
       {animals.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-12 text-center">
-          <SnakeIcon className="h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
+          <FaSnakeIcon className="h-8 w-8 text-muted-foreground" variant="thin" />
           <p className="text-sm text-muted-foreground">No animals saved yet.</p>
           <p className="text-xs text-muted-foreground/40">
             Add your first snake to track its genetics.
           </p>
           <button
             onClick={openAdd}
-            className="mt-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
           >
             Add Animal
+            <PlusIcon className="h-3.5 w-3.5" />
           </button>
         </div>
       ) : (
@@ -140,9 +154,17 @@ export function AnimalsPage() {
                   className="transition-colors hover:bg-muted/20"
                 >
                   <td className="px-4 py-3">
-                    <span className="font-medium text-foreground">
-                      {animal.name}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-medium text-foreground">
+                        {animal.name}
+                      </span>
+                      {animal.sex === 'male' && (
+                        <MarsIcon className="h-3.5 w-3.5 text-sky-400" />
+                      )}
+                      {animal.sex === 'female' && (
+                        <VenusIcon className="h-3.5 w-3.5 text-rose-400" />
+                      )}
+                    </div>
                     <div className="mt-0.5 sm:hidden">
                       <GenotypePreview genotype={animal.genotype} />
                     </div>
@@ -155,47 +177,51 @@ export function AnimalsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1.5">
-                      <button
-                        onClick={() =>
-                          navigate('/calculator', {
-                            state: { loadAnimal: animal, slot: 'parent1' },
-                          })
-                        }
-                        className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                        title="Load as Sire in Calculator"
-                      >
-                        <span className="inline-flex items-center gap-1">
-                          <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
-                          <span>Sire</span>
-                        </span>
-                      </button>
-                      <button
-                        onClick={() =>
-                          navigate('/calculator', {
-                            state: { loadAnimal: animal, slot: 'parent2' },
-                          })
-                        }
-                        className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                        title="Load as Dam in Calculator"
-                      >
-                        <span className="inline-flex items-center gap-1">
-                          <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
-                          <span>Dam</span>
-                        </span>
-                      </button>
+                      {(!animal.sex || animal.sex === 'male') && (
+                        <button
+                          onClick={() =>
+                            navigate('/calculator', {
+                              state: { loadAnimal: animal, slot: 'parent1' },
+                            })
+                          }
+                          className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          title="Load as Sire in Calculator"
+                        >
+                          <span className="inline-flex items-center gap-1">
+                            <span>Sire</span>
+                            <ArrowRightIcon className="h-3.5 w-3.5" />
+                          </span>
+                        </button>
+                      )}
+                      {(!animal.sex || animal.sex === 'female') && (
+                        <button
+                          onClick={() =>
+                            navigate('/calculator', {
+                              state: { loadAnimal: animal, slot: 'parent2' },
+                            })
+                          }
+                          className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          title="Load as Dam in Calculator"
+                        >
+                          <span className="inline-flex items-center gap-1">
+                            <span>Dam</span>
+                            <ArrowRightIcon className="h-3.5 w-3.5" />
+                          </span>
+                        </button>
+                      )}
                       <button
                         onClick={() => openEdit(animal)}
                         className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                         title="Edit"
                       >
-                        <Pencil className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        <PencilIcon className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={() => setConfirmDelete(animal.id)}
                         className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/40 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
                         title="Delete"
                       >
-                        <X className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        <CircleXmarkIcon className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </td>
@@ -219,7 +245,7 @@ export function AnimalsPage() {
                 className="text-muted-foreground/60 transition-colors hover:text-foreground"
                 aria-label="Close"
               >
-                <X className="h-4 w-4" strokeWidth={1.75} />
+                <XmarkIcon className="h-4 w-4" />
               </button>
             </div>
 
@@ -243,6 +269,46 @@ export function AnimalsPage() {
                   className="w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-foreground transition-colors placeholder:text-muted-foreground/40 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
                 />
               </label>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium text-muted-foreground">
+                  Sex
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setModal((m) =>
+                        m && { ...m, sex: m.sex === 'male' ? undefined : 'male' }
+                      )
+                    }
+                    className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition-colors ${
+                      modal.sex === 'male'
+                        ? 'border-sky-500/40 bg-sky-500/15 text-sky-300'
+                        : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground'
+                    }`}
+                  >
+                    Male
+                    <MarsIcon className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setModal((m) =>
+                        m && { ...m, sex: m.sex === 'female' ? undefined : 'female' }
+                      )
+                    }
+                    className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition-colors ${
+                      modal.sex === 'female'
+                        ? 'border-rose-500/40 bg-rose-500/15 text-rose-300'
+                        : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground'
+                    }`}
+                  >
+                    Female
+                    <VenusIcon className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="px-6">
@@ -252,7 +318,6 @@ export function AnimalsPage() {
               <div className="rounded-xl border border-border bg-card p-4">
                 <ParentSelector
                   parentLabel="Edit Animal Genetics"
-                  parentSex=""
                   genotype={modal.genotype}
                   onChange={(g) => setModal((m) => m && { ...m, genotype: g })}
                 />
@@ -262,15 +327,26 @@ export function AnimalsPage() {
             <div className="flex justify-end gap-2 px-6 pb-6">
               <button
                 onClick={() => setModal(null)}
-                className="rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 Cancel
+                <XmarkIcon className="h-4 w-4" />
               </button>
               <button
                 onClick={handleSave}
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
               >
-                {modal.mode === 'add' ? 'Add Animal' : 'Save Changes'}
+                {modal.mode === 'add' ? (
+                  <>
+                    Add Animal
+                    <PlusIcon className="h-4 w-4" />
+                  </>
+                ) : (
+                  <>
+                    Save Changes
+                    <FloppyDiskIcon className="h-4 w-4" />
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -288,7 +364,7 @@ export function AnimalsPage() {
                 className="text-muted-foreground/60 transition-colors hover:text-foreground"
                 aria-label="Close"
               >
-                <X className="h-4 w-4" strokeWidth={1.75} />
+                <XmarkIcon className="h-4 w-4" />
               </button>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -301,15 +377,17 @@ export function AnimalsPage() {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 Cancel
+                <XmarkIcon className="h-4 w-4" />
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
-                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-rose-500"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-rose-500"
               >
                 Delete
+                <TrashCanIcon className="h-4 w-4" />
               </button>
             </div>
           </div>
