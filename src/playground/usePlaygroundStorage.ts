@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { loadFromStorage, persistToStorage } from '../lib/storage'
 import type {
   PlaygroundProject,
   PlaygroundNode,
@@ -10,8 +11,9 @@ import type {
 } from './types'
 
 // ---------------------------------------------------------------------------
-// localStorage keys
-// Each key maps to one future DB table.
+// localStorage keys — each maps to a future DB table.
+// TODO (DB migration): replace loadFromStorage/persistToStorage calls with
+// DB queries/mutations.
 // ---------------------------------------------------------------------------
 const KEYS = {
   projects: 'pg-projects',
@@ -24,29 +26,8 @@ const KEYS = {
 } as const
 
 // ---------------------------------------------------------------------------
-// localStorage helpers
-// TODO (DB migration): replace loadJson/persistJson with DB SELECT/INSERT calls
-// ---------------------------------------------------------------------------
-function loadJson<T>(key: string): T[] {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T[]) : []
-  } catch {
-    return []
-  }
-}
-
-function persistJson<T>(key: string, data: T[]): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(data))
-  } catch {
-    // ignore quota errors
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Decompose: PlaygroundProject → flat rows
-// TODO (DB migration): replace with INSERT/UPDATE statements per table
+// TODO (DB migration): replace with INSERT/UPDATE per table
 // ---------------------------------------------------------------------------
 function decomposeProject(project: PlaygroundProject): {
   projectRow: PlaygroundProjectRow
@@ -110,7 +91,7 @@ function decomposeProject(project: PlaygroundProject): {
 
 // ---------------------------------------------------------------------------
 // Compose: flat rows → PlaygroundProject
-// TODO (DB migration): replace with JOIN query across all 5 tables
+// TODO (DB migration): replace with a JOIN query across all 5 tables
 // ---------------------------------------------------------------------------
 function composeProject(
   projectRow: PlaygroundProjectRow,
@@ -160,10 +141,6 @@ function composeProject(
   }
 }
 
-// ---------------------------------------------------------------------------
-// One-time migration from the old single-blob format (playground-projects key)
-// TODO (DB migration): remove this once the DB is the source of truth
-// ---------------------------------------------------------------------------
 interface StorageState {
   projects: PlaygroundProjectRow[]
   nodes: PlaygroundNodeRow[]
@@ -172,22 +149,24 @@ interface StorageState {
   aliases: PlaygroundNodeAliasRow[]
 }
 
+/** Loads from flat tables, migrating from the legacy single-blob format on first run.
+ * TODO (DB migration): remove migration path once DB is source of truth. */
 function loadInitialState(): StorageState {
-  const projects = loadJson<PlaygroundProjectRow>(KEYS.projects)
+  const projects = loadFromStorage<PlaygroundProjectRow>(KEYS.projects)
 
   // If new tables already have data, use them as-is
   if (projects.length > 0) {
     return {
       projects,
-      nodes: loadJson<PlaygroundNodeRow>(KEYS.nodes),
-      edges: loadJson<PlaygroundEdgeRow>(KEYS.edges),
-      flags: loadJson<PlaygroundNodeFlagRow>(KEYS.flags),
-      aliases: loadJson<PlaygroundNodeAliasRow>(KEYS.aliases),
+      nodes: loadFromStorage<PlaygroundNodeRow>(KEYS.nodes),
+      edges: loadFromStorage<PlaygroundEdgeRow>(KEYS.edges),
+      flags: loadFromStorage<PlaygroundNodeFlagRow>(KEYS.flags),
+      aliases: loadFromStorage<PlaygroundNodeAliasRow>(KEYS.aliases),
     }
   }
 
   // Attempt migration from old format
-  const legacy = loadJson<PlaygroundProject>(KEYS.legacy)
+  const legacy = loadFromStorage<PlaygroundProject>(KEYS.legacy)
   if (legacy.length === 0) {
     return { projects: [], nodes: [], edges: [], flags: [], aliases: [] }
   }
@@ -208,11 +187,11 @@ function loadInitialState(): StorageState {
     allAliases.push(...aliasRows)
   }
 
-  persistJson(KEYS.projects, allProjects)
-  persistJson(KEYS.nodes, allNodes)
-  persistJson(KEYS.edges, allEdges)
-  persistJson(KEYS.flags, allFlags)
-  persistJson(KEYS.aliases, allAliases)
+  persistToStorage(KEYS.projects, allProjects)
+  persistToStorage(KEYS.nodes, allNodes)
+  persistToStorage(KEYS.edges, allEdges)
+  persistToStorage(KEYS.flags, allFlags)
+  persistToStorage(KEYS.aliases, allAliases)
 
   return {
     projects: allProjects,
@@ -224,116 +203,72 @@ function loadInitialState(): StorageState {
 }
 
 // ---------------------------------------------------------------------------
-// Hook
-// TODO (DB migration): replace useState + persistJson calls with DB mutations
-// (e.g. useMutation hooks from an ORM/query client)
-// ---------------------------------------------------------------------------
+// TODO (DB migration): replace useState + persistToStorage calls with DB mutations
 export function usePlaygroundStorage() {
   const [state, setState] = useState<StorageState>(loadInitialState)
 
-  // Keep a stable ref so auto-save effects don't need it in their dep arrays
+  // Stable ref keeps loadProject from going stale without adding state to deps
   const stateRef = useRef(state)
   useEffect(() => { stateRef.current = state })
 
-  // -------------------------------------------------------------------------
-  // saveProject — upsert a full project across all 5 tables
-  // TODO (DB migration): replace with upsert transactions per table
-  // -------------------------------------------------------------------------
+  /** Upsert a full project across all 5 tables.
+   * TODO (DB migration): replace with upsert transactions per table. */
   const saveProject = useCallback((project: PlaygroundProject) => {
     const { projectRow, nodeRows, edgeRows, flagRows, aliasRows } =
       decomposeProject(project)
 
     setState((prev) => {
-      // Remove stale rows for this project, then prepend fresh ones
       const projectNodeIds = new Set(nodeRows.map((n) => n.id))
+      const nextProjects = [projectRow, ...prev.projects.filter((p) => p.id !== project.id)]
+      const nextNodes = [...nodeRows, ...prev.nodes.filter((n) => n.projectId !== project.id)]
+      const nextEdges = [...edgeRows, ...prev.edges.filter((e) => e.projectId !== project.id)]
+      const nextFlags = [...flagRows, ...prev.flags.filter((f) => !projectNodeIds.has(f.nodeId))]
+      const nextAliases = [...aliasRows, ...prev.aliases.filter((a) => !projectNodeIds.has(a.nodeId))]
 
-      const nextProjects = [
-        projectRow,
-        ...prev.projects.filter((p) => p.id !== project.id),
-      ]
-      const nextNodes = [
-        ...nodeRows,
-        ...prev.nodes.filter((n) => n.projectId !== project.id),
-      ]
-      const nextEdges = [
-        ...edgeRows,
-        ...prev.edges.filter((e) => e.projectId !== project.id),
-      ]
-      const nextFlags = [
-        ...flagRows,
-        ...prev.flags.filter((f) => !projectNodeIds.has(f.nodeId)),
-      ]
-      const nextAliases = [
-        ...aliasRows,
-        ...prev.aliases.filter((a) => !projectNodeIds.has(a.nodeId)),
-      ]
+      persistToStorage(KEYS.projects, nextProjects)
+      persistToStorage(KEYS.nodes, nextNodes)
+      persistToStorage(KEYS.edges, nextEdges)
+      persistToStorage(KEYS.flags, nextFlags)
+      persistToStorage(KEYS.aliases, nextAliases)
 
-      persistJson(KEYS.projects, nextProjects)
-      persistJson(KEYS.nodes, nextNodes)
-      persistJson(KEYS.edges, nextEdges)
-      persistJson(KEYS.flags, nextFlags)
-      persistJson(KEYS.aliases, nextAliases)
-
-      return {
-        projects: nextProjects,
-        nodes: nextNodes,
-        edges: nextEdges,
-        flags: nextFlags,
-        aliases: nextAliases,
-      }
+      return { projects: nextProjects, nodes: nextNodes, edges: nextEdges, flags: nextFlags, aliases: nextAliases }
     })
   }, [])
 
-  // -------------------------------------------------------------------------
-  // removeProject — delete a project and all its related rows
-  // TODO (DB migration): replace with cascading DELETE (or ON DELETE CASCADE FK)
-  // -------------------------------------------------------------------------
+  /** Delete a project and all its related rows.
+   * TODO (DB migration): replace with ON DELETE CASCADE or explicit cascade. */
   const removeProject = useCallback((id: string) => {
     setState((prev) => {
       const projectNodeIds = new Set(
         prev.nodes.filter((n) => n.projectId === id).map((n) => n.id)
       )
-
       const nextProjects = prev.projects.filter((p) => p.id !== id)
       const nextNodes = prev.nodes.filter((n) => n.projectId !== id)
       const nextEdges = prev.edges.filter((e) => e.projectId !== id)
       const nextFlags = prev.flags.filter((f) => !projectNodeIds.has(f.nodeId))
-      const nextAliases = prev.aliases.filter(
-        (a) => !projectNodeIds.has(a.nodeId)
-      )
+      const nextAliases = prev.aliases.filter((a) => !projectNodeIds.has(a.nodeId))
 
-      persistJson(KEYS.projects, nextProjects)
-      persistJson(KEYS.nodes, nextNodes)
-      persistJson(KEYS.edges, nextEdges)
-      persistJson(KEYS.flags, nextFlags)
-      persistJson(KEYS.aliases, nextAliases)
+      persistToStorage(KEYS.projects, nextProjects)
+      persistToStorage(KEYS.nodes, nextNodes)
+      persistToStorage(KEYS.edges, nextEdges)
+      persistToStorage(KEYS.flags, nextFlags)
+      persistToStorage(KEYS.aliases, nextAliases)
 
-      return {
-        projects: nextProjects,
-        nodes: nextNodes,
-        edges: nextEdges,
-        flags: nextFlags,
-        aliases: nextAliases,
-      }
+      return { projects: nextProjects, nodes: nextNodes, edges: nextEdges, flags: nextFlags, aliases: nextAliases }
     })
   }, [])
 
-  // -------------------------------------------------------------------------
-  // loadProject — compose a full PlaygroundProject from flat rows
-  // TODO (DB migration): replace with a JOIN query across all 5 tables
-  // -------------------------------------------------------------------------
-  const loadProject = useCallback(
-    (id: string): PlaygroundProject | null => {
-      const projectRow = stateRef.current.projects.find((p) => p.id === id)
-      if (!projectRow) return null
-      const { nodes, edges, flags, aliases } = stateRef.current
-      return composeProject(projectRow, nodes, edges, flags, aliases)
-    },
-    [] // stateRef is stable
-  )
+  /** Compose a full PlaygroundProject from flat rows by ID.
+   * TODO (DB migration): replace with a JOIN query across all 5 tables. */
+  const loadProject = useCallback((id: string): PlaygroundProject | null => {
+    const projectRow = stateRef.current.projects.find((p) => p.id === id)
+    if (!projectRow) return null
+    const { nodes, edges, flags, aliases } = stateRef.current
+    return composeProject(projectRow, nodes, edges, flags, aliases)
+  }, [])
 
   return {
-    /** Flat project metadata rows — use for listing */
+    /** Flat project metadata rows — use for listing. */
     projects: state.projects,
     saveProject,
     removeProject,

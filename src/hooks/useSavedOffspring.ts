@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
 import { genotypeKey } from '../playground/utils/compactLabel'
+import { loadFromStorage, persistToStorage } from '../lib/storage'
 
 export interface SavedOffspring {
   id: string
@@ -14,25 +15,10 @@ export interface SavedOffspring {
 
 const STORAGE_KEY = 'saved-offspring'
 
-function load(): SavedOffspring[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as SavedOffspring[]) : []
-  } catch {
-    return []
-  }
-}
-
-function persist(savedOffspring: SavedOffspring[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedOffspring))
-  } catch {
-    // ignore
-  }
-}
-
 export function useSavedOffspring() {
-  const [savedOffspring, setSavedOffspring] = useState<SavedOffspring[]>(load)
+  const [savedOffspring, setSavedOffspring] = useState<SavedOffspring[]>(() =>
+    loadFromStorage<SavedOffspring>(STORAGE_KEY)
+  )
 
   const save = useCallback(
     (pairingId: string, outcome: OffspringOutcome): string => {
@@ -55,7 +41,7 @@ export function useSavedOffspring() {
 
       setSavedOffspring((prev) => {
         const next = [entry, ...prev]
-        persist(next)
+        persistToStorage(STORAGE_KEY, next)
         return next
       })
 
@@ -67,7 +53,7 @@ export function useSavedOffspring() {
   const remove = useCallback((id: string) => {
     setSavedOffspring((prev) => {
       const next = prev.filter((entry) => entry.id !== id)
-      persist(next)
+      persistToStorage(STORAGE_KEY, next)
       return next
     })
   }, [])
@@ -75,7 +61,7 @@ export function useSavedOffspring() {
   const removeByPairing = useCallback((pairingId: string) => {
     setSavedOffspring((prev) => {
       const next = prev.filter((entry) => entry.pairingId !== pairingId)
-      persist(next)
+      persistToStorage(STORAGE_KEY, next)
       return next
     })
   }, [])
