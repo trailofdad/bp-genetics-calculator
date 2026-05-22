@@ -25,7 +25,6 @@ function probabilityBadgeClass(prob: number) {
 }
 
 const DEFAULT_SHOWN = 8
-const FLAGGED_COLLAPSED_SHOWN = 3
 
 function OutcomeLabel({
   label,
@@ -100,12 +99,22 @@ function OutcomeLabel({
   )
 }
 
+type OutcomeTab = 'all' | 'flagged'
+
+function traitCount(outcome: OffspringOutcome): number {
+  return Object.values(outcome.genotype).filter((c) => c > 0).length
+}
+
 export function PairingNode({ data }: { data: PairingNodeData }) {
   const { node, onPairOffspring, onRenameOutcome, onFlagOutcome, isRoot } = data
   const [showAll, setShowAll] = useState(false)
+  const [activeTab, setActiveTab] = useState<OutcomeTab>('all')
 
   const outcomes = useMemo(
-    () => calculateOffspring(node.parent1, node.parent2),
+    () =>
+      calculateOffspring(node.parent1, node.parent2).sort(
+        (a, b) => traitCount(b) - traitCount(a)
+      ),
     [node.parent1, node.parent2]
   )
 
@@ -129,13 +138,11 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
     return { flaggedOutcomes: flagged, unflaggedOutcomes: unflagged }
   }, [flaggedKeys, outcomes])
 
-  const collapsedShown =
-    flaggedOutcomes.length > 0 ? FLAGGED_COLLAPSED_SHOWN : DEFAULT_SHOWN
-  const visibleUnflagged = showAll
-    ? unflaggedOutcomes
-    : unflaggedOutcomes.slice(0, collapsedShown)
-  const visible = [...flaggedOutcomes, ...visibleUnflagged]
-  const hiddenCount = unflaggedOutcomes.length - visibleUnflagged.length
+  const tabOutcomes = activeTab === 'flagged' ? flaggedOutcomes : unflaggedOutcomes
+  const visibleTabOutcomes = showAll
+    ? tabOutcomes
+    : tabOutcomes.slice(0, DEFAULT_SHOWN)
+  const hiddenCount = tabOutcomes.length - visibleTabOutcomes.length
 
   const pairedChildGenotypes = useMemo(
     () => new Set(node.childEdges.map((edge) => genotypeKey(edge.offspringGenotype))),
@@ -167,8 +174,39 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
         </p>
       </div>
 
+      {/* Tab bar */}
+      <div className="flex gap-1 border-b border-white/5 px-3 pt-2 pb-0">
+        <button
+          onClick={() => { setActiveTab('all'); setShowAll(false) }}
+          className={`rounded-t-md px-2.5 py-1 text-[10px] font-medium transition-colors ${
+            activeTab === 'all'
+              ? 'border border-b-0 border-white/10 bg-[#161b27] text-slate-200'
+              : 'text-slate-500 hover:text-slate-300'
+          }`}
+        >
+          All ({unflaggedOutcomes.length})
+        </button>
+        <button
+          onClick={() => { setActiveTab('flagged'); setShowAll(false) }}
+          className={`rounded-t-md px-2.5 py-1 text-[10px] font-medium transition-colors ${
+            activeTab === 'flagged'
+              ? 'border border-b-0 border-white/10 bg-[#161b27] text-amber-300'
+              : flaggedOutcomes.length > 0
+                ? 'text-amber-500/70 hover:text-amber-300'
+                : 'text-slate-600 hover:text-slate-400'
+          }`}
+        >
+          ★ Flagged ({flaggedOutcomes.length})
+        </button>
+      </div>
+
       <div className="flex flex-col gap-1 px-3 py-2">
-        {visible.map((outcome) => {
+        {activeTab === 'flagged' && flaggedOutcomes.length === 0 && (
+          <p className="py-3 text-center text-[10px] text-slate-600">
+            No flagged offspring yet — use ☆ to flag outcomes.
+          </p>
+        )}
+        {visibleTabOutcomes.map((outcome) => {
           const gKey = genotypeKey(outcome.genotype)
           const alreadyPaired = pairedChildGenotypes.has(gKey)
           const alias = node.offspringAliases?.[gKey]
@@ -180,7 +218,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
             <div
               key={gKey}
               className={`group flex items-center justify-between gap-2 rounded-lg border px-2 py-1.5 ${
-                isFlagged
+                activeTab === 'flagged'
                   ? 'border-amber-500/20 bg-amber-500/8'
                   : 'border-white/5 bg-white/3'
               }`}
@@ -250,7 +288,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
             Show {hiddenCount} more
           </button>
         )}
-        {showAll && unflaggedOutcomes.length > collapsedShown && (
+        {showAll && tabOutcomes.length > DEFAULT_SHOWN && (
           <button
             onClick={() => setShowAll(false)}
             className="py-1 text-center text-[11px] text-slate-600 transition-colors hover:text-slate-400"

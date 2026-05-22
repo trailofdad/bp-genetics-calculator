@@ -278,7 +278,9 @@ export function CalculatorPage() {
               setSaveName('')
               setSaveModalOpen(true)
             }}
-            className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium tracking-tight text-white transition-colors hover:bg-indigo-500"
+            disabled={!!currentPairingId}
+            title={currentPairingId ? 'Pairing already saved' : undefined}
+            className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium tracking-tight text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-indigo-600"
           >
             Save Pairing
           </button>
