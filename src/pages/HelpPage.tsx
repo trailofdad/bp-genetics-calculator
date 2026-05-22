@@ -178,8 +178,8 @@ export function HelpPage() {
               onClick={() => setConfirmReset(true)}
               className="flex items-center gap-2 rounded-xl border border-rose-500/25 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-400 transition-colors hover:border-rose-500/40 hover:bg-rose-500/20"
             >
-              <TrashCanIcon className="h-4 w-4" />
               Reset All Data…
+              <TrashCanIcon className="h-4 w-4" />
             </button>
           </div>
         </SubSection>

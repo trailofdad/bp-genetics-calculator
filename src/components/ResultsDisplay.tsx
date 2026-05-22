@@ -152,18 +152,18 @@ export function ResultsDisplay({
               >
                 {k === 'probability' ? (
                   <>
-                    <PercentIcon className="h-3.5 w-3.5" />
                     By %
+                    <PercentIcon className="h-3.5 w-3.5" />
                   </>
                 ) : k === 'traits' ? (
                   <>
-                    <DnaIcon className="h-3.5 w-3.5" />
                     By traits
+                    <DnaIcon className="h-3.5 w-3.5" />
                   </>
                 ) : (
                   <>
-                    <ArrowDownAZIcon className="h-3.5 w-3.5" />
                     A–Z
+                    <ArrowDownAZIcon className="h-3.5 w-3.5" />
                   </>
                 )}
               </button>

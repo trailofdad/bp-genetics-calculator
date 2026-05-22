@@ -188,8 +188,8 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          <ListIcon className="h-3.5 w-3.5" />
           All ({unflaggedOutcomes.length})
+          <ListIcon className="h-3.5 w-3.5" />
         </button>
         <button
           onClick={() => { setActiveTab('flagged'); setShowAll(false) }}
@@ -201,8 +201,8 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
                 : 'text-muted-foreground/60 hover:text-muted-foreground'
           }`}
         >
-          <StarIcon className="h-3.5 w-3.5" />
           Flagged ({flaggedOutcomes.length})
+          <StarIcon className="h-3.5 w-3.5" />
         </button>
       </div>
 
@@ -307,8 +307,8 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
             onClick={() => setShowAll(true)}
             className="inline-flex items-center justify-center gap-1 py-1 text-center text-[11px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
           >
-            <ChevronDownIcon className="h-3.5 w-3.5" />
             Show {hiddenCount} more
+            <ChevronDownIcon className="h-3.5 w-3.5" />
           </button>
         )}
         {showAll && tabOutcomes.length > DEFAULT_SHOWN && (
@@ -316,8 +316,8 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
             onClick={() => setShowAll(false)}
             className="inline-flex items-center justify-center gap-1 py-1 text-center text-[11px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
           >
-            <ChevronDownIcon className="h-3.5 w-3.5 rotate-180" />
             Show less
+            <ChevronDownIcon className="h-3.5 w-3.5 rotate-180" />
           </button>
         )}
       </div>

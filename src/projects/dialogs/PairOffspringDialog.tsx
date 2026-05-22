@@ -240,16 +240,16 @@ export function PairOffspringDialog({
               onClick={onClose}
               className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              <XmarkIcon className="h-3.5 w-3.5" />
               Cancel
+              <XmarkIcon className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={handleConfirm}
               disabled={!canConfirm}
               className="inline-flex items-center gap-1.5 rounded-xl border border-transparent bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-500 disabled:pointer-events-none disabled:opacity-40"
             >
-              <CodeForkIcon className="h-3.5 w-3.5" />
               Add Branch
+              <CodeForkIcon className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>

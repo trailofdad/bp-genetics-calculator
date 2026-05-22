@@ -166,8 +166,8 @@ export function DashboardPage() {
                 onClick={() => navigate('/animals')}
                 className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
               >
+                Manage
                 <ArrowRightIcon className="h-3.5 w-3.5" />
-                Manage →
               </button>
             </div>
             {traitStats.length === 0 ? (
@@ -321,8 +321,8 @@ export function DashboardPage() {
               onClick={() => navigate('/calculator')}
               className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
             >
+              New goal
               <PlusIcon className="h-3.5 w-3.5" />
-              New goal →
             </button>
           }
         >
@@ -358,8 +358,8 @@ export function DashboardPage() {
                         onClick={() => navigate('/projects', { state: { project } })}
                         className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground/80"
                       >
-                        <ArrowUpRightFromSquareIcon className="h-3.5 w-3.5" />
-                        Open
+                       Open
+                       <ArrowUpRightFromSquareIcon className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </div>
@@ -426,8 +426,8 @@ export function DashboardPage() {
                   onClick={() => navigate('/calculator')}
                   className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
                 >
-                  <ArrowRightIcon className="h-3.5 w-3.5" />
                   Go to Calculator
+                  <ArrowRightIcon className="h-3.5 w-3.5" />
                 </button>
               </div>
             )}
@@ -444,10 +444,15 @@ export function DashboardPage() {
             onClick={() => navigate('/animals')}
             className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
           >
-            {animals.length > 6 ? `View all ${animals.length} →` : (
+            {animals.length > 6 ? (
               <>
+                {`View all ${animals.length}`}
                 <ArrowRightIcon className="h-3.5 w-3.5" />
-                Manage →
+              </>
+            ) : (
+              <>
+                Manage
+                <ArrowRightIcon className="h-3.5 w-3.5" />
               </>
             )}
           </button>
@@ -465,15 +470,15 @@ export function DashboardPage() {
                 onClick={() => navigate('/animals')}
                 className="mt-1 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
               >
-                <PlusIcon className="h-3.5 w-3.5" />
                 Add Animal
+                <PlusIcon className="h-3.5 w-3.5" />
               </button>
               <button
                 onClick={() => navigate('/animals', { state: { openImport: true } })}
                 className="mt-1 inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-4 py-2 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
               >
-                <ArrowUpFromBracketIcon className="h-3.5 w-3.5" />
                 Import Animals
+                <ArrowUpFromBracketIcon className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -502,8 +507,8 @@ export function DashboardPage() {
                     }
                     className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
-                    <ArrowRightIcon className="h-3.5 w-3.5" />
                     Load as Sire
+                    <ArrowRightIcon className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() =>
@@ -513,8 +518,8 @@ export function DashboardPage() {
                     }
                     className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
-                    <ArrowRightIcon className="h-3.5 w-3.5" />
                     Load as Dam
+                    <ArrowRightIcon className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => navigate('/animals')}
@@ -538,9 +543,10 @@ export function DashboardPage() {
           action={
             <button
               onClick={() => navigate('/pairings')}
-              className="text-xs text-indigo-400 transition-colors hover:text-indigo-300"
+              className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
             >
-              View all →
+              View all
+              <ArrowRightIcon className="h-3.5 w-3.5" />
             </button>
           }
         >
@@ -567,8 +573,8 @@ export function DashboardPage() {
                     }
                     className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
                   >
-                    <ArrowRightIcon className="h-3.5 w-3.5" />
                     Load
+                    <ArrowRightIcon className="h-3.5 w-3.5" />
                   </button>
                 </div>
               )
@@ -706,8 +712,8 @@ function GoalRow({
         >
           {goal.achieved ? (
             <span className="inline-flex items-center gap-1">
-              <ArrowRotateLeftIcon className="h-3.5 w-3.5" />
               Reopen
+              <ArrowRotateLeftIcon className="h-3.5 w-3.5" />
             </span>
           ) : (
             <CheckIcon className="h-3.5 w-3.5" />

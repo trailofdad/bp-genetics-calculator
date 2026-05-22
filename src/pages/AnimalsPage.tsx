@@ -98,15 +98,15 @@ export function AnimalsPage() {
             onClick={() => setImportOpen(true)}
             className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <ArrowUpFromBracketIcon className="h-4 w-4" />
             <span>Import</span>
+            <ArrowUpFromBracketIcon className="h-4 w-4" />
           </button>
           <button
             onClick={openAdd}
             className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
           >
-            <PlusIcon className="h-4 w-4" />
             <span>Add Animal</span>
+            <PlusIcon className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -123,8 +123,8 @@ export function AnimalsPage() {
             onClick={openAdd}
             className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
           >
-            <PlusIcon className="h-3.5 w-3.5" />
             Add Animal
+            <PlusIcon className="h-3.5 w-3.5" />
           </button>
         </div>
       ) : (
@@ -187,8 +187,8 @@ export function AnimalsPage() {
                           title="Load as Sire in Calculator"
                         >
                           <span className="inline-flex items-center gap-1">
-                            <ArrowRightIcon className="h-3.5 w-3.5" />
                             <span>Sire</span>
+                            <ArrowRightIcon className="h-3.5 w-3.5" />
                           </span>
                         </button>
                       )}
@@ -203,8 +203,8 @@ export function AnimalsPage() {
                           title="Load as Dam in Calculator"
                         >
                           <span className="inline-flex items-center gap-1">
-                            <ArrowRightIcon className="h-3.5 w-3.5" />
                             <span>Dam</span>
+                            <ArrowRightIcon className="h-3.5 w-3.5" />
                           </span>
                         </button>
                       )}
@@ -287,8 +287,8 @@ export function AnimalsPage() {
                         : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground'
                     }`}
                   >
-                    <MarsIcon className="h-3.5 w-3.5" />
                     Male
+                    <MarsIcon className="h-3.5 w-3.5" />
                   </button>
                   <button
                     type="button"
@@ -303,8 +303,8 @@ export function AnimalsPage() {
                         : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground'
                     }`}
                   >
-                    <VenusIcon className="h-3.5 w-3.5" />
                     Female
+                    <VenusIcon className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
@@ -328,8 +328,8 @@ export function AnimalsPage() {
                 onClick={() => setModal(null)}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                <XmarkIcon className="h-4 w-4" />
                 Cancel
+                <XmarkIcon className="h-4 w-4" />
               </button>
               <button
                 onClick={handleSave}
@@ -337,13 +337,13 @@ export function AnimalsPage() {
               >
                 {modal.mode === 'add' ? (
                   <>
-                    <PlusIcon className="h-4 w-4" />
                     Add Animal
+                    <PlusIcon className="h-4 w-4" />
                   </>
                 ) : (
                   <>
-                    <FloppyDiskIcon className="h-4 w-4" />
                     Save Changes
+                    <FloppyDiskIcon className="h-4 w-4" />
                   </>
                 )}
               </button>
@@ -378,15 +378,15 @@ export function AnimalsPage() {
                 onClick={() => setConfirmDelete(null)}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                <XmarkIcon className="h-4 w-4" />
                 Cancel
+                <XmarkIcon className="h-4 w-4" />
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-rose-500"
               >
-                <TrashCanIcon className="h-4 w-4" />
                 Delete
+                <TrashCanIcon className="h-4 w-4" />
               </button>
             </div>
           </div>

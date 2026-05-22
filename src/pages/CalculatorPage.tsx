@@ -269,8 +269,8 @@ export function CalculatorPage() {
             onClick={() => setLoadPairingPickerOpen(true)}
             className="flex items-center gap-1.5 rounded-xl border border-border bg-muted/30 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
           >
-            <FolderOpenIcon className="h-3.5 w-3.5" />
             <span>Load Pairing</span>
+            <FolderOpenIcon className="h-3.5 w-3.5" />
           </button>
         </div>
       )}
@@ -320,8 +320,8 @@ export function CalculatorPage() {
                         onClick={() => setLoadAnimalPicker(slot)}
                         className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground/60 transition-colors hover:bg-muted/60 hover:text-foreground/80"
                       >
-                        <FolderOpenIcon className="h-3.5 w-3.5" />
                         <span>Load Animal</span>
+                        <FolderOpenIcon className="h-3.5 w-3.5" />
                       </button>
                     ) : undefined
                   }
@@ -335,8 +335,8 @@ export function CalculatorPage() {
                       }
                       className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground/60 transition-colors hover:bg-muted/60 hover:text-foreground/80"
                     >
-                      <FaSnakeIcon className="h-4 w-4" />
                       <span>Save Animal</span>
+                      <FaSnakeIcon className="h-4 w-4" />
                     </button>
                   )}
                 </div>
@@ -357,8 +357,8 @@ export function CalculatorPage() {
             title={currentPairingId ? 'Pairing already saved' : undefined}
             className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium tracking-tight text-foreground transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-indigo-600"
           >
-            <FloppyDiskIcon className="h-4 w-4" />
             Save Pairing
+            <FloppyDiskIcon className="h-4 w-4" />
           </button>
           <button
             onClick={handleOpenInProjects}
@@ -366,15 +366,15 @@ export function CalculatorPage() {
             title={!currentPairingId ? 'Save pairing first' : 'Open in Projects'}
             className="flex items-center gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-emerald-500/10"
           >
-            <CodeForkIcon className="h-4 w-4" />
             <span>Open in Projects</span>
+            <CodeForkIcon className="h-4 w-4" />
           </button>
           <button
             onClick={handleReset}
             className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <ArrowRotateLeftIcon className="h-4 w-4" />
             Reset
+            <ArrowRotateLeftIcon className="h-4 w-4" />
           </button>
         </div>
       )}
@@ -419,15 +419,15 @@ export function CalculatorPage() {
                 onClick={() => setSaveModalOpen(false)}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                <XmarkIcon className="h-4 w-4" />
                 Cancel
+                <XmarkIcon className="h-4 w-4" />
               </button>
               <button
                 onClick={handleSaveConfirm}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
               >
-                <FloppyDiskIcon className="h-4 w-4" />
                 Save
+                <FloppyDiskIcon className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -462,15 +462,15 @@ export function CalculatorPage() {
                 onClick={() => setSaveAnimalModal(null)}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                <XmarkIcon className="h-4 w-4" />
                 Cancel
+                <XmarkIcon className="h-4 w-4" />
               </button>
               <button
                 onClick={handleSaveAnimalConfirm}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
               >
-                <FloppyDiskIcon className="h-4 w-4" />
                 Save
+                <FloppyDiskIcon className="h-4 w-4" />
               </button>
             </div>
           </div>

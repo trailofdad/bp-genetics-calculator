@@ -91,8 +91,8 @@ export function PairingsPage() {
           onClick={() => navigate('/calculator')}
           className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
         >
-          <PlusIcon className="h-4 w-4" />
           <span>New Pairing</span>
+          <PlusIcon className="h-4 w-4" />
         </button>
       </div>
 
@@ -107,8 +107,8 @@ export function PairingsPage() {
             onClick={() => navigate('/calculator')}
             className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
           >
-            <ArrowRightIcon className="h-3.5 w-3.5" />
             Go to Calculator
+            <ArrowRightIcon className="h-3.5 w-3.5" />
           </button>
         </div>
       ) : (
@@ -210,8 +210,8 @@ export function PairingsPage() {
                             className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
                             title="Load in Calculator"
                           >
-                            <ArrowRightIcon className="h-3.5 w-3.5" />
                             Load
+                            <ArrowRightIcon className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => handleOpenProject(pairing)}
@@ -228,13 +228,13 @@ export function PairingsPage() {
                             >
                               {expanded ? (
                                 <>
-                                  <EyeSlashIcon className="h-3.5 w-3.5" />
                                   Hide saved
+                                  <EyeSlashIcon className="h-3.5 w-3.5" />
                                 </>
                               ) : (
                                 <>
-                                  <StarIcon className="h-3.5 w-3.5" />
                                   Saved offspring
+                                  <StarIcon className="h-3.5 w-3.5" />
                                 </>
                               )}
                             </button>
@@ -344,15 +344,15 @@ export function PairingsPage() {
                     onClick={() => setEditingNotesId(null)}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
-                    <XmarkIcon className="h-4 w-4" />
                     Cancel
+                    <XmarkIcon className="h-4 w-4" />
                   </button>
                   <button
                     onClick={saveNotes}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
                   >
-                    <FloppyDiskIcon className="h-4 w-4" />
                     Save Notes
+                    <FloppyDiskIcon className="h-4 w-4" />
                   </button>
                 </div>
               </div>
@@ -387,15 +387,15 @@ export function PairingsPage() {
                 onClick={() => setConfirmDelete(null)}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                <XmarkIcon className="h-4 w-4" />
                 Cancel
+                <XmarkIcon className="h-4 w-4" />
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-rose-500"
               >
-                <TrashCanIcon className="h-4 w-4" />
                 Delete
+                <TrashCanIcon className="h-4 w-4" />
               </button>
             </div>
           </div>

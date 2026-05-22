@@ -142,8 +142,8 @@ function AnimalCard({
             onClick={onLoad1}
             className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-xs text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
           >
-            <ArrowRightIcon className="h-3.5 w-3.5" />
             <span>Sire</span>
+            <ArrowRightIcon className="h-3.5 w-3.5" />
           </button>
         )}
         {onLoad2 && (
@@ -151,16 +151,16 @@ function AnimalCard({
             onClick={onLoad2}
             className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-xs text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
           >
-            <ArrowRightIcon className="h-3.5 w-3.5" />
             <span>Dam</span>
+            <ArrowRightIcon className="h-3.5 w-3.5" />
           </button>
         )}
         <button
           onClick={onSave}
           className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/20 bg-indigo-600/30 px-3 py-1.5 text-xs text-indigo-300 transition-colors hover:bg-indigo-600/50 hover:text-indigo-200"
         >
-          <FloppyDiskIcon className="h-3.5 w-3.5" />
           Save
+          <FloppyDiskIcon className="h-3.5 w-3.5" />
         </button>
       </div>
     </div>
@@ -303,8 +303,8 @@ export function ImportModal({
               }}
               className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/20 bg-indigo-600/30 px-3 py-1.5 text-xs text-indigo-300 transition-colors hover:bg-indigo-600/50 hover:text-indigo-200"
             >
-              <FloppyDiskIcon className="h-3.5 w-3.5" />
               Save all
+              <FloppyDiskIcon className="h-3.5 w-3.5" />
             </button>
           </div>
         )}
