@@ -1,13 +1,13 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { loadFromStorage, persistToStorage } from '../lib/storage'
 import type {
-  PlaygroundProject,
-  PlaygroundNode,
-  PlaygroundProjectRow,
-  PlaygroundNodeRow,
-  PlaygroundEdgeRow,
-  PlaygroundNodeFlagRow,
-  PlaygroundNodeAliasRow,
+  BreedingProject,
+  ProjectNode,
+  ProjectRow,
+  ProjectNodeRow,
+  ProjectEdgeRow,
+  ProjectNodeFlagRow,
+  ProjectNodeAliasRow,
 } from './types'
 
 // ---------------------------------------------------------------------------
@@ -21,25 +21,23 @@ const KEYS = {
   edges: 'pg-edges',
   flags: 'pg-node-flags',
   aliases: 'pg-node-aliases',
-  // Legacy single-blob key — used only for one-time migration
-  legacy: 'playground-projects',
 } as const
 
 // ---------------------------------------------------------------------------
-// Decompose: PlaygroundProject → flat rows
+// Decompose: BreedingProject → flat rows
 // TODO (DB migration): replace with INSERT/UPDATE per table
 // ---------------------------------------------------------------------------
-function decomposeProject(project: PlaygroundProject): {
-  projectRow: PlaygroundProjectRow
-  nodeRows: PlaygroundNodeRow[]
-  edgeRows: PlaygroundEdgeRow[]
-  flagRows: PlaygroundNodeFlagRow[]
-  aliasRows: PlaygroundNodeAliasRow[]
+function decomposeProject(project: BreedingProject): {
+  projectRow: ProjectRow
+  nodeRows: ProjectNodeRow[]
+  edgeRows: ProjectEdgeRow[]
+  flagRows: ProjectNodeFlagRow[]
+  aliasRows: ProjectNodeAliasRow[]
 } {
-  const nodeRows: PlaygroundNodeRow[] = []
-  const edgeRows: PlaygroundEdgeRow[] = []
-  const flagRows: PlaygroundNodeFlagRow[] = []
-  const aliasRows: PlaygroundNodeAliasRow[] = []
+  const nodeRows: ProjectNodeRow[] = []
+  const edgeRows: ProjectEdgeRow[] = []
+  const flagRows: ProjectNodeFlagRow[] = []
+  const aliasRows: ProjectNodeAliasRow[] = []
 
   for (const node of Object.values(project.nodes)) {
     nodeRows.push({
@@ -90,19 +88,19 @@ function decomposeProject(project: PlaygroundProject): {
 }
 
 // ---------------------------------------------------------------------------
-// Compose: flat rows → PlaygroundProject
+// Compose: flat rows → BreedingProject
 // TODO (DB migration): replace with a JOIN query across all 5 tables
 // ---------------------------------------------------------------------------
 function composeProject(
-  projectRow: PlaygroundProjectRow,
-  allNodes: PlaygroundNodeRow[],
-  allEdges: PlaygroundEdgeRow[],
-  allFlags: PlaygroundNodeFlagRow[],
-  allAliases: PlaygroundNodeAliasRow[]
-): PlaygroundProject {
+  projectRow: ProjectRow,
+  allNodes: ProjectNodeRow[],
+  allEdges: ProjectEdgeRow[],
+  allFlags: ProjectNodeFlagRow[],
+  allAliases: ProjectNodeAliasRow[]
+): BreedingProject {
   const projectNodes = allNodes.filter((n) => n.projectId === projectRow.id)
   const projectEdges = allEdges.filter((e) => e.projectId === projectRow.id)
-  const nodes: Record<string, PlaygroundNode> = {}
+  const nodes: Record<string, ProjectNode> = {}
 
   for (const nodeRow of projectNodes) {
     const nodeEdges = projectEdges.filter((e) => e.parentNodeId === nodeRow.id)
@@ -142,69 +140,26 @@ function composeProject(
 }
 
 interface StorageState {
-  projects: PlaygroundProjectRow[]
-  nodes: PlaygroundNodeRow[]
-  edges: PlaygroundEdgeRow[]
-  flags: PlaygroundNodeFlagRow[]
-  aliases: PlaygroundNodeAliasRow[]
+  projects: ProjectRow[]
+  nodes: ProjectNodeRow[]
+  edges: ProjectEdgeRow[]
+  flags: ProjectNodeFlagRow[]
+  aliases: ProjectNodeAliasRow[]
 }
 
-/** Loads from flat tables, migrating from the legacy single-blob format on first run.
- * TODO (DB migration): remove migration path once DB is source of truth. */
 function loadInitialState(): StorageState {
-  const projects = loadFromStorage<PlaygroundProjectRow>(KEYS.projects)
-
-  // If new tables already have data, use them as-is
-  if (projects.length > 0) {
-    return {
-      projects,
-      nodes: loadFromStorage<PlaygroundNodeRow>(KEYS.nodes),
-      edges: loadFromStorage<PlaygroundEdgeRow>(KEYS.edges),
-      flags: loadFromStorage<PlaygroundNodeFlagRow>(KEYS.flags),
-      aliases: loadFromStorage<PlaygroundNodeAliasRow>(KEYS.aliases),
-    }
-  }
-
-  // Attempt migration from old format
-  const legacy = loadFromStorage<PlaygroundProject>(KEYS.legacy)
-  if (legacy.length === 0) {
-    return { projects: [], nodes: [], edges: [], flags: [], aliases: [] }
-  }
-
-  const allProjects: PlaygroundProjectRow[] = []
-  const allNodes: PlaygroundNodeRow[] = []
-  const allEdges: PlaygroundEdgeRow[] = []
-  const allFlags: PlaygroundNodeFlagRow[] = []
-  const allAliases: PlaygroundNodeAliasRow[] = []
-
-  for (const project of legacy) {
-    const { projectRow, nodeRows, edgeRows, flagRows, aliasRows } =
-      decomposeProject(project)
-    allProjects.push(projectRow)
-    allNodes.push(...nodeRows)
-    allEdges.push(...edgeRows)
-    allFlags.push(...flagRows)
-    allAliases.push(...aliasRows)
-  }
-
-  persistToStorage(KEYS.projects, allProjects)
-  persistToStorage(KEYS.nodes, allNodes)
-  persistToStorage(KEYS.edges, allEdges)
-  persistToStorage(KEYS.flags, allFlags)
-  persistToStorage(KEYS.aliases, allAliases)
-
   return {
-    projects: allProjects,
-    nodes: allNodes,
-    edges: allEdges,
-    flags: allFlags,
-    aliases: allAliases,
+    projects: loadFromStorage<ProjectRow>(KEYS.projects),
+    nodes: loadFromStorage<ProjectNodeRow>(KEYS.nodes),
+    edges: loadFromStorage<ProjectEdgeRow>(KEYS.edges),
+    flags: loadFromStorage<ProjectNodeFlagRow>(KEYS.flags),
+    aliases: loadFromStorage<ProjectNodeAliasRow>(KEYS.aliases),
   }
 }
 
 // ---------------------------------------------------------------------------
 // TODO (DB migration): replace useState + persistToStorage calls with DB mutations
-export function usePlaygroundStorage() {
+export function useProjectsStorage() {
   const [state, setState] = useState<StorageState>(loadInitialState)
 
   // Stable ref keeps loadProject from going stale without adding state to deps
@@ -213,7 +168,7 @@ export function usePlaygroundStorage() {
 
   /** Upsert a full project across all 5 tables.
    * TODO (DB migration): replace with upsert transactions per table. */
-  const saveProject = useCallback((project: PlaygroundProject) => {
+  const saveProject = useCallback((project: BreedingProject) => {
     const { projectRow, nodeRows, edgeRows, flagRows, aliasRows } =
       decomposeProject(project)
 
@@ -258,9 +213,9 @@ export function usePlaygroundStorage() {
     })
   }, [])
 
-  /** Compose a full PlaygroundProject from flat rows by ID.
+  /** Compose a full BreedingProject from flat rows by ID.
    * TODO (DB migration): replace with a JOIN query across all 5 tables. */
-  const loadProject = useCallback((id: string): PlaygroundProject | null => {
+  const loadProject = useCallback((id: string): BreedingProject | null => {
     const projectRow = stateRef.current.projects.find((p) => p.id === id)
     if (!projectRow) return null
     const { nodes, edges, flags, aliases } = stateRef.current
@@ -270,6 +225,14 @@ export function usePlaygroundStorage() {
   return {
     /** Flat project metadata rows — use for listing. */
     projects: state.projects,
+    /** pairingId → projectId mapping derived from project nodes. */
+    pairingIdToProjectId: useMemo(() => {
+      const map = new Map<string, string>()
+      for (const node of state.nodes) {
+        if (node.pairingId) map.set(node.pairingId, node.projectId)
+      }
+      return map
+    }, [state.nodes]),
     saveProject,
     removeProject,
     loadProject,

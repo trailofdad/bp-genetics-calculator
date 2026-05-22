@@ -2,15 +2,18 @@ import { useMemo, useState, useRef, useEffect } from 'react'
 import { Handle, Position } from '@xyflow/react'
 import { calculateOffspring, formatProbability } from 'bp-genetics'
 import type { OffspringOutcome } from 'bp-genetics'
-import type { PlaygroundNode } from '../types'
+import type { ProjectNode } from '../types'
 import { Badge } from '@/components/ui/badge'
+import { Tooltip } from '@/components/ui/tooltip'
 import { buildCompactLabel, genotypeKey } from '../utils/compactLabel'
 
 export interface PairingNodeData {
-  node: PlaygroundNode
+  node: ProjectNode
   onPairOffspring: (outcome: OffspringOutcome) => void
   onRenameOutcome: (genotypeKey: string, alias: string | null) => void
   onFlagOutcome: (genotypeKey: string) => void
+  onAddGoal: (outcome: OffspringOutcome) => void
+  goalKeys: Set<string>
   isRoot: boolean
 }
 
@@ -106,7 +109,7 @@ function traitCount(outcome: OffspringOutcome): number {
 }
 
 export function PairingNode({ data }: { data: PairingNodeData }) {
-  const { node, onPairOffspring, onRenameOutcome, onFlagOutcome, isRoot } = data
+  const { node, onPairOffspring, onRenameOutcome, onFlagOutcome, onAddGoal, goalKeys, isRoot } = data
   const [showAll, setShowAll] = useState(false)
   const [activeTab, setActiveTab] = useState<OutcomeTab>('all')
 
@@ -213,6 +216,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
           const compactLabel = buildCompactLabel(outcome.genotype)
           const showProbability = outcome.probability < 1
           const isFlagged = flaggedKeys.has(gKey)
+          const isGoal = goalKeys.has(gKey)
 
           return (
             <div
@@ -247,6 +251,21 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-1">
+                <Tooltip
+                  content={isGoal ? "Already added to this project's goals" : "Add to this project's goals"}
+                  side="top"
+                >
+                  <button
+                    onClick={() => onAddGoal(outcome)}
+                    className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] transition-colors ${
+                      isGoal
+                        ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-300 cursor-default'
+                        : 'border-white/10 bg-white/5 text-slate-500 opacity-0 group-hover:opacity-100 hover:border-emerald-500/25 hover:bg-emerald-500/10 hover:text-emerald-300'
+                    }`}
+                  >
+                    {isGoal ? '◉' : '◎'}
+                  </button>
+                </Tooltip>
                 <button
                   onClick={() => onFlagOutcome(gKey)}
                   title={isFlagged ? 'Unflag outcome' : 'Flag outcome'}

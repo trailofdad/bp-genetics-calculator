@@ -16,9 +16,9 @@ import '@xyflow/react/dist/style.css'
 
 import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
 import { calculateOffspring } from 'bp-genetics'
-import type { PlaygroundProject } from './types'
+import type { BreedingProject } from './types'
 import type { SavedAnimal } from '../hooks/useSavedAnimals'
-import { usePlaygroundState } from './usePlaygroundState'
+import { useProjectsState } from './useProjectsState'
 import { PairingNode, type PairingNodeData } from './nodes/PairingNode'
 import { BranchEdge } from './edges/BranchEdge'
 import { PairOffspringDialog } from './dialogs/PairOffspringDialog'
@@ -31,14 +31,16 @@ const nodeTypes = { pairingNode: PairingNode }
 const edgeTypes = { branchEdge: BranchEdge }
 
 function buildGraph(
-  project: PlaygroundProject,
+  project: BreedingProject,
   onPairOffspring: (nodeId: string, outcome: OffspringOutcome) => void,
   onRenameOutcome: (
     nodeId: string,
     genotypeKey: string,
     alias: string | null
   ) => void,
-  onFlagOutcome: (nodeId: string, genotypeKey: string) => void
+  onFlagOutcome: (nodeId: string, genotypeKey: string) => void,
+  onAddGoal: (nodeId: string, outcome: OffspringOutcome) => void,
+  goalKeys: Set<string>
 ): { nodes: Node[]; edges: Edge[] } {
   const g = new dagre.graphlib.Graph()
   g.setDefaultEdgeLabel(() => ({}))
@@ -70,6 +72,8 @@ function buildGraph(
       onPairOffspring: (outcome) => onPairOffspring(node.id, outcome),
       onRenameOutcome: (gKey, alias) => onRenameOutcome(node.id, gKey, alias),
       onFlagOutcome: (gKey) => onFlagOutcome(node.id, gKey),
+      onAddGoal: (outcome) => onAddGoal(node.id, outcome),
+      goalKeys,
     }
     return {
       id: node.id,
@@ -100,22 +104,26 @@ function buildGraph(
 }
 
 interface Props {
-  project: PlaygroundProject
+  project: BreedingProject
   savedAnimals: SavedAnimal[]
   saveAnimal: (name: string, genotype: ParentGenotype) => void
   onBack: () => void
-  onSave: (project: PlaygroundProject) => void
+  onSave: (project: BreedingProject) => void
+  onSaveGoal: (outcome: OffspringOutcome, pairingId?: string, pairingName?: string) => void
+  goalKeys: Set<string>
 }
 
-export function PlaygroundView({
+export function ProjectsView({
   project: initialProject,
   savedAnimals,
   saveAnimal,
   onBack,
   onSave,
+  onSaveGoal,
+  goalKeys,
 }: Props) {
   const { project, addChildPairing, renameOutcome, toggleFlagOutcome } =
-    usePlaygroundState(initialProject)
+    useProjectsState(initialProject)
 
   const [pendingPair, setPendingPair] = useState<{
     nodeId: string
@@ -143,11 +151,22 @@ export function PlaygroundView({
     [toggleFlagOutcome]
   )
 
+  const handleAddGoal = useCallback(
+    (nodeId: string, outcome: OffspringOutcome) => {
+      const node = project.nodes[nodeId]
+      if (!node) return
+      onSaveGoal(outcome, node.pairingId, `${node.parent1Name} × ${node.parent2Name}`)
+    },
+    [project.nodes, onSaveGoal]
+  )
+
   const { nodes: layoutNodes, edges: layoutEdges } = buildGraph(
     project,
     handlePairOffspring,
     handleRenameOutcome,
-    handleFlagOutcome
+    handleFlagOutcome,
+    handleAddGoal,
+    goalKeys
   )
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutEdges)
@@ -157,12 +176,14 @@ export function PlaygroundView({
       project,
       handlePairOffspring,
       handleRenameOutcome,
-      handleFlagOutcome
+      handleFlagOutcome,
+      handleAddGoal,
+      goalKeys
     )
     setNodes(ln)
     setEdges(le)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project])
+  }, [project, goalKeys])
 
   // Auto-save on every project change after the initial render.
   // Uses a ref for onSave so stale closure is never an issue.
@@ -178,18 +199,19 @@ export function PlaygroundView({
     onSaveRef.current(project)
   }, [project])
 
-  const flaggedOffspring = useMemo<OffspringOutcome[]>(() => {
+  const flaggedOffspring = useMemo<(OffspringOutcome & { sourceLabel: string })[]>(() => {
     const seen = new Set<string>()
-    const results: OffspringOutcome[] = []
+    const results: (OffspringOutcome & { sourceLabel: string })[] = []
 
     for (const node of Object.values(project.nodes)) {
       const keys = new Set(node.flaggedOutcomeKeys ?? [])
       if (keys.size === 0) continue
+      const sourceLabel = `${node.parent1Name} × ${node.parent2Name}`
       for (const o of calculateOffspring(node.parent1, node.parent2)) {
         const key = genotypeKey(o.genotype)
         if (keys.has(key) && !seen.has(key)) {
           seen.add(key)
-          results.push(o)
+          results.push({ ...o, sourceLabel })
         }
       }
     }
@@ -212,21 +234,21 @@ export function PlaygroundView({
   }
 
   return (
-    <div className="flex h-screen flex-col bg-[#0d1117]">
+    <div className="fixed inset-0 z-40 flex flex-col bg-[#0d1117]">
       <div className="z-10 flex shrink-0 items-center justify-between border-b border-white/5 bg-[#0d1117] px-4 py-3">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
             className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-xs text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200"
           >
-            ← Calculator
+            ← Projects
           </button>
           <div>
             <p className="text-sm leading-none font-semibold text-white">
               {project.name}
             </p>
             <p className="mt-0.5 text-[10px] text-slate-600">
-              Breeding Playground
+              Projects
             </p>
           </div>
         </div>
@@ -267,6 +289,7 @@ export function PlaygroundView({
           </span>
           <span>
             Hover an offspring row → click{' '}
+            <span className="font-mono text-slate-300">◎</span> to set a goal,{' '}
             <span className="font-mono text-slate-300">+</span> to branch
           </span>
           <span>

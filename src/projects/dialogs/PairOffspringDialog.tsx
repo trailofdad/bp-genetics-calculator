@@ -14,7 +14,7 @@ import type { SavedAnimal } from '../../hooks/useSavedAnimals'
 interface Props {
   open: boolean
   offspring: OffspringOutcome | null
-  flaggedOffspring: OffspringOutcome[]
+  flaggedOffspring: (OffspringOutcome & { sourceLabel: string })[]
   savedAnimals: SavedAnimal[]
   onSaveAnimal: (name: string, genotype: ParentGenotype) => void
   onConfirm: (pairedWith: ParentGenotype, pairedWithName: string) => void
@@ -172,6 +172,9 @@ export function PairOffspringDialog({
                         {o.probability < 1
                           ? formatProbability(o.probability)
                           : '100%'}
+                        <span className="ml-1.5 text-slate-600">
+                          from {o.sourceLabel}
+                        </span>
                       </p>
                     </button>
                   )

@@ -3,10 +3,12 @@ import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
 import { useSavedAnimals } from '../hooks/useSavedAnimals'
 import { useSavedPairings } from '../hooks/useSavedPairings'
 import { useSavedOffspring } from '../hooks/useSavedOffspring'
-import { usePlaygroundStorage } from '../playground/usePlaygroundStorage'
+import { useProjectGoals } from '../hooks/useProjectGoals'
+import { useProjectsStorage } from '../projects/useProjectsStorage'
 import type { SavedAnimal } from '../hooks/useSavedAnimals'
 import type { SavedPairing } from '../hooks/useSavedPairings'
 import type { SavedOffspring } from '../hooks/useSavedOffspring'
+import type { ProjectGoal } from '../hooks/useProjectGoals'
 
 interface AppContextValue {
   animals: SavedAnimal[]
@@ -37,10 +39,17 @@ interface AppContextValue {
   saveOffspring: (pairingId: string, outcome: OffspringOutcome) => string
   removeSavedOffspring: (id: string) => void
 
-  projects: ReturnType<typeof usePlaygroundStorage>['projects']
-  saveProject: ReturnType<typeof usePlaygroundStorage>['saveProject']
-  removeProject: ReturnType<typeof usePlaygroundStorage>['removeProject']
-  loadProject: ReturnType<typeof usePlaygroundStorage>['loadProject']
+  projectGoals: ProjectGoal[]
+  saveProjectGoal: (outcome: OffspringOutcome, pairingId?: string, pairingName?: string) => string
+  removeProjectGoal: (id: string) => void
+  removeProjectGoalByKey: (genotypeKey: string) => void
+  toggleGoalAchieved: (id: string) => void
+
+  projects: ReturnType<typeof useProjectsStorage>['projects']
+  pairingIdToProjectId: ReturnType<typeof useProjectsStorage>['pairingIdToProjectId']
+  saveProject: ReturnType<typeof useProjectsStorage>['saveProject']
+  removeProject: ReturnType<typeof useProjectsStorage>['removeProject']
+  loadProject: ReturnType<typeof useProjectsStorage>['loadProject']
 }
 
 const AppContext = createContext<AppContextValue | null>(null)
@@ -60,15 +69,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     remove: removeSavedOffspring,
     removeByPairing: removeSavedOffspringByPairing,
   } = useSavedOffspring()
-  const { projects, saveProject, removeProject, loadProject } =
-    usePlaygroundStorage()
+  const {
+    projectGoals,
+    save: saveProjectGoal,
+    remove: removeProjectGoal,
+    removeByKey: removeProjectGoalByKey,
+    removeByPairing: removeProjectGoalsByPairing,
+    toggleAchieved: toggleGoalAchieved,
+  } = useProjectGoals()
+  const { projects, pairingIdToProjectId, saveProject, removeProject, loadProject } =
+    useProjectsStorage()
 
   const removePairing = useCallback(
     (id: string) => {
       removePairingEntry(id)
       removeSavedOffspringByPairing(id)
+      removeProjectGoalsByPairing(id)
     },
-    [removePairingEntry, removeSavedOffspringByPairing]
+    [removePairingEntry, removeSavedOffspringByPairing, removeProjectGoalsByPairing]
   )
 
   return (
@@ -86,7 +104,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         savedOffspring,
         saveOffspring,
         removeSavedOffspring,
+        projectGoals,
+        saveProjectGoal,
+        removeProjectGoal,
+        removeProjectGoalByKey,
+        toggleGoalAchieved,
         projects,
+        pairingIdToProjectId,
         saveProject,
         removeProject,
         loadProject,

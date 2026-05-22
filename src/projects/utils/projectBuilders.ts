@@ -1,7 +1,7 @@
 import type { SavedAnimal } from '../../hooks/useSavedAnimals'
 import type { SavedOffspring } from '../../hooks/useSavedOffspring'
 import type { SavedPairing } from '../../hooks/useSavedPairings'
-import type { PlaygroundProject } from '../types'
+import type { BreedingProject } from '../types'
 
 function makeId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
@@ -10,7 +10,7 @@ function makeId() {
 export function buildProjectFromPairing(
   pairing: SavedPairing,
   animals: SavedAnimal[]
-): PlaygroundProject {
+): BreedingProject {
   const rootNodeId = `${makeId()}-root`
   return {
     id: makeId(),
@@ -39,7 +39,7 @@ export function buildProjectFromSavedOffspring(
   pairing: SavedPairing,
   offspring: SavedOffspring,
   animals: SavedAnimal[]
-): PlaygroundProject {
+): BreedingProject {
   const rootNodeId = `${makeId()}-root`
   const mateName =
     animals.find((a) => a.id === pairing.parent2AnimalId)?.name ?? 'Parent 2'

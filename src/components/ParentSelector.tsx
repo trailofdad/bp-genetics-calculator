@@ -223,14 +223,14 @@ export function ParentSelector({
     <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <h2 className="text-sm font-semibold tracking-tight text-white">
+        <h2 className="text-sm font-semibold tracking-tight text-foreground">
           {parentLabel}
         </h2>
-        <span className="text-sm text-slate-600">{parentSex}</span>
+        <span className="text-sm text-muted-foreground/40">{parentSex}</span>
         <div className="ml-auto flex items-center gap-2">
           {headerAction}
           {activeGenes.length > 0 && (
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-muted-foreground/60">
               {activeGenes.length} selected
             </span>
           )}
@@ -241,12 +241,12 @@ export function ParentSelector({
       <div
         className={`flex min-h-[42px] flex-wrap gap-1.5 rounded-xl border px-3 py-2 transition-colors ${
           activeGenes.length > 0
-            ? 'border-white/8 bg-white/3'
-            : 'border-white/5 bg-transparent'
+            ? 'border-border bg-muted/30'
+            : 'border-border bg-transparent'
         }`}
       >
         {activeGenes.length === 0 && (
-          <span className="self-center text-xs text-slate-600">
+          <span className="self-center text-xs text-muted-foreground/40">
             No genes selected
           </span>
         )}
@@ -275,7 +275,7 @@ export function ParentSelector({
 
       {/* Recent genes — always rendered to prevent layout shift */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[10px] font-medium tracking-wider text-slate-600 uppercase">
+        <span className="text-[10px] font-medium tracking-wider text-muted-foreground/40 uppercase">
           Recent
         </span>
         <div className="flex min-h-[26px] flex-wrap gap-1.5">
@@ -284,7 +284,7 @@ export function ParentSelector({
             if (!gene) return null
             const already = (genotype[id] ?? 0) > 0
             const colorClass = already
-              ? 'bg-white/5 text-slate-600 border-white/5 cursor-default'
+              ? 'bg-muted/50 text-muted-foreground/40 border-border cursor-default'
               : gene.lethalSuper
                 ? 'bg-rose-500/10 text-rose-300/70 border-rose-500/20 hover:bg-rose-500/20 hover:text-rose-200 cursor-pointer'
                 : gene.type === 'codominant'
@@ -317,7 +317,7 @@ export function ParentSelector({
         placeholder="Search genes…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full rounded-lg border border-white/8 bg-white/5 px-3 py-2 text-sm text-slate-200 transition-colors placeholder:text-slate-600 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
+        className="w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-foreground transition-colors placeholder:text-muted-foreground/40 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
       />
 
       {/* Category filter */}
@@ -327,7 +327,7 @@ export function ParentSelector({
           className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
             activeCategory === null
               ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-300'
-              : 'border border-white/5 bg-white/5 text-slate-500 hover:bg-white/10 hover:text-slate-300'
+              : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
           }`}
         >
           All
@@ -339,7 +339,7 @@ export function ParentSelector({
           className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
             activeCategory === 'Combos'
               ? 'border border-amber-500/30 bg-amber-500/20 text-amber-300'
-              : 'border border-white/5 bg-white/5 text-slate-500 hover:bg-white/10 hover:text-slate-300'
+              : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
           }`}
         >
           Combos
@@ -353,7 +353,7 @@ export function ParentSelector({
             className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               activeCategory === cat
                 ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-300'
-                : 'border border-white/5 bg-white/5 text-slate-500 hover:bg-white/10 hover:text-slate-300'
+                : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
             }`}
           >
             {cat}
@@ -384,12 +384,12 @@ export function ParentSelector({
                 className={`flex items-center justify-between rounded-lg px-3 py-2 transition-colors ${
                   isApplied
                     ? 'border border-emerald-500/10 bg-emerald-500/5'
-                    : 'hover:bg-white/5'
+                    : 'hover:bg-muted/50'
                 }`}
               >
                 <div className="mr-3 flex min-w-0 flex-col">
                   <div className="flex items-center gap-1.5">
-                    <span className="truncate text-sm font-medium text-slate-200">
+                    <span className="truncate text-sm font-medium text-foreground">
                       {combo.name}
                     </span>
                     <span className="shrink-0 rounded border border-emerald-500/20 bg-emerald-500/15 px-1.5 py-px text-[10px] font-medium text-emerald-300">
@@ -401,7 +401,7 @@ export function ParentSelector({
                       </span>
                     )}
                   </div>
-                  <span className="truncate text-[11px] text-slate-500">
+                  <span className="truncate text-[11px] text-muted-foreground/60">
                     {constituents}
                   </span>
                 </div>
@@ -438,11 +438,11 @@ export function ParentSelector({
           return (
             <div
               key={`gene:${gene.id}`}
-              className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-white/5"
+              className="group flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-muted/50"
             >
               <div className="mr-3 flex min-w-0 flex-col">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="truncate text-sm font-medium text-slate-200">
+                  <span className="truncate text-sm font-medium text-foreground">
                     {gene.name}
                   </span>
                   {/* Gene type badge with hover tooltip */}
@@ -458,7 +458,7 @@ export function ParentSelector({
                             ? 'Dominant'
                             : 'Recessive'}
                     </span>
-                    <span className="flex h-3.5 w-3.5 cursor-default items-center justify-center rounded-full bg-slate-700 text-slate-400">
+                    <span className="flex h-3.5 w-3.5 cursor-default items-center justify-center rounded-full bg-slate-700 text-muted-foreground">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 16 16"
@@ -472,7 +472,7 @@ export function ParentSelector({
                         />
                       </svg>
                     </span>
-                    <span className="pointer-events-none absolute top-full left-0 z-50 mt-1 w-max max-w-[220px] rounded-md border border-white/10 bg-slate-800 px-2 py-1 text-[11px] text-slate-300 opacity-0 shadow-lg transition-opacity group-hover/badge:opacity-100">
+                    <span className="pointer-events-none absolute top-full left-0 z-50 mt-1 w-max max-w-[220px] rounded-md border border-border bg-slate-800 px-2 py-1 text-[11px] text-foreground/80 opacity-0 shadow-lg transition-opacity group-hover/badge:opacity-100">
                       {tooltipText}
                     </span>
                   </span>
@@ -497,7 +497,7 @@ export function ParentSelector({
                           ? val === 1
                             ? 'border border-amber-500/30 bg-amber-500/20 text-amber-300'
                             : 'border border-emerald-500/30 bg-emerald-500/20 text-emerald-300'
-                          : 'bg-white/4 text-slate-600 hover:bg-white/10 hover:text-slate-400'
+                          : 'bg-muted/40 text-muted-foreground/40 hover:bg-muted hover:text-muted-foreground'
                       }`}
                     >
                       {short}
@@ -522,7 +522,7 @@ export function ParentSelector({
           )
         })}
         {listItems.length === 0 && (
-          <p className="py-6 text-center text-sm text-slate-600">
+          <p className="py-6 text-center text-sm text-muted-foreground/40">
             No matches found.
           </p>
         )}

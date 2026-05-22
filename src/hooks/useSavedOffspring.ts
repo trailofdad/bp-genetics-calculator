@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
-import { genotypeKey } from '../playground/utils/compactLabel'
+import { genotypeKey } from '../projects/utils/compactLabel'
 import { loadFromStorage, persistToStorage } from '../lib/storage'
 
 export interface SavedOffspring {

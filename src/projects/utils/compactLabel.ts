@@ -13,7 +13,7 @@ export function genotypeKey(genotype: Record<string, CopyCount>): string {
 }
 
 /**
- * Build a compact human-readable label from a genotype for use in the playground node cards.
+ * Build a compact human-readable label from a genotype for use in the project node cards.
  * - Uses `shortName` for all genes (abbreviation-friendly)
  * - Omits "100%" prefix from het recessives (just "Het X")
  * - Super codominant form is rendered as "Sup {shortName}"

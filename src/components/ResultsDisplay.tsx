@@ -1,14 +1,18 @@
 import { useMemo, useState } from 'react'
+import { AlertTriangle, Dna, Info, Star, Target } from 'lucide-react'
 import type { OffspringOutcome } from 'bp-genetics'
 import { formatProbability } from 'bp-genetics'
 import { GENES, geneById } from 'bp-genetics'
-import { genotypeKey } from '../playground/utils/compactLabel'
+import { genotypeKey } from '../projects/utils/compactLabel'
+import { Tooltip } from './ui/tooltip'
 
 interface Props {
   outcomes: OffspringOutcome[]
   onSaveOffspring?: (outcome: OffspringOutcome) => void
   savedOutcomeIds?: Set<string>
   savedOutcomeKeys?: Set<string>
+  onToggleGoal?: (outcome: OffspringOutcome) => void
+  goalOutcomeKeys?: Set<string>
 }
 
 type SortKey = 'probability' | 'label' | 'traits'
@@ -20,7 +24,7 @@ function cardAccent(prob: number): { border: string; bar: string } {
     return { border: 'border-indigo-500/20', bar: 'bg-indigo-500' }
   if (prob >= 0.125)
     return { border: 'border-violet-500/20', bar: 'bg-violet-500' }
-  return { border: 'border-white/5', bar: 'bg-slate-600' }
+  return { border: 'border-border', bar: 'bg-slate-600' }
 }
 
 function GeneTag({ geneId, copies }: { geneId: string; copies: 0 | 1 | 2 }) {
@@ -58,6 +62,8 @@ export function ResultsDisplay({
   onSaveOffspring,
   savedOutcomeIds,
   savedOutcomeKeys,
+  onToggleGoal,
+  goalOutcomeKeys,
 }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>('probability')
   const [showLethal, setShowLethal] = useState(true)
@@ -87,8 +93,8 @@ export function ResultsDisplay({
 
   if (outcomes.length === 0) {
     return (
-      <div className="py-12 text-center text-slate-600">
-        <p className="mb-3 text-3xl">🐍</p>
+      <div className="py-12 text-center text-muted-foreground/40">
+        <Dna className="mx-auto mb-3 h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
         <p className="text-sm">
           Select genes above to see offspring probabilities
         </p>
@@ -102,13 +108,13 @@ export function ResultsDisplay({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <span className="text-sm font-semibold text-slate-300">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+          <span className="text-sm font-semibold text-foreground/80">
             {sorted.length}
           </span>
           unique outcomes
           {normalOutcome && (
-            <span className="text-slate-600">
+            <span className="text-muted-foreground/40">
               · {formatProbability(normalOutcome.probability)} normal
             </span>
           )}
@@ -133,7 +139,7 @@ export function ResultsDisplay({
                 className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                   sortKey === k
                     ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-300'
-                    : 'border border-white/5 bg-white/5 text-slate-500 hover:bg-white/10 hover:text-slate-300'
+                    : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
                 }`}
               >
                 {k === 'probability'
@@ -153,11 +159,12 @@ export function ResultsDisplay({
           const pct = outcome.probability / totalProb
           const gKey = genotypeKey(outcome.genotype)
           const isSaved = savedKeys?.has(gKey) ?? false
+          const isGoal = goalOutcomeKeys?.has(gKey) ?? false
 
           return (
             <div
               key={gKey}
-              className={`relative overflow-hidden rounded-xl border bg-white/3 px-4 py-3 ${border} ${
+              className={`relative overflow-hidden rounded-xl border bg-muted/30 px-4 py-3 ${border} ${
                 outcome.hasLethal ? 'opacity-50' : ''
               }`}
             >
@@ -179,16 +186,18 @@ export function ResultsDisplay({
                       ))}
                     </div>
                   )}
-                  <p className="text-sm leading-snug font-medium text-slate-200">
+                  <p className="text-sm leading-snug font-medium text-foreground">
                     {outcome.label}
                     {outcome.hasLethal && (
                       <span className="ml-2 text-[11px] font-normal text-rose-400/80">
-                        ⚠ lethal
+                        <AlertTriangle className="mr-0.5 inline h-3 w-3" strokeWidth={1.75} />
+                        lethal
                       </span>
                     )}
                     {outcome.hasRisk && !outcome.hasLethal && (
                       <span className="ml-2 text-[11px] font-normal text-orange-400/80">
-                        ⚠ risky
+                        <AlertTriangle className="mr-0.5 inline h-3 w-3" strokeWidth={1.75} />
+                        risky
                       </span>
                     )}
                   </p>
@@ -204,7 +213,7 @@ export function ResultsDisplay({
                           />
                         ))}
                       {Object.values(outcome.genotype).every((c) => c === 0) && (
-                        <span className="text-xs text-slate-600">
+                        <span className="text-xs text-muted-foreground/40">
                           No visible morphs
                         </span>
                       )}
@@ -217,7 +226,7 @@ export function ResultsDisplay({
                           key={ni}
                           className="flex items-start gap-1 text-[11px] text-indigo-400/80"
                         >
-                          <span className="mt-px shrink-0">ℹ</span>
+                          <Info className="mt-px h-3 w-3 shrink-0" strokeWidth={1.75} />
                           <span>{note}</span>
                         </li>
                       ))}
@@ -230,7 +239,7 @@ export function ResultsDisplay({
                           key={ri}
                           className="flex items-start gap-1 text-[11px] text-orange-400/70"
                         >
-                          <span className="mt-px shrink-0">⚠</span>
+                          <AlertTriangle className="mt-px h-3 w-3 shrink-0" strokeWidth={1.75} />
                           <span>{risk}</span>
                         </li>
                       ))}
@@ -238,9 +247,26 @@ export function ResultsDisplay({
                   )}
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <span className="text-base font-semibold text-slate-300 tabular-nums">
+                  <span className="text-base font-semibold text-foreground/80 tabular-nums">
                     {formatProbability(outcome.probability)}
                   </span>
+                  {onToggleGoal && (
+                    <Tooltip
+                      content={isGoal ? 'Remove standalone goal' : 'Save as standalone goal — not linked to any project'}
+                      side="top"
+                    >
+                      <button
+                        onClick={() => onToggleGoal(outcome)}
+                        className={`flex h-7 w-7 items-center justify-center rounded-full border text-sm transition-colors ${
+                          isGoal
+                            ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
+                            : 'border-border bg-muted/50 text-muted-foreground/60 hover:border-emerald-500/25 hover:bg-emerald-500/10 hover:text-emerald-300'
+                        }`}
+                      >
+                        <Target className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      </button>
+                    </Tooltip>
+                  )}
                   {onSaveOffspring && (
                     <button
                       onClick={() => onSaveOffspring(outcome)}
@@ -250,10 +276,14 @@ export function ResultsDisplay({
                       className={`flex h-7 w-7 items-center justify-center rounded-full border text-sm transition-colors ${
                         isSaved
                           ? 'border-amber-500/30 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25'
-                          : 'border-white/10 bg-white/5 text-slate-500 hover:border-amber-500/25 hover:bg-amber-500/10 hover:text-amber-300'
+                          : 'border-border bg-muted/50 text-muted-foreground/60 hover:border-amber-500/25 hover:bg-amber-500/10 hover:text-amber-300'
                       }`}
                     >
-                      {isSaved ? '★' : '☆'}
+                      {isSaved ? (
+                        <Star className="h-3.5 w-3.5 fill-current" strokeWidth={1.75} />
+                      ) : (
+                        <Star className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      )}
                     </button>
                   )}
                 </div>
@@ -264,8 +294,8 @@ export function ResultsDisplay({
       </div>
 
       {totalGenes.length > 0 && (
-        <div className="mt-1 rounded-xl border border-white/5 bg-white/2 p-3">
-          <p className="mb-2 text-[10px] font-semibold tracking-widest text-slate-600 uppercase">
+        <div className="mt-1 rounded-xl border border-border bg-muted/20 p-3">
+          <p className="mb-2 text-[10px] font-semibold tracking-widest text-muted-foreground/40 uppercase">
             Gene Key
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -273,13 +303,13 @@ export function ResultsDisplay({
               const gene = GENES.find((g) => g.id === geneId)
               if (!gene) return null
               return (
-                <span key={geneId} className="text-[11px] text-slate-500">
-                  <span className="font-semibold text-slate-400">
+                <span key={geneId} className="text-[11px] text-muted-foreground/60">
+                  <span className="font-semibold text-muted-foreground">
                     {gene.shortName}
                   </span>{' '}
                   = {gene.name}
                   {gene.type === 'codominant' && gene.superName && (
-                    <span className="text-slate-600">
+                    <span className="text-muted-foreground/40">
                       {' '}
                       · super: {gene.superName}
                     </span>

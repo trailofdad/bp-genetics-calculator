@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react'
 import type { ParentGenotype, OffspringOutcome } from 'bp-genetics'
-import type { PlaygroundProject, PlaygroundNode, PlaygroundEdge } from './types'
+import type { BreedingProject, ProjectNode, ProjectEdge } from './types'
 import { buildCompactLabel } from './utils/compactLabel'
 
 function makeId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
 }
 
-export function usePlaygroundState(initial: PlaygroundProject) {
-  const [project, setProject] = useState<PlaygroundProject>(initial)
+export function useProjectsState(initial: BreedingProject) {
+  const [project, setProject] = useState<BreedingProject>(initial)
 
   const addChildPairing = useCallback(
     (
@@ -21,7 +21,7 @@ export function usePlaygroundState(initial: PlaygroundProject) {
         const childNodeId = makeId()
         const edgeId = makeId()
 
-        const childNode: PlaygroundNode = {
+        const childNode: ProjectNode = {
           id: childNodeId,
           parent1: outcome.genotype as ParentGenotype,
           parent1Name: outcome.label,
@@ -30,7 +30,7 @@ export function usePlaygroundState(initial: PlaygroundProject) {
           childEdges: [],
         }
 
-        const edge: PlaygroundEdge = {
+        const edge: ProjectEdge = {
           id: edgeId,
           offspringGenotype: outcome.genotype as ParentGenotype,
           offspringLabel: buildCompactLabel(outcome.genotype as ParentGenotype),
@@ -38,7 +38,7 @@ export function usePlaygroundState(initial: PlaygroundProject) {
           childNodeId,
         }
 
-        const updatedParent: PlaygroundNode = {
+        const updatedParent: ProjectNode = {
           ...prev.nodes[parentNodeId],
           childEdges: [...prev.nodes[parentNodeId].childEdges, edge],
         }
@@ -74,7 +74,7 @@ export function usePlaygroundState(initial: PlaygroundProject) {
           if (node) node.childEdges.forEach((e) => queue.push(e.childNodeId))
         }
 
-        const updatedParent: PlaygroundNode = {
+        const updatedParent: ProjectNode = {
           ...prev.nodes[parentNodeId],
           childEdges: prev.nodes[parentNodeId].childEdges.filter(
             (e) => e.id !== edgeId
