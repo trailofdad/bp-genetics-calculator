@@ -281,7 +281,7 @@ export function ImportModal({
                   if (!savedIds.has(a.sourceId))
                     onSaveAnimal(a.name, a.genotype)
                 })
-                setSavedIds(new Set(animals.map((a) => a.sourceId)))
+                handleClose()
               }}
               className="rounded-lg border border-indigo-500/20 bg-indigo-600/30 px-3 py-1.5 text-xs text-indigo-300 transition-colors hover:bg-indigo-600/50 hover:text-indigo-200"
             >
