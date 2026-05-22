@@ -1,5 +1,13 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Dna, Info, Star, Target } from 'lucide-react'
+import {
+  TriangleExclamationIcon,
+  DnaIcon,
+  CircleInfoIcon,
+  StarIcon,
+  BullseyeIcon,
+  PercentIcon,
+  ArrowDownAZIcon,
+} from './icons/index'
 import type { OffspringOutcome } from 'bp-genetics'
 import { formatProbability } from 'bp-genetics'
 import { GENES, geneById } from 'bp-genetics'
@@ -94,7 +102,7 @@ export function ResultsDisplay({
   if (outcomes.length === 0) {
     return (
       <div className="py-12 text-center text-muted-foreground/40">
-        <Dna className="mx-auto mb-3 h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
+        <DnaIcon className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
         <p className="text-sm">
           Select genes above to see offspring probabilities
         </p>
@@ -136,17 +144,28 @@ export function ResultsDisplay({
               <button
                 key={k}
                 onClick={() => setSortKey(k)}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                   sortKey === k
                     ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
                     : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
                 }`}
               >
-                {k === 'probability'
-                  ? 'By %'
-                  : k === 'traits'
-                    ? 'By traits'
-                    : 'A–Z'}
+                {k === 'probability' ? (
+                  <>
+                    <PercentIcon className="h-3.5 w-3.5" />
+                    By %
+                  </>
+                ) : k === 'traits' ? (
+                  <>
+                    <DnaIcon className="h-3.5 w-3.5" />
+                    By traits
+                  </>
+                ) : (
+                  <>
+                    <ArrowDownAZIcon className="h-3.5 w-3.5" />
+                    A–Z
+                  </>
+                )}
               </button>
             ))}
           </div>
@@ -190,13 +209,13 @@ export function ResultsDisplay({
                     {outcome.label}
                     {outcome.hasLethal && (
                       <span className="ml-2 text-[11px] font-normal text-rose-600/80 dark:text-rose-400/80">
-                        <AlertTriangle className="mr-0.5 inline h-3 w-3" strokeWidth={1.75} />
+                        <TriangleExclamationIcon className="mr-0.5 inline h-3 w-3" />
                         lethal
                       </span>
                     )}
                     {outcome.hasRisk && !outcome.hasLethal && (
                       <span className="ml-2 text-[11px] font-normal text-orange-600/80 dark:text-orange-400/80">
-                        <AlertTriangle className="mr-0.5 inline h-3 w-3" strokeWidth={1.75} />
+                        <TriangleExclamationIcon className="mr-0.5 inline h-3 w-3" />
                         risky
                       </span>
                     )}
@@ -226,7 +245,7 @@ export function ResultsDisplay({
                           key={ni}
                           className="flex items-start gap-1 text-[11px] text-indigo-600/80 dark:text-indigo-400/80"
                         >
-                          <Info className="mt-px h-3 w-3 shrink-0" strokeWidth={1.75} />
+                          <CircleInfoIcon className="mt-px h-3 w-3 shrink-0" />
                           <span>{note}</span>
                         </li>
                       ))}
@@ -239,7 +258,7 @@ export function ResultsDisplay({
                           key={ri}
                           className="flex items-start gap-1 text-[11px] text-orange-600/70 dark:text-orange-400/70"
                         >
-                          <AlertTriangle className="mt-px h-3 w-3 shrink-0" strokeWidth={1.75} />
+                          <TriangleExclamationIcon className="mt-px h-3 w-3 shrink-0" />
                           <span>{risk}</span>
                         </li>
                       ))}
@@ -263,7 +282,7 @@ export function ResultsDisplay({
                             : 'border-border bg-muted/50 text-muted-foreground/60 hover:border-emerald-500/25 hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300'
                         }`}
                       >
-                        <Target className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        <BullseyeIcon className="h-3.5 w-3.5" />
                       </button>
                     </Tooltip>
                   )}
@@ -280,9 +299,9 @@ export function ResultsDisplay({
                       }`}
                     >
                       {isSaved ? (
-                        <Star className="h-3.5 w-3.5 fill-current" strokeWidth={1.75} />
+                        <StarIcon className="h-3.5 w-3.5 fill-current" />
                       ) : (
-                        <Star className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        <StarIcon className="h-3.5 w-3.5" />
                       )}
                     </button>
                   )}

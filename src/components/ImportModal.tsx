@@ -1,20 +1,31 @@
 import { useState, useCallback } from 'react'
-import { ArrowRight, X } from 'lucide-react'
+import { ArrowRightIcon, XmarkIcon, FloppyDiskIcon, MarsIcon, VenusIcon } from './icons/index'
 import { GENES } from 'bp-genetics'
 import type { ParentGenotype } from 'bp-genetics'
 import { importCSV } from '../utils/csvImport'
-import type { ImportedAnimal } from '../utils/csvImport'
+import type { ImportedAnimal, ImportSex } from '../utils/csvImport'
+import type { AnimalSex } from '../hooks/useSavedAnimals'
 
 interface Props {
   open: boolean
   onClose: () => void
   onLoadParent?: (genotype: ParentGenotype, slot: 'parent1' | 'parent2') => void
-  onSaveAnimal: (name: string, genotype: ParentGenotype) => void
+  onSaveAnimal: (name: string, genotype: ParentGenotype, sex?: AnimalSex) => void
 }
 
 // ─── Small helpers ─────────────────────────────────────────────────────────────
 
-const SEX_LABEL: Record<string, string> = { M: '♂', F: '♀', Unknown: '?' }
+function importSexToAnimalSex(sex: ImportSex): AnimalSex | undefined {
+  if (sex === 'M') return 'male'
+  if (sex === 'F') return 'female'
+  return undefined
+}
+
+function SexIcon({ sex }: { sex: ImportSex }) {
+  if (sex === 'M') return <MarsIcon className="h-3.5 w-3.5 text-sky-400" />
+  if (sex === 'F') return <VenusIcon className="h-3.5 w-3.5 text-rose-400" />
+  return null
+}
 
 function GeneChip({ geneId, copies }: { geneId: string; copies: 1 | 2 }) {
   const gene = GENES.find((g) => g.id === geneId)
@@ -62,9 +73,7 @@ function AnimalCard({
             <span className="text-sm font-medium text-foreground">
               {animal.name}
             </span>
-            <span className="text-xs text-muted-foreground/60">
-              {SEX_LABEL[animal.sex]}
-            </span>
+            <SexIcon sex={animal.sex} />
             {animal.dob && (
               <span className="font-mono text-[10px] text-muted-foreground/40">
                 {animal.dob}
@@ -133,7 +142,7 @@ function AnimalCard({
             onClick={onLoad1}
             className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-xs text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
           >
-            <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <ArrowRightIcon className="h-3.5 w-3.5" />
             <span>Sire</span>
           </button>
         )}
@@ -142,14 +151,15 @@ function AnimalCard({
             onClick={onLoad2}
             className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-xs text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
           >
-            <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <ArrowRightIcon className="h-3.5 w-3.5" />
             <span>Dam</span>
           </button>
         )}
         <button
           onClick={onSave}
-          className="rounded-lg border border-indigo-500/20 bg-indigo-600/30 px-3 py-1.5 text-xs text-indigo-300 transition-colors hover:bg-indigo-600/50 hover:text-indigo-200"
+          className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/20 bg-indigo-600/30 px-3 py-1.5 text-xs text-indigo-300 transition-colors hover:bg-indigo-600/50 hover:text-indigo-200"
         >
+          <FloppyDiskIcon className="h-3.5 w-3.5" />
           Save
         </button>
       </div>
@@ -194,7 +204,7 @@ export function ImportModal({
   }, [])
 
   function handleSave(animal: ImportedAnimal) {
-    onSaveAnimal(animal.name, animal.genotype)
+    onSaveAnimal(animal.name, animal.genotype, importSexToAnimalSex(animal.sex))
     setSavedIds((prev) => new Set([...prev, animal.sourceId]))
   }
 
@@ -234,7 +244,7 @@ export function ImportModal({
             className="text-muted-foreground/60 transition-colors hover:text-foreground"
             aria-label="Close"
           >
-            <X className="h-4 w-4" strokeWidth={1.75} />
+            <XmarkIcon className="h-4 w-4" />
           </button>
         </div>
 
@@ -262,10 +272,14 @@ export function ImportModal({
               key={animal.sourceId}
               animal={animal}
               onLoad1={
-                onLoadParent ? () => handleLoad(animal, 'parent1') : undefined
+                onLoadParent && animal.sex !== 'F'
+                  ? () => handleLoad(animal, 'parent1')
+                  : undefined
               }
               onLoad2={
-                onLoadParent ? () => handleLoad(animal, 'parent2') : undefined
+                onLoadParent && animal.sex !== 'M'
+                  ? () => handleLoad(animal, 'parent2')
+                  : undefined
               }
               onSave={() => handleSave(animal)}
             />
@@ -283,12 +297,13 @@ export function ImportModal({
               onClick={() => {
                 animals.forEach((a) => {
                   if (!savedIds.has(a.sourceId))
-                    onSaveAnimal(a.name, a.genotype)
+                    onSaveAnimal(a.name, a.genotype, importSexToAnimalSex(a.sex))
                 })
                 handleClose()
               }}
-              className="rounded-lg border border-indigo-500/20 bg-indigo-600/30 px-3 py-1.5 text-xs text-indigo-300 transition-colors hover:bg-indigo-600/50 hover:text-indigo-200"
+              className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/20 bg-indigo-600/30 px-3 py-1.5 text-xs text-indigo-300 transition-colors hover:bg-indigo-600/50 hover:text-indigo-200"
             >
+              <FloppyDiskIcon className="h-3.5 w-3.5" />
               Save all
             </button>
           </div>

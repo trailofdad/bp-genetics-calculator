@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import type React from 'react'
 import {
-  Dna,
-  ArrowLeftRight,
-  GitFork,
-  Database,
-  Lightbulb,
-  AlertTriangle,
-  Trash2,
-} from 'lucide-react'
-import { SnakeIcon } from '../components/icons/SnakeIcon'
+  DnaIcon,
+  ArrowsLeftRightIcon,
+  CodeForkIcon,
+  DatabaseIcon,
+  LightbulbIcon,
+  TriangleExclamationIcon,
+  TrashCanIcon,
+  FaSnakeIcon,
+} from '../components/icons/index'
 
 export function HelpPage() {
   const [confirmReset, setConfirmReset] = useState(false)
@@ -33,7 +33,7 @@ export function HelpPage() {
       </div>
 
       {/* Animals */}
-      <Section Icon={SnakeIcon} title="Animals">
+      <Section Icon={FaSnakeIcon} title="Animals">
         <p>
           The <strong>Animals</strong> page is your personal roster of snakes.
           Every snake you save here can be quickly selected as a parent in the
@@ -83,7 +83,7 @@ export function HelpPage() {
       </Section>
 
       {/* Calculator */}
-      <Section Icon={Dna} title="Calculator">
+      <Section Icon={DnaIcon} title="Calculator">
         <p>
           The <strong>Calculator</strong> runs a live Punnett-square analysis for any two parents and shows every possible offspring outcome with its probability.
         </p>
@@ -98,7 +98,7 @@ export function HelpPage() {
           <ul className="list-inside list-disc space-y-1.5 text-sm text-muted-foreground">
             <li>Each card shows the outcome label (e.g. <em>Pastel Het Clown</em>), its probability, and any interaction notes.</li>
             <li>Outcomes flagged <span className="font-medium text-red-400">lethal</span> involve homozygous combinations known to be incompatible with life.</li>
-            <li><span className="font-medium text-amber-400 inline-flex items-center gap-0.5"><AlertTriangle className="h-3 w-3" strokeWidth={1.75} /> Risk notes</span> appear for genes with documented health concerns.</li>
+            <li><span className="font-medium text-amber-400 inline-flex items-center gap-0.5"><TriangleExclamationIcon className="h-3 w-3" /> Risk notes</span> appear for genes with documented health concerns.</li>
             <li>BEL-complex genes automatically produce compound-het notes when multiple BEL morphs are present.</li>
           </ul>
         </SubSection>
@@ -110,7 +110,7 @@ export function HelpPage() {
       </Section>
 
       {/* Pairings */}
-      <Section Icon={ArrowLeftRight} title="Pairings">
+      <Section Icon={ArrowsLeftRightIcon} title="Pairings">
         <p>
           The <strong>Pairings</strong> page stores named pairings you&apos;ve created in the Calculator. Think of it as your breeding season plan.
         </p>
@@ -129,7 +129,7 @@ export function HelpPage() {
       </Section>
 
       {/* Projects */}
-      <Section Icon={GitFork} title="Projects">
+      <Section Icon={CodeForkIcon} title="Projects">
         <p>
           The <strong>Projects</strong> page lets you build a multi-generation visual breeding tree. Starting from any pairing, you can branch offspring forward to see how traits carry through multiple generations.
         </p>
@@ -164,7 +164,7 @@ export function HelpPage() {
       </Section>
 
       {/* Data */}
-      <Section Icon={Database} title="Your Data">
+      <Section Icon={DatabaseIcon} title="Your Data">
         <p>
           All data — animals, pairings, saved offspring, and projects — is stored locally in your browser&apos;s{' '}
           <code className="rounded bg-muted px-1 text-foreground/80">localStorage</code>. Nothing is sent to a server.
@@ -178,7 +178,7 @@ export function HelpPage() {
               onClick={() => setConfirmReset(true)}
               className="flex items-center gap-2 rounded-xl border border-rose-500/25 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-400 transition-colors hover:border-rose-500/40 hover:bg-rose-500/20"
             >
-              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+              <TrashCanIcon className="h-4 w-4" />
               Reset All Data…
             </button>
           </div>
@@ -224,7 +224,7 @@ function Section({
   title,
   children,
 }: {
-  Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
+  Icon: React.ComponentType<{ className?: string }>
   title: string
   children: React.ReactNode
 }) {
@@ -232,7 +232,7 @@ function Section({
     <section className="flex flex-col gap-5">
       <div className="flex items-center gap-3 border-b border-border pb-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-          <Icon className="h-4 w-4 text-primary" strokeWidth={1.75} />
+          <Icon className="h-4 w-4 text-primary" />
         </div>
         <h2 className="text-lg font-semibold text-foreground">{title}</h2>
       </div>
@@ -286,7 +286,7 @@ function Kbd({ children }: { children: React.ReactNode }) {
 function Note({ children }: { children: React.ReactNode }) {
   return (
     <div className="mt-1 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2.5">
-      <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" strokeWidth={1.75} />
+      <LightbulbIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
       <p className="text-xs leading-relaxed text-amber-700 dark:text-amber-300/80">{children}</p>
     </div>
   )

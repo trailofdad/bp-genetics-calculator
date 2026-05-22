@@ -49,7 +49,7 @@ function useRecentGenes(parentLabel: string) {
 
 interface Props {
   parentLabel: string
-  parentSex: string
+  parentSex?: ReactNode
   genotype: ParentGenotype
   onChange: (g: ParentGenotype) => void
   headerAction?: ReactNode

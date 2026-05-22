@@ -1,6 +1,14 @@
 import { useMemo, useState, useRef, useEffect } from 'react'
-import { FolderOpen, GitFork, X } from 'lucide-react'
-import { SnakeIcon } from '../components/icons/SnakeIcon'
+import {
+  FolderOpenIcon,
+  CodeForkIcon,
+  XmarkIcon,
+  FloppyDiskIcon,
+  ArrowRotateLeftIcon,
+  FaSnakeIcon,
+  MarsIcon,
+  VenusIcon,
+} from '../components/icons/index'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
 import { calculateOffspring } from 'bp-genetics'
@@ -8,7 +16,7 @@ import { ParentSelector } from '../components/ParentSelector'
 import { ResultsDisplay } from '../components/ResultsDisplay'
 import { GenotypePreview } from '../components/GenotypePreview'
 import { useAppContext } from '../context/AppContext'
-import type { SavedAnimal } from '../hooks/useSavedAnimals'
+import type { SavedAnimal, AnimalSex } from '../hooks/useSavedAnimals'
 import type { SavedPairing } from '../hooks/useSavedPairings'
 import { genotypeKey } from '../projects/utils/compactLabel'
 import { buildProjectFromPairing } from '../projects/utils/projectBuilders'
@@ -89,6 +97,7 @@ export function CalculatorPage() {
   const [saveAnimalModal, setSaveAnimalModal] = useState<{
     genotype: ParentGenotype
     name: string
+    sex?: AnimalSex
   } | null>(null)
   const saveAnimalInputRef = useRef<HTMLInputElement>(null)
 
@@ -161,7 +170,7 @@ export function CalculatorPage() {
 
   function handleSaveAnimalConfirm() {
     if (!saveAnimalModal) return
-    saveAnimal(saveAnimalModal.name, saveAnimalModal.genotype)
+    saveAnimal(saveAnimalModal.name, saveAnimalModal.genotype, saveAnimalModal.sex)
     setSaveAnimalModal(null)
   }
 
@@ -225,7 +234,8 @@ export function CalculatorPage() {
   const parentConfigs = [
     {
       label: 'Sire',
-      sex: '♂',
+      sex: <MarsIcon className="h-3.5 w-3.5 text-sky-400" />,
+      inferredSex: 'male' as AnimalSex,
       genotype: parent1,
       onChange: (g: ParentGenotype) => {
         setParent1(g)
@@ -237,7 +247,8 @@ export function CalculatorPage() {
     },
     {
       label: 'Dam',
-      sex: '♀',
+      sex: <VenusIcon className="h-3.5 w-3.5 text-rose-400" />,
+      inferredSex: 'female' as AnimalSex,
       genotype: parent2,
       onChange: (g: ParentGenotype) => {
         setParent2(g)
@@ -258,14 +269,14 @@ export function CalculatorPage() {
             onClick={() => setLoadPairingPickerOpen(true)}
             className="flex items-center gap-1.5 rounded-xl border border-border bg-muted/30 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
           >
-            <FolderOpen className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <FolderOpenIcon className="h-3.5 w-3.5" />
             <span>Load Pairing</span>
           </button>
         </div>
       )}
       <div className="grid gap-4 md:grid-cols-2">
         {parentConfigs.map(
-          ({ label, sex, genotype, onChange, animalId, slot }) => {
+          ({ label, sex, inferredSex, genotype, onChange, animalId, slot }) => {
             const linkedAnimal = animals.find((a) => a.id === animalId)
             const hasGenesForParent = Object.values(genotype).some((c) => c > 0)
             return (
@@ -276,8 +287,14 @@ export function CalculatorPage() {
                 {linkedAnimal && (
                   <div className="flex items-center gap-2 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1.5">
                     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-300">
-                      <SnakeIcon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      <FaSnakeIcon className="h-4 w-4" />
                       <span>{linkedAnimal.name}</span>
+                      {linkedAnimal.sex === 'male' && (
+                        <MarsIcon className="h-3.5 w-3.5 text-sky-400/80" />
+                      )}
+                      {linkedAnimal.sex === 'female' && (
+                        <VenusIcon className="h-3.5 w-3.5 text-rose-400/80" />
+                      )}
                     </span>
                     <button
                       onClick={() => {
@@ -287,7 +304,7 @@ export function CalculatorPage() {
                       title="Unlink animal"
                       aria-label="Unlink animal"
                     >
-                      <X className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      <XmarkIcon className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 )}
@@ -303,7 +320,7 @@ export function CalculatorPage() {
                         onClick={() => setLoadAnimalPicker(slot)}
                         className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground/60 transition-colors hover:bg-muted/60 hover:text-foreground/80"
                       >
-                        <FolderOpen className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        <FolderOpenIcon className="h-3.5 w-3.5" />
                         <span>Load Animal</span>
                       </button>
                     ) : undefined
@@ -313,10 +330,12 @@ export function CalculatorPage() {
                 <div className="flex items-center justify-end gap-2">
                   {hasGenesForParent && (
                     <button
-                      onClick={() => setSaveAnimalModal({ genotype, name: '' })}
+                      onClick={() =>
+                        setSaveAnimalModal({ genotype, name: '', sex: inferredSex })
+                      }
                       className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground/60 transition-colors hover:bg-muted/60 hover:text-foreground/80"
                     >
-                      <SnakeIcon className="h-4 w-4" strokeWidth={1.75} />
+                      <FaSnakeIcon className="h-4 w-4" />
                       <span>Save Animal</span>
                     </button>
                   )}
@@ -336,8 +355,9 @@ export function CalculatorPage() {
             }}
             disabled={!!currentPairingId}
             title={currentPairingId ? 'Pairing already saved' : undefined}
-            className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium tracking-tight text-foreground transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-indigo-600"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium tracking-tight text-foreground transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-indigo-600"
           >
+            <FloppyDiskIcon className="h-4 w-4" />
             Save Pairing
           </button>
           <button
@@ -346,13 +366,14 @@ export function CalculatorPage() {
             title={!currentPairingId ? 'Save pairing first' : 'Open in Projects'}
             className="flex items-center gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-emerald-500/10"
           >
-            <GitFork className="h-4 w-4" strokeWidth={1.75} />
+            <CodeForkIcon className="h-4 w-4" />
             <span>Open in Projects</span>
           </button>
           <button
             onClick={handleReset}
-            className="rounded-xl border border-border bg-muted/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
+            <ArrowRotateLeftIcon className="h-4 w-4" />
             Reset
           </button>
         </div>
@@ -396,14 +417,16 @@ export function CalculatorPage() {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setSaveModalOpen(false)}
-                className="rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
+                <XmarkIcon className="h-4 w-4" />
                 Cancel
               </button>
               <button
                 onClick={handleSaveConfirm}
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
               >
+                <FloppyDiskIcon className="h-4 w-4" />
                 Save
               </button>
             </div>
@@ -437,14 +460,16 @@ export function CalculatorPage() {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setSaveAnimalModal(null)}
-                className="rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
+                <XmarkIcon className="h-4 w-4" />
                 Cancel
               </button>
               <button
                 onClick={handleSaveAnimalConfirm}
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
               >
+                <FloppyDiskIcon className="h-4 w-4" />
                 Save
               </button>
             </div>
@@ -464,25 +489,53 @@ export function CalculatorPage() {
                 className="text-muted-foreground/60 transition-colors hover:text-foreground"
                 aria-label="Close"
               >
-                <X className="h-4 w-4" strokeWidth={1.75} />
+                <XmarkIcon className="h-4 w-4" />
               </button>
             </div>
             <div className="flex max-h-72 flex-col gap-2 overflow-y-auto">
-              {animals.map((animal) => (
-                <button
-                  key={animal.id}
-                  onClick={() => handleLoadAnimal(animal, loadAnimalPicker)}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 px-3 py-2.5 text-left transition-colors hover:border-indigo-500/25 hover:bg-muted"
-                >
-                  <SnakeIcon className="h-5 w-5 text-muted-foreground" strokeWidth={1.5} />
-                  <div className="flex min-w-0 flex-col gap-0.5">
-                    <span className="truncate text-sm font-medium text-foreground">
-                      {animal.name}
-                    </span>
-                    <GenotypePreview genotype={animal.genotype} />
-                  </div>
-                </button>
-              ))}
+              {animals.filter(
+                (a) =>
+                  !a.sex ||
+                  (loadAnimalPicker === 'parent1'
+                    ? a.sex === 'male'
+                    : a.sex === 'female')
+              ).length === 0 ? (
+                <p className="py-4 text-center text-xs text-muted-foreground/60">
+                  No{' '}
+                  {loadAnimalPicker === 'parent1' ? 'male' : 'female'} animals
+                  saved.
+                </p>
+              ) : (
+                animals
+                  .filter(
+                    (a) =>
+                      !a.sex ||
+                      (loadAnimalPicker === 'parent1'
+                        ? a.sex === 'male'
+                        : a.sex === 'female')
+                  )
+                  .map((animal) => (
+                    <button
+                      key={animal.id}
+                      onClick={() => handleLoadAnimal(animal, loadAnimalPicker)}
+                      className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 px-3 py-2.5 text-left transition-colors hover:border-indigo-500/25 hover:bg-muted"
+                    >
+                      <FaSnakeIcon className="h-5 w-5 shrink-0 text-muted-foreground" variant="thin" />
+                      <div className="flex min-w-0 flex-col gap-0.5">
+                        <span className="inline-flex items-center gap-1.5 truncate text-sm font-medium text-foreground">
+                          {animal.name}
+                          {animal.sex === 'male' && (
+                            <MarsIcon className="h-3.5 w-3.5 shrink-0 text-sky-400" />
+                          )}
+                          {animal.sex === 'female' && (
+                            <VenusIcon className="h-3.5 w-3.5 shrink-0 text-rose-400" />
+                          )}
+                        </span>
+                        <GenotypePreview genotype={animal.genotype} />
+                      </div>
+                    </button>
+                  ))
+              )}
             </div>
           </div>
         </div>
@@ -498,7 +551,7 @@ export function CalculatorPage() {
                 className="text-muted-foreground/60 transition-colors hover:text-foreground"
                 aria-label="Close"
               >
-                <X className="h-4 w-4" strokeWidth={1.75} />
+                <XmarkIcon className="h-4 w-4" />
               </button>
             </div>
             <div className="flex max-h-72 flex-col gap-2 overflow-y-auto">

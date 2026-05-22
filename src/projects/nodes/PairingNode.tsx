@@ -6,6 +6,7 @@ import type { ProjectNode } from '../types'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip } from '@/components/ui/tooltip'
 import { buildCompactLabel, genotypeKey } from '../utils/compactLabel'
+import { ChevronDownIcon, ListIcon, StarIcon } from '../../components/icons/index'
 
 export interface PairingNodeData {
   node: ProjectNode
@@ -181,17 +182,18 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
       <div className="flex gap-1 border-b border-border px-3 pt-2 pb-0">
         <button
           onClick={() => { setActiveTab('all'); setShowAll(false) }}
-          className={`rounded-t-md px-2.5 py-1 text-[10px] font-medium transition-colors ${
+          className={`inline-flex items-center gap-1 rounded-t-md px-2.5 py-1 text-[10px] font-medium transition-colors ${
             activeTab === 'all'
               ? 'border border-b-0 border-border bg-card text-foreground'
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
+          <ListIcon className="h-3.5 w-3.5" />
           All ({unflaggedOutcomes.length})
         </button>
         <button
           onClick={() => { setActiveTab('flagged'); setShowAll(false) }}
-          className={`rounded-t-md px-2.5 py-1 text-[10px] font-medium transition-colors ${
+          className={`inline-flex items-center gap-1 rounded-t-md px-2.5 py-1 text-[10px] font-medium transition-colors ${
             activeTab === 'flagged'
               ? 'border border-b-0 border-border bg-card text-amber-700 dark:text-amber-300'
               : flaggedOutcomes.length > 0
@@ -199,7 +201,8 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
                 : 'text-muted-foreground/60 hover:text-muted-foreground'
           }`}
         >
-          ★ Flagged ({flaggedOutcomes.length})
+          <StarIcon className="h-3.5 w-3.5" />
+          Flagged ({flaggedOutcomes.length})
         </button>
       </div>
 
@@ -302,16 +305,18 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
         {!showAll && hiddenCount > 0 && (
           <button
             onClick={() => setShowAll(true)}
-            className="py-1 text-center text-[11px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
+            className="inline-flex items-center justify-center gap-1 py-1 text-center text-[11px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
           >
+            <ChevronDownIcon className="h-3.5 w-3.5" />
             Show {hiddenCount} more
           </button>
         )}
         {showAll && tabOutcomes.length > DEFAULT_SHOWN && (
           <button
             onClick={() => setShowAll(false)}
-            className="py-1 text-center text-[11px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
+            className="inline-flex items-center justify-center gap-1 py-1 text-center text-[11px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
           >
+            <ChevronDownIcon className="h-3.5 w-3.5 rotate-180" />
             Show less
           </button>
         )}

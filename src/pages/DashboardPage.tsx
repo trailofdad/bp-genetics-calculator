@@ -1,21 +1,26 @@
 import { useMemo, useState } from 'react'
 import type React from 'react'
 import {
-  Check,
-  ChevronDown,
-  Dna,
-  ArrowLeftRight,
-  GitFork,
-  Target,
-  Pencil,
-  X,
-} from 'lucide-react'
+  CheckIcon,
+  ChevronDownIcon,
+  DnaIcon,
+  ArrowsLeftRightIcon,
+  CodeForkIcon,
+  BullseyeIcon,
+  PencilIcon,
+  XmarkIcon,
+  ArrowRightIcon,
+  PlusIcon,
+  ArrowUpFromBracketIcon,
+  ArrowRotateLeftIcon,
+  ArrowUpRightFromSquareIcon,
+  FaSnakeIcon,
+} from '../components/icons/index'
 import { useNavigate } from 'react-router-dom'
 import { geneById, formatProbability } from 'bp-genetics'
 import { useAppContext } from '../context/AppContext'
 import { GenotypePreview } from '../components/GenotypePreview'
 import { formatDate } from '../utils/formatDate'
-import { SnakeIcon } from '../components/icons/SnakeIcon'
 
 export function DashboardPage() {
   const {
@@ -108,28 +113,28 @@ export function DashboardPage() {
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard
-          Icon={SnakeIcon}
+          Icon={FaSnakeIcon}
           label="Animals"
           value={animals.length}
           to="/animals"
           navigate={navigate}
         />
         <StatCard
-          Icon={ArrowLeftRight}
+          Icon={ArrowsLeftRightIcon}
           label="Pairings"
           value={pairings.length}
           to="/pairings"
           navigate={navigate}
         />
         <StatCard
-          Icon={GitFork}
+          Icon={CodeForkIcon}
           label="Projects"
           value={projects.length}
           to="/projects"
           navigate={navigate}
         />
         <StatCard
-          Icon={Target}
+          Icon={BullseyeIcon}
           label={achievedGoals.length > 0 ? `Goals · ${achievedGoals.length} achieved` : 'Goals'}
           value={activeGoals.length}
           to="/calculator"
@@ -159,8 +164,9 @@ export function DashboardPage() {
               </div>
               <button
                 onClick={() => navigate('/animals')}
-                className="text-xs text-indigo-400 transition-colors hover:text-indigo-300"
+                className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
               >
+                <ArrowRightIcon className="h-3.5 w-3.5" />
                 Manage →
               </button>
             </div>
@@ -313,8 +319,9 @@ export function DashboardPage() {
           action={
             <button
               onClick={() => navigate('/calculator')}
-              className="text-xs text-indigo-400 transition-colors hover:text-indigo-300"
+              className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
             >
+              <PlusIcon className="h-3.5 w-3.5" />
               New goal →
             </button>
           }
@@ -331,7 +338,7 @@ export function DashboardPage() {
                 >
                   {/* Project header */}
                   <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-                    <GitFork className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
+                    <CodeForkIcon className="h-4 w-4 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-foreground">
                         {project.name}
@@ -343,14 +350,15 @@ export function DashboardPage() {
                     <div className="flex shrink-0 items-center gap-2">
                       {goals.length > 0 && (
                         <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-                          <Target className="h-3 w-3" strokeWidth={1.75} />
+                          <BullseyeIcon className="h-3 w-3" />
                           <span>{goals.length}</span>
                         </span>
                       )}
                       <button
                         onClick={() => navigate('/projects', { state: { project } })}
-                        className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground/80"
+                        className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground/80"
                       >
+                        <ArrowUpRightFromSquareIcon className="h-3.5 w-3.5" />
                         Open
                       </button>
                     </div>
@@ -409,15 +417,16 @@ export function DashboardPage() {
             {/* Empty state — projects but no goals yet */}
             {projects.length > 0 && projectGoals.length === 0 && (
               <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-card px-6 py-8 text-center">
-                <Target className="h-8 w-8 text-muted-foreground" strokeWidth={1.75} />
+                <BullseyeIcon className="h-8 w-8 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">No goals set yet</p>
                 <p className="text-xs text-muted-foreground/40">
                   Open the Calculator, run a cross, and use the goal button on any outcome.
                 </p>
                 <button
                   onClick={() => navigate('/calculator')}
-                  className="mt-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
                 >
+                  <ArrowRightIcon className="h-3.5 w-3.5" />
                   Go to Calculator
                 </button>
               </div>
@@ -433,15 +442,20 @@ export function DashboardPage() {
         action={
           <button
             onClick={() => navigate('/animals')}
-            className="text-xs text-indigo-400 transition-colors hover:text-indigo-300"
+            className="inline-flex items-center gap-1 text-xs text-indigo-400 transition-colors hover:text-indigo-300"
           >
-            {animals.length > 6 ? `View all ${animals.length} →` : 'Manage →'}
+            {animals.length > 6 ? `View all ${animals.length} →` : (
+              <>
+                <ArrowRightIcon className="h-3.5 w-3.5" />
+                Manage →
+              </>
+            )}
           </button>
         }
       >
         {animals.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-8 text-center">
-            <SnakeIcon className="h-8 w-8 text-muted-foreground" strokeWidth={1.75} />
+            <FaSnakeIcon className="h-8 w-8 text-muted-foreground" variant="thin" />
             <p className="text-sm text-muted-foreground">No animals saved yet.</p>
             <p className="text-xs text-muted-foreground/40">
               Head to the Animals page to add your first snake.
@@ -449,14 +463,16 @@ export function DashboardPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('/animals')}
-                className="mt-1 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
+                className="mt-1 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
               >
+                <PlusIcon className="h-3.5 w-3.5" />
                 Add Animal
               </button>
               <button
                 onClick={() => navigate('/animals', { state: { openImport: true } })}
-                className="mt-1 rounded-xl border border-border bg-muted/50 px-4 py-2 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                className="mt-1 inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/50 px-4 py-2 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
               >
+                <ArrowUpFromBracketIcon className="h-3.5 w-3.5" />
                 Import Animals
               </button>
             </div>
@@ -484,8 +500,9 @@ export function DashboardPage() {
                         state: { loadAnimal: animal, slot: 'parent1' },
                       })
                     }
-                    className="flex-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
+                    <ArrowRightIcon className="h-3.5 w-3.5" />
                     Load as Sire
                   </button>
                   <button
@@ -494,8 +511,9 @@ export function DashboardPage() {
                         state: { loadAnimal: animal, slot: 'parent2' },
                       })
                     }
-                    className="flex-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
+                    <ArrowRightIcon className="h-3.5 w-3.5" />
                     Load as Dam
                   </button>
                   <button
@@ -503,7 +521,7 @@ export function DashboardPage() {
                     className="rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     title="Edit"
                   >
-                    <Pencil className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    <PencilIcon className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
@@ -547,8 +565,9 @@ export function DashboardPage() {
                     onClick={() =>
                       navigate('/calculator', { state: { loadPairing: p } })
                     }
-                    className="shrink-0 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
+                    className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
                   >
+                    <ArrowRightIcon className="h-3.5 w-3.5" />
                     Load
                   </button>
                 </div>
@@ -578,7 +597,9 @@ function useCollapsed(key: string, defaultValue = false) {
       const next = !c
       try {
         localStorage.setItem(`dashboard-collapsed-${key}`, String(next))
-      } catch {}
+      } catch (e) {
+        void e
+      }
       return next
     })
   }
@@ -618,11 +639,10 @@ function CollapsibleSection({
               <p className="mt-0.5 text-xs text-muted-foreground/60">{subtitle}</p>
             )}
           </div>
-          <ChevronDown
+          <ChevronDownIcon
             className={`h-3.5 w-3.5 text-muted-foreground/40 transition-transform duration-200 ${
               collapsed ? '-rotate-90' : ''
             }`}
-            strokeWidth={1.75}
           />
         </button>
         {action}
@@ -660,7 +680,7 @@ function GoalRow({
           </p>
           {goal.achieved && (
             <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-              <Check className="h-3 w-3" strokeWidth={1.75} />
+              <CheckIcon className="h-3 w-3" />
               <span>Achieved</span>
             </span>
           )}
@@ -685,9 +705,12 @@ function GoalRow({
           }`}
         >
           {goal.achieved ? (
-            'Reopen'
+            <span className="inline-flex items-center gap-1">
+              <ArrowRotateLeftIcon className="h-3.5 w-3.5" />
+              Reopen
+            </span>
           ) : (
-            <Check className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <CheckIcon className="h-3.5 w-3.5" />
           )}
         </button>
         {onLoadPairing && (
@@ -696,7 +719,7 @@ function GoalRow({
             title="Open pairing in Calculator"
             className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
           >
-            <Dna className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <DnaIcon className="h-3.5 w-3.5" />
           </button>
         )}
         <button
@@ -704,7 +727,7 @@ function GoalRow({
           title="Remove goal"
           className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground/40 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
         >
-          <X className="h-3.5 w-3.5" strokeWidth={1.75} />
+          <XmarkIcon className="h-3.5 w-3.5" />
         </button>
       </div>
     </div>
@@ -736,7 +759,7 @@ function StatCard({
   navigate,
   accent,
 }: {
-  Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
+  Icon: React.ComponentType<{ className?: string }>
   label: string
   value: number | null
   to: string
@@ -754,7 +777,7 @@ function StatCard({
     >
       <div className="flex items-center gap-2">
         <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${accent === 'emerald' ? 'bg-emerald-500/15' : 'bg-muted'}`}>
-          <Icon className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.75} />
+          <Icon className="h-3.5 w-3.5 text-muted-foreground" />
         </div>
         <p className="text-lg font-bold leading-none text-foreground">
           {value !== null ? value : '→'}

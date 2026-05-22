@@ -5,15 +5,15 @@ import { useSavedPairings } from '../hooks/useSavedPairings'
 import { useSavedOffspring } from '../hooks/useSavedOffspring'
 import { useProjectGoals } from '../hooks/useProjectGoals'
 import { useProjectsStorage } from '../projects/useProjectsStorage'
-import type { SavedAnimal } from '../hooks/useSavedAnimals'
+import type { SavedAnimal, AnimalSex } from '../hooks/useSavedAnimals'
 import type { SavedPairing } from '../hooks/useSavedPairings'
 import type { SavedOffspring } from '../hooks/useSavedOffspring'
 import type { ProjectGoal } from '../hooks/useProjectGoals'
 
 interface AppContextValue {
   animals: SavedAnimal[]
-  saveAnimal: (name: string, genotype: ParentGenotype) => void
-  updateAnimal: (id: string, name: string, genotype: ParentGenotype) => void
+  saveAnimal: (name: string, genotype: ParentGenotype, sex?: AnimalSex) => void
+  updateAnimal: (id: string, name: string, genotype: ParentGenotype, sex?: AnimalSex) => void
   removeAnimal: (id: string) => void
 
   pairings: SavedPairing[]

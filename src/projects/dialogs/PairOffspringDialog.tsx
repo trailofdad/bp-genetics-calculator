@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ParentSelector } from '../../components/ParentSelector'
+import { CodeForkIcon, XmarkIcon } from '../../components/icons/index'
 import type { SavedAnimal } from '../../hooks/useSavedAnimals'
 
 interface Props {
@@ -237,15 +238,17 @@ export function PairOffspringDialog({
           <div className="flex items-center justify-end gap-2 border-t border-border pt-1">
             <button
               onClick={onClose}
-              className="rounded-xl border border-border bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
+              <XmarkIcon className="h-3.5 w-3.5" />
               Cancel
             </button>
             <button
               onClick={handleConfirm}
               disabled={!canConfirm}
-              className="rounded-xl border border-transparent bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-500 disabled:pointer-events-none disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-transparent bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-500 disabled:pointer-events-none disabled:opacity-40"
             >
+              <CodeForkIcon className="h-3.5 w-3.5" />
               Add Branch
             </button>
           </div>
