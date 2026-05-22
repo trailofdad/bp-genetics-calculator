@@ -3,7 +3,7 @@ import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
 import { useSavedAnimals } from '../hooks/useSavedAnimals'
 import { useSavedPairings } from '../hooks/useSavedPairings'
 import { useSavedOffspring } from '../hooks/useSavedOffspring'
-import { usePlaygroundProjects } from '../playground/usePlaygroundProjects'
+import { usePlaygroundStorage } from '../playground/usePlaygroundStorage'
 import type { SavedAnimal } from '../hooks/useSavedAnimals'
 import type { SavedPairing } from '../hooks/useSavedPairings'
 import type { SavedOffspring } from '../hooks/useSavedOffspring'
@@ -37,9 +37,10 @@ interface AppContextValue {
   saveOffspring: (pairingId: string, outcome: OffspringOutcome) => string
   removeSavedOffspring: (id: string) => void
 
-  projects: ReturnType<typeof usePlaygroundProjects>['projects']
-  saveProject: ReturnType<typeof usePlaygroundProjects>['saveProject']
-  removeProject: ReturnType<typeof usePlaygroundProjects>['removeProject']
+  projects: ReturnType<typeof usePlaygroundStorage>['projects']
+  saveProject: ReturnType<typeof usePlaygroundStorage>['saveProject']
+  removeProject: ReturnType<typeof usePlaygroundStorage>['removeProject']
+  loadProject: ReturnType<typeof usePlaygroundStorage>['loadProject']
 }
 
 const AppContext = createContext<AppContextValue | null>(null)
@@ -59,7 +60,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     remove: removeSavedOffspring,
     removeByPairing: removeSavedOffspringByPairing,
   } = useSavedOffspring()
-  const { projects, saveProject, removeProject } = usePlaygroundProjects()
+  const { projects, saveProject, removeProject, loadProject } =
+    usePlaygroundStorage()
 
   const removePairing = useCallback(
     (id: string) => {
@@ -87,6 +89,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         projects,
         saveProject,
         removeProject,
+        loadProject,
       }}
     >
       {children}

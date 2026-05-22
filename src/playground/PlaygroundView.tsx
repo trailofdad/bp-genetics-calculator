@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ReactFlow,
   Background,
@@ -164,18 +164,38 @@ export function PlaygroundView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project])
 
-  const pendingNode = pendingPair
-    ? project.nodes[pendingPair.nodeId]
-    : null
+  // Auto-save on every project change after the initial render.
+  // Uses a ref for onSave so stale closure is never an issue.
+  // TODO (DB migration): replace onSave with a DB mutation call here
+  const onSaveRef = useRef(onSave)
+  useEffect(() => { onSaveRef.current = onSave })
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    onSaveRef.current(project)
+  }, [project])
 
   const flaggedOffspring = useMemo<OffspringOutcome[]>(() => {
-    if (!pendingNode) return []
-    const keys = new Set(pendingNode.flaggedOutcomeKeys ?? [])
-    if (keys.size === 0) return []
-    return calculateOffspring(pendingNode.parent1, pendingNode.parent2).filter(
-      (o) => keys.has(genotypeKey(o.genotype))
-    )
-  }, [pendingNode])
+    const seen = new Set<string>()
+    const results: OffspringOutcome[] = []
+
+    for (const node of Object.values(project.nodes)) {
+      const keys = new Set(node.flaggedOutcomeKeys ?? [])
+      if (keys.size === 0) continue
+      for (const o of calculateOffspring(node.parent1, node.parent2)) {
+        const key = genotypeKey(o.genotype)
+        if (keys.has(key) && !seen.has(key)) {
+          seen.add(key)
+          results.push(o)
+        }
+      }
+    }
+
+    return results
+  }, [project.nodes])
 
   function handleDialogConfirm(
     pairedWith: ParentGenotype,
@@ -210,12 +230,7 @@ export function PlaygroundView({
             </p>
           </div>
         </div>
-        <button
-          onClick={() => onSave(project)}
-          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-500"
-        >
-          Save Project
-        </button>
+        <p className="text-[10px] text-slate-600">Auto-saved</p>
       </div>
 
       <div className="relative flex-1">

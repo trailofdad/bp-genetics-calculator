@@ -79,6 +79,7 @@ export function PlaygroundPage() {
     animals,
     saveAnimal,
     saveProject,
+    loadProject,
     projects,
     removeProject,
     pairings,
@@ -101,9 +102,17 @@ export function PlaygroundPage() {
     }, {})
   }, [savedOffspring])
 
+  // Save a brand-new project (built from a pairing) then open it
   function openProject(nextProject: PlaygroundProject) {
     saveProject(nextProject)
     setProject(nextProject)
+  }
+
+  // Open an existing project by ID — composes from flat storage rows
+  // TODO (DB migration): replace loadProject with a DB query
+  function openExistingProject(id: string) {
+    const full = loadProject(id)
+    if (full) setProject(full)
   }
 
   if (!project) {
@@ -195,7 +204,7 @@ export function PlaygroundPage() {
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
-                              onClick={() => setProject(p)}
+                              onClick={() => openExistingProject(p.id)}
                               className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
                             >
                               Open
@@ -390,10 +399,7 @@ export function PlaygroundPage() {
       savedAnimals={animals}
       saveAnimal={saveAnimal}
       onBack={() => setProject(null)}
-      onSave={(p) => {
-        saveProject(p)
-        setProject(p)
-      }}
+      onSave={saveProject}
     />
   )
 }
