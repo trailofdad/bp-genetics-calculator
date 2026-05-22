@@ -5,7 +5,7 @@ import { useAppContext } from '../context/AppContext'
 import { GenotypePreview } from '../components/GenotypePreview'
 import { formatDate } from '../utils/formatDate'
 import type { SavedPairing } from '../hooks/useSavedPairings'
-import type { PlaygroundProject } from '../playground/types'
+import { buildProjectFromPairing } from '../playground/utils/projectBuilders'
 
 export function PairingsPage() {
   const {
@@ -59,28 +59,7 @@ export function PairingsPage() {
   }
 
   function handleOpenPlayground(pairing: SavedPairing) {
-    const rootNodeId = `${Date.now()}-root`
-    const project: PlaygroundProject = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      name: pairing.name,
-      rootNodeId,
-      nodes: {
-        [rootNodeId]: {
-          id: rootNodeId,
-          pairingId: pairing.id,
-          parent1: pairing.parent1,
-          parent1Name:
-            animals.find((a) => a.id === pairing.parent1AnimalId)?.name ??
-            'Parent 1',
-          parent2: pairing.parent2,
-          parent2Name:
-            animals.find((a) => a.id === pairing.parent2AnimalId)?.name ??
-            'Parent 2',
-          childEdges: [],
-        },
-      },
-      savedAt: new Date().toISOString(),
-    }
+    const project = buildProjectFromPairing(pairing, animals)
     saveProject(project)
     navigate('/playground', { state: { project } })
   }

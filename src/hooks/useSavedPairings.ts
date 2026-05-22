@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { ParentGenotype } from 'bp-genetics'
+import { loadFromStorage, persistToStorage } from '../lib/storage'
 
 export interface SavedPairing {
   id: string
@@ -14,25 +15,10 @@ export interface SavedPairing {
 
 const STORAGE_KEY = 'saved-pairings'
 
-function load(): SavedPairing[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as SavedPairing[]) : []
-  } catch {
-    return []
-  }
-}
-
-function persist(pairings: SavedPairing[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pairings))
-  } catch {
-    // ignore
-  }
-}
-
 export function useSavedPairings() {
-  const [pairings, setPairings] = useState<SavedPairing[]>(load)
+  const [pairings, setPairings] = useState<SavedPairing[]>(() =>
+    loadFromStorage<SavedPairing>(STORAGE_KEY)
+  )
 
   const save = useCallback(
     (
@@ -53,7 +39,7 @@ export function useSavedPairings() {
       }
       setPairings((prev) => {
         const next = [entry, ...prev]
-        persist(next)
+        persistToStorage(STORAGE_KEY, next)
         return next
       })
       return entry.id
@@ -83,7 +69,7 @@ export function useSavedPairings() {
               }
             : p
         )
-        persist(next)
+        persistToStorage(STORAGE_KEY, next)
         return next
       })
     },
@@ -95,7 +81,7 @@ export function useSavedPairings() {
       const next = prev.map((p) =>
         p.id === id ? { ...p, notes: notes.trim() || undefined } : p
       )
-      persist(next)
+      persistToStorage(STORAGE_KEY, next)
       return next
     })
   }, [])
@@ -103,7 +89,7 @@ export function useSavedPairings() {
   const remove = useCallback((id: string) => {
     setPairings((prev) => {
       const next = prev.filter((p) => p.id !== id)
-      persist(next)
+      persistToStorage(STORAGE_KEY, next)
       return next
     })
   }, [])

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { ParentGenotype } from 'bp-genetics'
+import { loadFromStorage, persistToStorage } from '../lib/storage'
 
 export interface SavedAnimal {
   id: string
@@ -10,25 +11,10 @@ export interface SavedAnimal {
 
 const STORAGE_KEY = 'saved-animals'
 
-function load(): SavedAnimal[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as SavedAnimal[]) : []
-  } catch {
-    return []
-  }
-}
-
-function persist(animals: SavedAnimal[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(animals))
-  } catch {
-    // ignore quota errors
-  }
-}
-
 export function useSavedAnimals() {
-  const [animals, setAnimals] = useState<SavedAnimal[]>(load)
+  const [animals, setAnimals] = useState<SavedAnimal[]>(() =>
+    loadFromStorage<SavedAnimal>(STORAGE_KEY)
+  )
 
   const saveAnimal = useCallback((name: string, genotype: ParentGenotype) => {
     const entry: SavedAnimal = {
@@ -39,7 +25,7 @@ export function useSavedAnimals() {
     }
     setAnimals((prev) => {
       const next = [entry, ...prev]
-      persist(next)
+      persistToStorage(STORAGE_KEY, next)
       return next
     })
   }, [])
@@ -52,7 +38,7 @@ export function useSavedAnimals() {
             ? { ...a, name: name.trim() || 'Untitled Animal', genotype }
             : a
         )
-        persist(next)
+        persistToStorage(STORAGE_KEY, next)
         return next
       })
     },
@@ -62,7 +48,7 @@ export function useSavedAnimals() {
   const removeAnimal = useCallback((id: string) => {
     setAnimals((prev) => {
       const next = prev.filter((a) => a.id !== id)
-      persist(next)
+      persistToStorage(STORAGE_KEY, next)
       return next
     })
   }, [])
