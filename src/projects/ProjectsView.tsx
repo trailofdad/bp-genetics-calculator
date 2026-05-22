@@ -13,6 +13,7 @@ import {
 } from '@xyflow/react'
 import dagre from '@dagrejs/dagre'
 import '@xyflow/react/dist/style.css'
+import { useTheme } from '../context/ThemeContext'
 
 import type { OffspringOutcome, ParentGenotype } from 'bp-genetics'
 import { calculateOffspring } from 'bp-genetics'
@@ -124,6 +125,7 @@ export function ProjectsView({
 }: Props) {
   const { project, addChildPairing, renameOutcome, toggleFlagOutcome } =
     useProjectsState(initialProject)
+  const { theme } = useTheme()
 
   const [pendingPair, setPendingPair] = useState<{
     nodeId: string
@@ -234,25 +236,25 @@ export function ProjectsView({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-[#0d1117]">
-      <div className="z-10 flex shrink-0 items-center justify-between border-b border-white/5 bg-[#0d1117] px-4 py-3">
+    <div className="fixed inset-0 z-40 flex flex-col bg-background">
+      <div className="z-10 flex shrink-0 items-center justify-between border-b border-border bg-background px-4 py-3">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 text-xs text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200"
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             ← Projects
           </button>
           <div>
-            <p className="text-sm leading-none font-semibold text-white">
+            <p className="text-sm leading-none font-semibold text-foreground">
               {project.name}
             </p>
-            <p className="mt-0.5 text-[10px] text-slate-600">
+            <p className="mt-0.5 text-[10px] text-muted-foreground/60">
               Projects
             </p>
           </div>
         </div>
-        <p className="text-[10px] text-slate-600">Auto-saved</p>
+        <p className="text-[10px] text-muted-foreground/60">Auto-saved</p>
       </div>
 
       <div className="relative flex-1">
@@ -273,31 +275,31 @@ export function ProjectsView({
             variant={BackgroundVariant.Dots}
             gap={24}
             size={1}
-            color="rgba(255,255,255,0.05)"
+            color={theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)'}
           />
-          <Controls className="!rounded-xl !border-white/10 !bg-[#161b27] !shadow-xl [&>button]:!border-white/5 [&>button]:!bg-[#161b27] [&>button]:!text-slate-400 [&>button:hover]:!bg-white/10" />
+          <Controls className="!rounded-xl !border-border !bg-card !shadow-xl [&>button]:!border-border [&>button]:!bg-card [&>button]:!text-muted-foreground [&>button:hover]:!bg-muted" />
           <MiniMap
-            nodeColor="#1e2a3d"
-            maskColor="rgba(0,0,0,0.6)"
-            className="!rounded-xl !border !border-white/10 !bg-[#0d1117]"
+            nodeColor={theme === 'dark' ? '#1e2a3d' : '#e2e8f0'}
+            maskColor={theme === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(200,210,225,0.5)'}
+            className="!rounded-xl !border !border-border !bg-card"
           />
         </ReactFlow>
 
-        <div className="pointer-events-none absolute top-3 right-3 flex flex-col gap-1 rounded-xl border border-white/5 bg-[#161b27]/90 px-3 py-2 text-[10px] text-slate-500 backdrop-blur-sm">
-          <span className="text-[11px] font-semibold text-slate-400">
+        <div className="pointer-events-none absolute top-3 right-3 flex flex-col gap-1 rounded-xl border border-border bg-card/90 px-3 py-2 text-[10px] text-muted-foreground backdrop-blur-sm">
+          <span className="text-[11px] font-semibold text-foreground/80">
             How to use
           </span>
           <span>
             Hover an offspring row → click{' '}
-            <span className="font-mono text-slate-300">◎</span> to set a goal,{' '}
-            <span className="font-mono text-slate-300">+</span> to branch
+            <span className="font-mono text-foreground">◎</span> to set a goal,{' '}
+            <span className="font-mono text-foreground">+</span> to branch
           </span>
           <span>
             Starred outcomes stay pinned at the top of each node
           </span>
           <span>
             Already-branched outcomes show{' '}
-            <span className="font-mono text-indigo-300">↗</span>
+            <span className="font-mono text-indigo-600 dark:text-indigo-300">↗</span>
           </span>
           <span>Drag nodes · scroll to zoom</span>
         </div>

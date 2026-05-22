@@ -19,12 +19,12 @@ export interface PairingNodeData {
 
 function probabilityBadgeClass(prob: number) {
   if (prob >= 0.5)
-    return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+    return 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
   if (prob >= 0.25)
-    return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+    return 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30'
   if (prob >= 0.125)
-    return 'bg-violet-500/20 text-violet-300 border-violet-500/30'
-  return 'bg-white/5 text-slate-400 border-white/10'
+    return 'bg-violet-500/20 text-violet-700 dark:text-violet-300 border-violet-500/30'
+  return 'bg-muted text-muted-foreground border-border'
 }
 
 const DEFAULT_SHOWN = 8
@@ -76,17 +76,17 @@ function OutcomeLabel({
         onChange={(e) => setDraft(e.target.value)}
         onBlur={commit}
         onKeyDown={handleKeyDown}
-        className="min-w-0 flex-1 rounded border border-indigo-500/40 bg-white/10 px-1.5 py-px text-[11px] text-slate-200 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
+        className="min-w-0 flex-1 rounded border border-indigo-500/40 bg-background px-1.5 py-px text-[11px] text-foreground focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
       />
     )
   }
 
   return (
     <span className="group/label flex min-w-0 items-center gap-1">
-      <span className="truncate text-[11px] leading-snug text-slate-300">
+      <span className="truncate text-[11px] leading-snug text-foreground/80">
         {alias ?? label}
         {alias && (
-          <span className="ml-1 text-[9px] font-normal text-indigo-400/60">
+          <span className="ml-1 text-[9px] font-normal text-indigo-500/60 dark:text-indigo-400/60">
             ✎
           </span>
         )}
@@ -94,7 +94,7 @@ function OutcomeLabel({
       <button
         onClick={startEdit}
         title="Rename this outcome"
-        className="shrink-0 text-[10px] leading-none text-slate-600 opacity-0 transition-all group-hover/label:opacity-100 hover:text-indigo-400"
+        className="shrink-0 text-[10px] leading-none text-muted-foreground/50 opacity-0 transition-all group-hover/label:opacity-100 hover:text-indigo-600 dark:hover:text-indigo-400"
       >
         ✎
       </button>
@@ -153,7 +153,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
   )
 
   return (
-    <div className="w-72 overflow-hidden rounded-2xl border border-white/10 bg-[#161b27] shadow-2xl">
+    <div className="w-72 overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
       {!isRoot && (
         <Handle
           type="target"
@@ -162,29 +162,29 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
         />
       )}
 
-      <div className="border-b border-white/5 px-4 pt-3 pb-2">
+      <div className="border-b border-border px-4 pt-3 pb-2">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs leading-snug font-semibold text-slate-200">
+          <span className="text-xs leading-snug font-semibold text-foreground">
             {node.parent1Name}
           </span>
-          <span className="text-xs text-slate-600">×</span>
-          <span className="text-xs leading-snug font-semibold text-slate-200">
+          <span className="text-xs text-muted-foreground/50">×</span>
+          <span className="text-xs leading-snug font-semibold text-foreground">
             {node.parent2Name}
           </span>
         </div>
-        <p className="mt-0.5 text-[10px] text-slate-600">
+        <p className="mt-0.5 text-[10px] text-muted-foreground/60">
           {outcomes.length} offspring outcomes
         </p>
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-1 border-b border-white/5 px-3 pt-2 pb-0">
+      <div className="flex gap-1 border-b border-border px-3 pt-2 pb-0">
         <button
           onClick={() => { setActiveTab('all'); setShowAll(false) }}
           className={`rounded-t-md px-2.5 py-1 text-[10px] font-medium transition-colors ${
             activeTab === 'all'
-              ? 'border border-b-0 border-white/10 bg-[#161b27] text-slate-200'
-              : 'text-slate-500 hover:text-slate-300'
+              ? 'border border-b-0 border-border bg-card text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           All ({unflaggedOutcomes.length})
@@ -193,10 +193,10 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
           onClick={() => { setActiveTab('flagged'); setShowAll(false) }}
           className={`rounded-t-md px-2.5 py-1 text-[10px] font-medium transition-colors ${
             activeTab === 'flagged'
-              ? 'border border-b-0 border-white/10 bg-[#161b27] text-amber-300'
+              ? 'border border-b-0 border-border bg-card text-amber-700 dark:text-amber-300'
               : flaggedOutcomes.length > 0
-                ? 'text-amber-500/70 hover:text-amber-300'
-                : 'text-slate-600 hover:text-slate-400'
+                ? 'text-amber-600/70 dark:text-amber-500/70 hover:text-amber-700 dark:hover:text-amber-300'
+                : 'text-muted-foreground/60 hover:text-muted-foreground'
           }`}
         >
           ★ Flagged ({flaggedOutcomes.length})
@@ -205,7 +205,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
 
       <div className="flex flex-col gap-1 px-3 py-2">
         {activeTab === 'flagged' && flaggedOutcomes.length === 0 && (
-          <p className="py-3 text-center text-[10px] text-slate-600">
+        <p className="py-3 text-center text-[10px] text-muted-foreground/60">
             No flagged offspring yet — use ☆ to flag outcomes.
           </p>
         )}
@@ -224,7 +224,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
               className={`group flex items-center justify-between gap-2 rounded-lg border px-2 py-1.5 ${
                 activeTab === 'flagged'
                   ? 'border-amber-500/20 bg-amber-500/8'
-                  : 'border-white/5 bg-white/3'
+                  : 'border-border bg-muted/20'
               }`}
             >
               <div className="flex min-w-0 flex-1 items-center gap-1.5">
@@ -259,8 +259,8 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
                     onClick={() => onAddGoal(outcome)}
                     className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] transition-colors ${
                       isGoal
-                        ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-300 cursor-default'
-                        : 'border-white/10 bg-white/5 text-slate-500 opacity-0 group-hover:opacity-100 hover:border-emerald-500/25 hover:bg-emerald-500/10 hover:text-emerald-300'
+                        ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 cursor-default'
+                        : 'border-border bg-muted/30 text-muted-foreground/50 opacity-0 group-hover:opacity-100 hover:border-emerald-500/25 hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300'
                     }`}
                   >
                     {isGoal ? '◉' : '◎'}
@@ -271,8 +271,8 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
                   title={isFlagged ? 'Unflag outcome' : 'Flag outcome'}
                   className={`flex h-5 w-5 items-center justify-center rounded-full border text-[11px] transition-colors ${
                     isFlagged
-                      ? 'border-amber-500/30 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25'
-                      : 'border-white/10 bg-white/5 text-slate-500 hover:border-amber-500/25 hover:bg-amber-500/10 hover:text-amber-300'
+                      ? 'border-amber-500/30 bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25'
+                      : 'border-border bg-muted/30 text-muted-foreground/50 hover:border-amber-500/25 hover:bg-amber-500/10 hover:text-amber-700 dark:hover:text-amber-300'
                   }`}
                 >
                   {isFlagged ? '★' : '☆'}
@@ -287,8 +287,8 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
                     }
                     className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold transition-colors ${
                       alreadyPaired
-                        ? 'border border-indigo-500/40 bg-indigo-500/30 text-indigo-300 hover:bg-indigo-500/50'
-                        : 'border border-white/10 bg-white/5 text-slate-500 opacity-0 group-hover:opacity-100 hover:border-indigo-500/30 hover:bg-indigo-500/20 hover:text-indigo-300'
+                        ? 'border border-indigo-500/40 bg-indigo-500/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/50'
+                        : 'border border-border bg-muted/30 text-muted-foreground/50 opacity-0 group-hover:opacity-100 hover:border-indigo-500/30 hover:bg-indigo-500/20 hover:text-indigo-700 dark:hover:text-indigo-300'
                     }`}
                   >
                     {alreadyPaired ? '↗' : '+'}
@@ -302,7 +302,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
         {!showAll && hiddenCount > 0 && (
           <button
             onClick={() => setShowAll(true)}
-            className="py-1 text-center text-[11px] text-slate-600 transition-colors hover:text-slate-400"
+            className="py-1 text-center text-[11px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
           >
             Show {hiddenCount} more
           </button>
@@ -310,7 +310,7 @@ export function PairingNode({ data }: { data: PairingNodeData }) {
         {showAll && tabOutcomes.length > DEFAULT_SHOWN && (
           <button
             onClick={() => setShowAll(false)}
-            className="py-1 text-center text-[11px] text-slate-600 transition-colors hover:text-slate-400"
+            className="py-1 text-center text-[11px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
           >
             Show less
           </button>

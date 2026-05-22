@@ -271,7 +271,7 @@ export function DashboardPage() {
                 )}
                 {collectionSummary.normalCount > 0 && (
                   <div
-                    className="h-full bg-slate-600/40"
+                    className="h-full bg-muted-foreground/40"
                     style={{
                       width: `${(collectionSummary.normalCount / animals.length) * 100}%`,
                     }}
@@ -293,7 +293,7 @@ export function DashboardPage() {
                 )}
                 {collectionSummary.normalCount > 0 && (
                   <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground/40">
-                    <span className="inline-block h-2 w-2 rounded-full bg-slate-600/40" />
+                    <span className="inline-block h-2 w-2 rounded-full bg-muted-foreground/40" />
                     {collectionSummary.normalCount} normal
                   </span>
                 )}

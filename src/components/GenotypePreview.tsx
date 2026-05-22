@@ -7,23 +7,23 @@ function geneBadgeClass(
   copies?: number
 ): string {
   if (lethalSuper && copies === 2) {
-    return 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+    return 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30'
   }
   if (type === 'codominant') {
-    return 'bg-sky-500/15 text-sky-300 border border-sky-500/25'
+    return 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/25'
   }
   // recessive het
   if (copies === 1) {
-    return 'bg-amber-500/15 text-amber-300 border border-amber-500/25'
+    return 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25'
   }
   // recessive visual
-  return 'bg-violet-500/15 text-violet-300 border border-violet-500/25'
+  return 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/25'
 }
 
 export function GenotypePreview({ genotype }: { genotype: ParentGenotype }) {
   const active = Object.entries(genotype).filter(([, c]) => c > 0)
   if (active.length === 0)
-    return <span className="text-xs text-slate-500 italic">Normal</span>
+    return <span className="text-xs text-muted-foreground italic">Normal</span>
   return (
     <span className="flex flex-wrap gap-1">
       {active.map(([id, copies]) => {

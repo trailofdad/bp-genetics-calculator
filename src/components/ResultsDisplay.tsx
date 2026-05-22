@@ -24,7 +24,7 @@ function cardAccent(prob: number): { border: string; bar: string } {
     return { border: 'border-indigo-500/20', bar: 'bg-indigo-500' }
   if (prob >= 0.125)
     return { border: 'border-violet-500/20', bar: 'bg-violet-500' }
-  return { border: 'border-border', bar: 'bg-slate-600' }
+  return { border: 'border-border', bar: 'bg-muted-foreground/60' }
 }
 
 function GeneTag({ geneId, copies }: { geneId: string; copies: 0 | 1 | 2 }) {
@@ -34,17 +34,17 @@ function GeneTag({ geneId, copies }: { geneId: string; copies: 0 | 1 | 2 }) {
   const isVisual = copies === 2
   const isCodominant = gene.type === 'codominant'
 
-  let cls = 'bg-amber-500/15 text-amber-300 border border-amber-500/20'
+  let cls = 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/20'
   let label = `Het ${gene.name}`
 
   if (isVisual && isCodominant) {
-    cls = 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/20'
+    cls = 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20'
     label = gene.superName ?? `Super ${gene.name}`
   } else if (isVisual) {
-    cls = 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/20'
+    cls = 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20'
     label = gene.name
   } else if (isCodominant) {
-    cls = 'bg-sky-500/15 text-sky-300 border border-sky-500/20'
+    cls = 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/20'
     label = gene.name
   }
 
@@ -138,7 +138,7 @@ export function ResultsDisplay({
                 onClick={() => setSortKey(k)}
                 className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                   sortKey === k
-                    ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-300'
+                    ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
                     : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
                 }`}
               >
@@ -179,7 +179,7 @@ export function ResultsDisplay({
                       {outcome.comboNames.map((name) => (
                         <span
                           key={name}
-                          className="inline-block rounded-md border border-emerald-500/25 bg-emerald-500/15 px-2 py-px text-[11px] font-semibold text-emerald-300"
+                          className="inline-block rounded-md border border-emerald-500/25 bg-emerald-500/15 px-2 py-px text-[11px] font-semibold text-emerald-700 dark:text-emerald-300"
                         >
                           {name}
                         </span>
@@ -189,13 +189,13 @@ export function ResultsDisplay({
                   <p className="text-sm leading-snug font-medium text-foreground">
                     {outcome.label}
                     {outcome.hasLethal && (
-                      <span className="ml-2 text-[11px] font-normal text-rose-400/80">
+                      <span className="ml-2 text-[11px] font-normal text-rose-600/80 dark:text-rose-400/80">
                         <AlertTriangle className="mr-0.5 inline h-3 w-3" strokeWidth={1.75} />
                         lethal
                       </span>
                     )}
                     {outcome.hasRisk && !outcome.hasLethal && (
-                      <span className="ml-2 text-[11px] font-normal text-orange-400/80">
+                      <span className="ml-2 text-[11px] font-normal text-orange-600/80 dark:text-orange-400/80">
                         <AlertTriangle className="mr-0.5 inline h-3 w-3" strokeWidth={1.75} />
                         risky
                       </span>
@@ -224,7 +224,7 @@ export function ResultsDisplay({
                       {outcome.notes.map((note, ni) => (
                         <li
                           key={ni}
-                          className="flex items-start gap-1 text-[11px] text-indigo-400/80"
+                          className="flex items-start gap-1 text-[11px] text-indigo-600/80 dark:text-indigo-400/80"
                         >
                           <Info className="mt-px h-3 w-3 shrink-0" strokeWidth={1.75} />
                           <span>{note}</span>
@@ -237,7 +237,7 @@ export function ResultsDisplay({
                       {outcome.risks.map((risk, ri) => (
                         <li
                           key={ri}
-                          className="flex items-start gap-1 text-[11px] text-orange-400/70"
+                          className="flex items-start gap-1 text-[11px] text-orange-600/70 dark:text-orange-400/70"
                         >
                           <AlertTriangle className="mt-px h-3 w-3 shrink-0" strokeWidth={1.75} />
                           <span>{risk}</span>
@@ -259,8 +259,8 @@ export function ResultsDisplay({
                         onClick={() => onToggleGoal(outcome)}
                         className={`flex h-7 w-7 items-center justify-center rounded-full border text-sm transition-colors ${
                           isGoal
-                            ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
-                            : 'border-border bg-muted/50 text-muted-foreground/60 hover:border-emerald-500/25 hover:bg-emerald-500/10 hover:text-emerald-300'
+                            ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25'
+                            : 'border-border bg-muted/50 text-muted-foreground/60 hover:border-emerald-500/25 hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300'
                         }`}
                       >
                         <Target className="h-3.5 w-3.5" strokeWidth={1.75} />
@@ -275,8 +275,8 @@ export function ResultsDisplay({
                       }
                       className={`flex h-7 w-7 items-center justify-center rounded-full border text-sm transition-colors ${
                         isSaved
-                          ? 'border-amber-500/30 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25'
-                          : 'border-border bg-muted/50 text-muted-foreground/60 hover:border-amber-500/25 hover:bg-amber-500/10 hover:text-amber-300'
+                          ? 'border-amber-500/30 bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25'
+                          : 'border-border bg-muted/50 text-muted-foreground/60 hover:border-amber-500/25 hover:bg-amber-500/10 hover:text-amber-700 dark:hover:text-amber-300'
                       }`}
                     >
                       {isSaved ? (

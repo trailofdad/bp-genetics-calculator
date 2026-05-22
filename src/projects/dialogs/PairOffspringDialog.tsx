@@ -115,17 +115,17 @@ export function PairOffspringDialog({
     >
       <DialogContent
         showCloseButton={false}
-        className="max-w-md gap-0 overflow-hidden border border-white/10 bg-[#1c2333] p-0 text-slate-200 ring-0"
+        className="max-w-md gap-0 overflow-hidden border border-border bg-card p-0 text-foreground ring-0"
       >
         {/* Header */}
         <DialogHeader className="px-5 pt-5 pb-0">
-          <DialogTitle className="text-sm leading-snug font-semibold text-white">
+          <DialogTitle className="text-sm leading-snug font-semibold text-foreground">
             Pair offspring
-            <span className="ml-1.5 font-normal text-indigo-300">
+            <span className="ml-1.5 font-normal text-indigo-600 dark:text-indigo-300">
               "{offspring?.label}"
             </span>
           </DialogTitle>
-          <p className="mt-0.5 text-[11px] text-slate-500">
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
             Choose a mate to branch the breeding tree.
           </p>
         </DialogHeader>
@@ -138,8 +138,8 @@ export function PairOffspringDialog({
               onClick={() => setTab(t.id)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                 tab === t.id
-                  ? 'border-indigo-500/30 bg-indigo-500/20 text-indigo-300'
-                  : 'border-white/5 bg-white/3 text-slate-500 hover:bg-white/6 hover:text-slate-300'
+                  ? 'border-indigo-500/30 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
+                  : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
               {t.label}
@@ -162,17 +162,17 @@ export function PairOffspringDialog({
                       className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
                         selectedFlaggedKey === key
                           ? 'border-amber-500/40 bg-amber-500/15'
-                          : 'border-white/5 bg-white/3 hover:bg-white/6'
+                          : 'border-border bg-muted/20 hover:bg-muted/40'
                       }`}
                     >
-                      <p className="text-xs font-medium text-slate-200">
+                      <p className="text-xs font-medium text-foreground">
                         {o.label}
                       </p>
-                      <p className="mt-0.5 text-[10px] text-slate-500">
+                      <p className="mt-0.5 text-[10px] text-muted-foreground">
                         {o.probability < 1
                           ? formatProbability(o.probability)
                           : '100%'}
-                        <span className="ml-1.5 text-slate-600">
+                        <span className="ml-1.5 text-muted-foreground/60">
                           from {o.sourceLabel}
                         </span>
                       </p>
@@ -194,13 +194,13 @@ export function PairOffspringDialog({
                     className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
                       selectedAnimalId === a.id
                         ? 'border-indigo-500/40 bg-indigo-500/15'
-                        : 'border-white/5 bg-white/3 hover:bg-white/6'
+                      : 'border-border bg-muted/20 hover:bg-muted/40'
                     }`}
                   >
-                    <p className="text-xs font-medium text-slate-200">
+                    <p className="text-xs font-medium text-foreground">
                       {a.name}
                     </p>
-                    <p className="mt-0.5 text-[10px] text-slate-500">
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">
                       {genotypePreview(a.genotype)}
                     </p>
                   </button>
@@ -217,7 +217,7 @@ export function PairOffspringDialog({
                 placeholder="Animal name (required)…"
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-200 transition-colors placeholder:text-slate-600 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
+                className="w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-xs text-foreground transition-colors placeholder:text-muted-foreground/60 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
                 autoFocus
               />
               <ScrollArea className="h-44">
@@ -234,10 +234,10 @@ export function PairOffspringDialog({
           )}
 
           {/* Footer actions */}
-          <div className="flex items-center justify-end gap-2 border-t border-white/5 pt-1">
+          <div className="flex items-center justify-end gap-2 border-t border-border pt-1">
             <button
               onClick={onClose}
-              className="rounded-xl border border-white/5 bg-white/5 px-4 py-2 text-xs font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200"
+              className="rounded-xl border border-border bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               Cancel
             </button>

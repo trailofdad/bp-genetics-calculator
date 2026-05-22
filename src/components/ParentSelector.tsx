@@ -79,25 +79,25 @@ function copyOptionLabel(
 
 /** Pastel chip style by gene type */
 function geneTypeChip(type: string, lethal?: boolean) {
-  if (lethal) return 'bg-rose-500/15 text-rose-300 border border-rose-500/20'
+  if (lethal) return 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/20'
   if (type === 'codominant')
-    return 'bg-sky-500/15 text-sky-300 border border-sky-500/20'
+    return 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/20'
   if (type === 'dominant')
-    return 'bg-teal-500/15 text-teal-300 border border-teal-500/20'
-  return 'bg-violet-500/15 text-violet-300 border border-violet-500/20'
+    return 'bg-teal-500/15 text-teal-700 dark:text-teal-300 border border-teal-500/20'
+  return 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/20'
 }
 
 /** Chip style for active-gene chips, matching the badge colour scheme */
 function copyChip(copies: CopyCount, type: string, lethalSuper?: boolean) {
   if (type === 'codominant') {
     if (lethalSuper && copies === 2)
-      return 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-    return 'bg-sky-500/15 text-sky-300 border border-sky-500/25'
+      return 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30'
+    return 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/25'
   }
   // recessive
   if (copies === 1)
-    return 'bg-amber-500/15 text-amber-300 border border-amber-500/20'
-  return 'bg-violet-500/15 text-violet-300 border border-violet-500/25'
+    return 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/20'
+  return 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/25'
 }
 
 export function ParentSelector({
@@ -286,10 +286,10 @@ export function ParentSelector({
             const colorClass = already
               ? 'bg-muted/50 text-muted-foreground/40 border-border cursor-default'
               : gene.lethalSuper
-                ? 'bg-rose-500/10 text-rose-300/70 border-rose-500/20 hover:bg-rose-500/20 hover:text-rose-200 cursor-pointer'
+                ? 'bg-rose-500/10 text-rose-600/80 dark:text-rose-300/70 border-rose-500/20 hover:bg-rose-500/20 hover:text-rose-700 dark:hover:text-rose-200 cursor-pointer'
                 : gene.type === 'codominant'
-                  ? 'bg-sky-500/10 text-sky-300/70 border-sky-500/20 hover:bg-sky-500/20 hover:text-sky-200 cursor-pointer'
-                  : 'bg-violet-500/10 text-violet-300/70 border-violet-500/20 hover:bg-violet-500/20 hover:text-violet-200 cursor-pointer'
+                  ? 'bg-sky-500/10 text-sky-600/80 dark:text-sky-300/70 border-sky-500/20 hover:bg-sky-500/20 hover:text-sky-700 dark:hover:text-sky-200 cursor-pointer'
+                  : 'bg-violet-500/10 text-violet-600/80 dark:text-violet-300/70 border-violet-500/20 hover:bg-violet-500/20 hover:text-violet-700 dark:hover:text-violet-200 cursor-pointer'
             return (
               <button
                 key={id}
@@ -326,7 +326,7 @@ export function ParentSelector({
           onClick={() => setActiveCategory(null)}
           className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
             activeCategory === null
-              ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-300'
+              ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
               : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
           }`}
         >
@@ -338,7 +338,7 @@ export function ParentSelector({
           }
           className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
             activeCategory === 'Combos'
-              ? 'border border-amber-500/30 bg-amber-500/20 text-amber-300'
+              ? 'border border-amber-500/30 bg-amber-500/20 text-amber-700 dark:text-amber-300'
               : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
           }`}
         >
@@ -352,7 +352,7 @@ export function ParentSelector({
             }
             className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               activeCategory === cat
-                ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-300'
+                ? 'border border-indigo-500/30 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
                 : 'border border-border bg-muted/50 text-muted-foreground/60 hover:bg-muted hover:text-foreground/80'
             }`}
           >
@@ -392,11 +392,11 @@ export function ParentSelector({
                     <span className="truncate text-sm font-medium text-foreground">
                       {combo.name}
                     </span>
-                    <span className="shrink-0 rounded border border-emerald-500/20 bg-emerald-500/15 px-1.5 py-px text-[10px] font-medium text-emerald-300">
+                    <span className="shrink-0 rounded border border-emerald-500/20 bg-emerald-500/15 px-1.5 py-px text-[10px] font-medium text-emerald-700 dark:text-emerald-300">
                       combo
                     </span>
                     {isApplied && (
-                      <span className="shrink-0 text-[10px] text-emerald-400/70">
+                      <span className="shrink-0 text-[10px] text-emerald-600/70 dark:text-emerald-400/70">
                         ✓ applied
                       </span>
                     )}
@@ -410,8 +410,8 @@ export function ParentSelector({
                   disabled={isApplied}
                   className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                     isApplied
-                      ? 'cursor-default bg-emerald-500/10 text-emerald-500/50'
-                      : 'border border-emerald-500/20 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 hover:text-emerald-200'
+                      ? 'cursor-default bg-emerald-500/10 text-emerald-600/50 dark:text-emerald-500/50'
+                      : 'border border-emerald-500/20 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25 hover:text-emerald-800 dark:hover:text-emerald-200'
                   }`}
                 >
                   {isApplied ? '✓' : 'Apply'}
@@ -458,7 +458,7 @@ export function ParentSelector({
                             ? 'Dominant'
                             : 'Recessive'}
                     </span>
-                    <span className="flex h-3.5 w-3.5 cursor-default items-center justify-center rounded-full bg-slate-700 text-muted-foreground">
+                    <span className="flex h-3.5 w-3.5 cursor-default items-center justify-center rounded-full bg-muted text-muted-foreground">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 16 16"
@@ -472,12 +472,12 @@ export function ParentSelector({
                         />
                       </svg>
                     </span>
-                    <span className="pointer-events-none absolute top-full left-0 z-50 mt-1 w-max max-w-[220px] rounded-md border border-border bg-slate-800 px-2 py-1 text-[11px] text-foreground/80 opacity-0 shadow-lg transition-opacity group-hover/badge:opacity-100">
+                    <span className="pointer-events-none absolute top-full left-0 z-50 mt-1 w-max max-w-[220px] rounded-md border border-border bg-popover px-2 py-1 text-[11px] text-popover-foreground/80 opacity-0 shadow-lg transition-opacity group-hover/badge:opacity-100">
                       {tooltipText}
                     </span>
                   </span>
                   {gene.riskNote && (
-                    <span className="shrink-0 rounded border border-orange-500/20 bg-orange-500/15 px-1.5 py-px text-[10px] font-medium text-orange-300">
+                    <span className="shrink-0 rounded border border-orange-500/20 bg-orange-500/15 px-1.5 py-px text-[10px] font-medium text-orange-700 dark:text-orange-300">
                       risky
                     </span>
                   )}
@@ -495,8 +495,8 @@ export function ParentSelector({
                       className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
                         copies === val
                           ? val === 1
-                            ? 'border border-amber-500/30 bg-amber-500/20 text-amber-300'
-                            : 'border border-emerald-500/30 bg-emerald-500/20 text-emerald-300'
+                            ? 'border border-amber-500/30 bg-amber-500/20 text-amber-700 dark:text-amber-300'
+                            : 'border border-emerald-500/30 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
                           : 'bg-muted/40 text-muted-foreground/40 hover:bg-muted hover:text-muted-foreground'
                       }`}
                     >

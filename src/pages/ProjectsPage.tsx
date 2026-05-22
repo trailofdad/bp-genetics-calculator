@@ -82,10 +82,10 @@ export function ProjectsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-semibold tracking-tight text-white">
+            <h1 className="text-lg font-semibold tracking-tight text-foreground">
               Projects
             </h1>
-            <p className="mt-0.5 text-xs text-slate-500">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               Open saved projects or build one from a pairing.
             </p>
           </div>
@@ -106,8 +106,8 @@ export function ProjectsPage() {
               onClick={() => setTab(t)}
               className={`rounded-lg border px-3.5 py-1.5 text-xs font-medium capitalize transition-colors ${
                 tab === t
-                  ? 'border-indigo-500/30 bg-indigo-500/15 text-indigo-300'
-                  : 'border-white/5 bg-white/3 text-slate-500 hover:bg-white/6 hover:text-slate-300'
+                  ? 'border-indigo-500/30 bg-indigo-500/15 text-indigo-700 dark:text-indigo-300'
+                  : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
               {t === 'projects' ? '🌿 Projects' : '⇄ Pairings'}
@@ -118,10 +118,10 @@ export function ProjectsPage() {
         {/* Projects tab */}
         {tab === 'projects' && (
           projects.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/5 bg-[#161b27] p-12 text-center">
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-12 text-center">
               <span className="text-4xl">🌿</span>
-              <p className="text-sm text-slate-400">No saved projects yet.</p>
-              <p className="text-xs text-slate-600">
+              <p className="text-sm text-muted-foreground">No saved projects yet.</p>
+              <p className="text-xs text-muted-foreground/60">
                 Switch to Pairings to open a saved pairing as a project.
               </p>
               <button
@@ -140,18 +140,18 @@ export function ProjectsPage() {
                 return (
                   <div
                     key={p.id}
-                    className="overflow-hidden rounded-2xl border border-white/5 bg-[#161b27]"
+                    className="overflow-hidden rounded-2xl border border-border bg-card"
                   >
                     {/* Project header */}
                     <div className="flex items-center gap-3 px-4 py-3">
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-slate-200">
+                        <p className="truncate text-sm font-medium text-foreground">
                           {p.name}
                         </p>
-                        <p className="mt-0.5 text-[11px] text-slate-600">
+                        <p className="mt-0.5 text-[11px] text-muted-foreground/60">
                           {formatDate(p.savedAt)}
                           {goals.length > 0 && (
-                            <span className="ml-2 text-emerald-500/70">
+                            <span className="ml-2 text-emerald-600 dark:text-emerald-500/70">
                               {activeGoals.length} active · {achievedGoals.length} achieved
                             </span>
                           )}
@@ -166,7 +166,7 @@ export function ProjectsPage() {
                         </button>
                         <button
                           onClick={() => setConfirmDelete(p.id)}
-                          className="rounded-lg border border-white/5 bg-white/4 px-2.5 py-1 text-xs text-slate-600 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
+                          className="rounded-lg border border-border bg-muted/30 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-600 dark:hover:text-rose-400"
                           title="Delete"
                         >
                           ✕
@@ -176,19 +176,19 @@ export function ProjectsPage() {
 
                     {/* Goals */}
                     {goals.length > 0 && (
-                      <div className="border-t border-white/5 divide-y divide-white/5">
+                      <div className="border-t border-border divide-y divide-border">
                         {[...activeGoals, ...achievedGoals].map((goal) => (
                           <div
                             key={goal.id}
                             className={`flex items-center gap-3 px-4 py-2 ${goal.achieved ? 'opacity-50' : ''}`}
                           >
-                            <span className="text-[10px] text-slate-600">◉</span>
+                            <span className="text-[10px] text-muted-foreground/50">◉</span>
                             <div className="min-w-0 flex-1">
-                              <p className={`truncate text-xs font-medium ${goal.achieved ? 'text-slate-500 line-through' : 'text-slate-300'}`}>
+                              <p className={`truncate text-xs font-medium ${goal.achieved ? 'text-muted-foreground line-through' : 'text-foreground/80'}`}>
                                 {goal.label}
                               </p>
                               {goal.probability !== undefined && !goal.achieved && (
-                                <p className="text-[10px] tabular-nums text-slate-600">
+                                <p className="text-[10px] tabular-nums text-muted-foreground/60">
                                   {Math.round(goal.probability * 100)}%
                                 </p>
                               )}
@@ -199,8 +199,8 @@ export function ProjectsPage() {
                                 title={goal.achieved ? 'Reopen' : 'Mark achieved'}
                                 className={`rounded-md border px-2 py-0.5 text-[10px] font-medium transition-colors ${
                                   goal.achieved
-                                    ? 'border-white/5 bg-white/4 text-slate-600 hover:text-slate-300'
-                                    : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                                    ? 'border-border bg-muted/30 text-muted-foreground hover:text-foreground'
+                                    : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20'
                                 }`}
                               >
                                 {goal.achieved ? 'Reopen' : '✓'}
@@ -208,7 +208,7 @@ export function ProjectsPage() {
                               <button
                                 onClick={() => removeProjectGoal(goal.id)}
                                 title="Remove goal"
-                                className="rounded-md border border-white/5 bg-white/4 px-2 py-0.5 text-[10px] text-slate-600 transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-400"
+                                className="rounded-md border border-border bg-muted/20 px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:border-rose-500/25 hover:bg-rose-500/15 hover:text-rose-600 dark:hover:text-rose-400"
                               >
                                 ✕
                               </button>
@@ -227,10 +227,10 @@ export function ProjectsPage() {
         {/* Pairings tab */}
         {tab === 'pairings' && (
           pairings.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/5 bg-[#161b27] p-12 text-center">
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-12 text-center">
               <span className="text-4xl">⇄</span>
-              <p className="text-sm text-slate-400">No pairings saved yet.</p>
-              <p className="text-xs text-slate-600">
+              <p className="text-sm text-muted-foreground">No pairings saved yet.</p>
+              <p className="text-xs text-muted-foreground/60">
                 Save a pairing in the calculator to use it here.
               </p>
               <button
@@ -254,21 +254,21 @@ export function ProjectsPage() {
                 return (
                   <div
                     key={pairing.id}
-                    className="rounded-2xl border border-white/5 bg-[#161b27] p-5"
+                    className="rounded-2xl border border-border bg-card p-5"
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="text-sm font-semibold text-white">
+                          <h2 className="text-sm font-semibold text-foreground">
                             {pairing.name}
                           </h2>
                           {offspring.length > 0 && (
-                            <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-300">
+                            <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-300">
                               ★ {offspring.length}
                             </span>
                           )}
                         </div>
-                        <p className="mt-1 text-xs text-slate-500">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           {parent1Name} × {parent2Name}
                         </p>
                       </div>
@@ -283,34 +283,34 @@ export function ProjectsPage() {
                     </div>
 
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
-                      <div className="rounded-xl border border-white/5 bg-[#0d1117] p-3">
-                        <p className="mb-1 text-[11px] font-medium text-slate-500">
+                      <div className="rounded-xl border border-border bg-muted/30 p-3">
+                        <p className="mb-1 text-[11px] font-medium text-muted-foreground">
                           {parent1Name}
                         </p>
                         <GenotypePreview genotype={pairing.parent1} />
                       </div>
-                      <div className="rounded-xl border border-white/5 bg-[#0d1117] p-3">
-                        <p className="mb-1 text-[11px] font-medium text-slate-500">
+                      <div className="rounded-xl border border-border bg-muted/30 p-3">
+                        <p className="mb-1 text-[11px] font-medium text-muted-foreground">
                           {parent2Name}
                         </p>
                         <GenotypePreview genotype={pairing.parent2} />
                       </div>
                     </div>
 
-                    <div className="mt-4 rounded-xl border border-white/5 bg-[#0d1117] p-3">
+                    <div className="mt-4 rounded-xl border border-border bg-muted/20 p-3">
                       <div className="mb-3 flex items-center justify-between gap-2">
                         <div>
-                          <h3 className="text-xs font-semibold tracking-wide text-slate-300 uppercase">
+                          <h3 className="text-xs font-semibold tracking-wide text-foreground/80 uppercase">
                             Saved Offspring
                           </h3>
-                          <p className="text-[11px] text-slate-600">
+                          <p className="text-[11px] text-muted-foreground/60">
                             Flag outcomes in the calculator to reuse them here.
                           </p>
                         </div>
                       </div>
 
                       {offspring.length === 0 ? (
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                           No saved offspring
                         </p>
                       ) : (
@@ -318,13 +318,13 @@ export function ProjectsPage() {
                           {offspring.map((entry) => (
                             <div
                               key={entry.id}
-                              className="flex flex-col gap-2 rounded-lg border border-white/5 bg-white/3 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                              className="flex flex-col gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
                             >
                               <div className="min-w-0">
-                                <p className="truncate text-sm text-slate-200">
+                                <p className="truncate text-sm text-foreground">
                                   {entry.label}
                                 </p>
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs text-muted-foreground">
                                   {formatProbability(entry.probability)}
                                 </p>
                               </div>
@@ -357,13 +357,13 @@ export function ProjectsPage() {
         {/* Delete confirm modal */}
         {confirmDelete !== null && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-            <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-white/10 bg-[#1c2333] p-6 shadow-2xl">
-              <h3 className="text-sm font-semibold text-white">
+            <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-2xl">
+              <h3 className="text-sm font-semibold text-foreground">
                 Delete Project?
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-muted-foreground">
                 This will permanently remove{' '}
-                <span className="font-medium text-slate-200">
+                <span className="font-medium text-foreground">
                   {projects.find((p) => p.id === confirmDelete)?.name}
                 </span>{' '}
                 from your saved projects.
@@ -371,7 +371,7 @@ export function ProjectsPage() {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setConfirmDelete(null)}
-                  className="rounded-lg border border-white/5 bg-white/5 px-4 py-2 text-sm text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200"
+                  className="rounded-lg border border-border bg-muted/30 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   Cancel
                 </button>
