@@ -39,6 +39,16 @@ export function HelpPage() {
             </ol>
           </div>
 
+          <div className="bg-[#161b27] border border-white/5 rounded-xl p-4 flex flex-col gap-2 mb-3">
+            <p className="text-xs font-semibold text-slate-300">Exporting from MorphMarket</p>
+            <ol className="list-decimal list-inside text-xs text-slate-400 space-y-1">
+              <li>On MorphMarket, go to your <strong>My Animals</strong> page.</li>
+              <li>Select the animals you want to export, or use the bulk-select option to export your entire collection.</li>
+              <li>Choose <em>Export</em> and make sure to select <strong>CSV</strong> as the format.</li>
+              <li>Save the <code className="bg-white/5 px-1 rounded">.csv</code> file to your device.</li>
+            </ol>
+          </div>
+
           <div className="bg-[#161b27] border border-white/5 rounded-xl p-4 flex flex-col gap-2">
             <p className="text-xs font-semibold text-slate-300">Importing the CSV</p>
             <ol className="list-decimal list-inside text-xs text-slate-400 space-y-1">

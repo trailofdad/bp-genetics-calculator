@@ -11,4 +11,15 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('@xyflow') || id.includes('@dagrejs')) return 'vendor-flow';
+          if (id.includes('lucide-react') || id.includes('radix-ui')) return 'vendor-ui';
+          if (id.includes('react-dom') || id.includes('react-router') || (id.includes('node_modules/react/') )) return 'vendor-react';
+        },
+      },
+    },
+  },
 })
