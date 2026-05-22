@@ -7,7 +7,7 @@ import type { PlaygroundProject } from '../playground/types';
 export function PlaygroundPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { pairings, animals, saveProject } = useAppContext();
+  const { animals, saveAnimal, saveProject } = useAppContext();
 
   const locationProject = (location.state as { project?: PlaygroundProject } | null)?.project;
   const [project, setProject] = useState<PlaygroundProject | null>(locationProject ?? null);
@@ -29,8 +29,8 @@ export function PlaygroundPage() {
   return (
     <PlaygroundView
       project={project}
-      savedPairings={pairings}
       savedAnimals={animals}
+      saveAnimal={saveAnimal}
       onBack={() => navigate(-1)}
       onSave={p => { saveProject(p); setProject(p); }}
     />

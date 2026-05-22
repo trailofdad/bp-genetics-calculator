@@ -8,6 +8,7 @@ export interface SavedPairing {
   parent2: ParentGenotype;
   parent1AnimalId?: string;
   parent2AnimalId?: string;
+  notes?: string;
   savedAt: string;
 }
 
@@ -75,6 +76,16 @@ export function useSavedPairings() {
     });
   }, []);
 
+  const updateNotes = useCallback((id: string, notes: string) => {
+    setPairings(prev => {
+      const next = prev.map(p =>
+        p.id === id ? { ...p, notes: notes.trim() || undefined } : p
+      );
+      persist(next);
+      return next;
+    });
+  }, []);
+
   const remove = useCallback((id: string) => {
     setPairings(prev => {
       const next = prev.filter(p => p.id !== id);
@@ -83,5 +94,5 @@ export function useSavedPairings() {
     });
   }, []);
 
-  return { pairings, save, update, remove };
+  return { pairings, save, update, updateNotes, remove };
 }

@@ -16,7 +16,6 @@ import '@xyflow/react/dist/style.css';
 
 import type { OffspringOutcome, ParentGenotype } from 'bp-genetics';
 import type { PlaygroundProject } from './types';
-import type { SavedPairing } from '../hooks/useSavedPairings';
 import type { SavedAnimal } from '../hooks/useSavedAnimals';
 import { usePlaygroundState } from './usePlaygroundState';
 import { PairingNode, type PairingNodeData } from './nodes/PairingNode';
@@ -89,13 +88,13 @@ function buildGraph(
 
 interface Props {
   project: PlaygroundProject;
-  savedPairings: SavedPairing[];
   savedAnimals: SavedAnimal[];
+  saveAnimal: (name: string, genotype: ParentGenotype) => void;
   onBack: () => void;
   onSave: (project: PlaygroundProject) => void;
 }
 
-export function PlaygroundView({ project: initialProject, savedPairings, savedAnimals, onBack, onSave }: Props) {
+export function PlaygroundView({ project: initialProject, savedAnimals, saveAnimal, onBack, onSave }: Props) {
   const { project, addChildPairing, renameOutcome } = usePlaygroundState(initialProject);
 
   const [pendingPair, setPendingPair] = useState<{
@@ -183,7 +182,7 @@ export function PlaygroundView({ project: initialProject, savedPairings, savedAn
         </ReactFlow>
 
         {/* Legend */}
-        <div className="absolute bottom-14 left-3 bg-[#161b27]/90 border border-white/5 rounded-xl px-3 py-2 text-[10px] text-slate-500 flex flex-col gap-1 backdrop-blur-sm pointer-events-none">
+        <div className="absolute top-3 right-3 bg-[#161b27]/90 border border-white/5 rounded-xl px-3 py-2 text-[10px] text-slate-500 flex flex-col gap-1 backdrop-blur-sm pointer-events-none">
           <span className="font-semibold text-slate-400 text-[11px]">How to use</span>
           <span>Hover an offspring row → click <span className="text-slate-300 font-mono">+</span> to branch</span>
           <span>Already-branched outcomes show <span className="text-indigo-300 font-mono">↗</span></span>
@@ -196,8 +195,8 @@ export function PlaygroundView({ project: initialProject, savedPairings, savedAn
         key={pendingPair ? `${pendingPair.nodeId}|${pendingPair.outcome.label}` : 'closed'}
         open={!!pendingPair}
         offspring={pendingPair?.outcome ?? null}
-        savedPairings={savedPairings}
         savedAnimals={savedAnimals}
+        onSaveAnimal={saveAnimal}
         onConfirm={handleDialogConfirm}
         onClose={() => setPendingPair(null)}
       />

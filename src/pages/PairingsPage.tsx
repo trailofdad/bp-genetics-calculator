@@ -7,13 +7,27 @@ import type { SavedPairing } from '../hooks/useSavedPairings';
 import type { PlaygroundProject } from '../playground/types';
 
 export function PairingsPage() {
-  const { pairings, removePairing, animals, saveProject } = useAppContext();
+  const { pairings, removePairing, updatePairingNotes, animals, saveProject } = useAppContext();
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
+  const [notesDraft, setNotesDraft] = useState('');
 
   function handleDelete(id: string) {
     removePairing(id);
     setConfirmDelete(null);
+  }
+
+  function openNotesModal(pairing: SavedPairing) {
+    setNotesDraft(pairing.notes ?? '');
+    setEditingNotesId(pairing.id);
+  }
+
+  function saveNotes() {
+    if (editingNotesId) {
+      updatePairingNotes(editingNotesId, notesDraft);
+    }
+    setEditingNotesId(null);
   }
 
   function handleOpenPlayground(pairing: SavedPairing) {
@@ -88,6 +102,9 @@ export function PairingsPage() {
                   <tr key={pairing.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="px-4 py-3">
                       <span className="font-medium text-slate-200">{pairing.name}</span>
+                      {pairing.notes && (
+                        <p className="text-[11px] text-slate-500 mt-0.5 max-w-xs truncate">{pairing.notes}</p>
+                      )}
                       <div className="sm:hidden mt-0.5 flex flex-col gap-0.5 text-xs text-slate-500">
                         <span>{animal1 ? animal1.name : <GenotypePreview genotype={pairing.parent1} />}</span>
                         <span>{animal2 ? animal2.name : <GenotypePreview genotype={pairing.parent2} />}</span>
@@ -127,6 +144,17 @@ export function PairingsPage() {
                           🌿
                         </button>
                         <button
+                          onClick={() => openNotesModal(pairing)}
+                          className={`px-2.5 py-1 border rounded-lg text-xs transition-colors ${
+                            pairing.notes
+                              ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/20'
+                              : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/5 text-slate-500 hover:text-slate-300'
+                          }`}
+                          title={pairing.notes ? 'Edit notes' : 'Add notes'}
+                        >
+                          📝
+                        </button>
+                        <button
                           onClick={() => setConfirmDelete(pairing.id)}
                           className="px-2.5 py-1 bg-white/[0.04] hover:bg-rose-500/15 border border-white/5 hover:border-rose-500/25 rounded-lg text-xs text-slate-600 hover:text-rose-400 transition-colors"
                           title="Delete"
@@ -142,6 +170,43 @@ export function PairingsPage() {
           </table>
         </div>
       )}
+
+      {/* Notes modal */}
+      {editingNotesId !== null && (() => {
+        const pairing = pairings.find(p => p.id === editingNotesId);
+        return (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4">
+            <div className="bg-[#1c2333] border border-white/10 rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-2xl">
+              <div>
+                <h3 className="text-sm font-semibold text-white">Notes</h3>
+                <p className="text-xs text-slate-500 mt-0.5">{pairing?.name}</p>
+              </div>
+              <textarea
+                value={notesDraft}
+                onChange={e => setNotesDraft(e.target.value)}
+                placeholder="Add notes about this pairing — dates, observations, offspring counts…"
+                rows={5}
+                autoFocus
+                className="w-full px-3 py-2.5 bg-[#0d1117] border border-white/10 rounded-xl text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 resize-none leading-relaxed"
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setEditingNotesId(null)}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 rounded-lg text-sm transition-colors border border-white/5"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveNotes}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Save Notes
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Confirm delete */}
       {confirmDelete !== null && (

@@ -7,7 +7,7 @@ interface Props {
   outcomes: OffspringOutcome[];
 }
 
-type SortKey = 'probability' | 'label';
+type SortKey = 'probability' | 'label' | 'traits';
 
 /** Card accent color based on probability tier */
 function cardAccent(prob: number): { border: string; bar: string } {
@@ -58,6 +58,13 @@ export function ResultsDisplay({ outcomes }: Props) {
   const sorted = useMemo(() => {
     const list = showLethal ? outcomes : outcomes.filter(o => !o.hasLethal);
     if (sortKey === 'label') return [...list].sort((a, b) => a.label.localeCompare(b.label));
+    if (sortKey === 'traits') {
+      return [...list].sort((a, b) => {
+        const countA = Object.values(a.genotype).filter(c => c > 0).length;
+        const countB = Object.values(b.genotype).filter(c => c > 0).length;
+        return countB - countA || b.probability - a.probability;
+      });
+    }
     return [...list].sort((a, b) => b.probability - a.probability);
   }, [outcomes, sortKey, showLethal]);
 
@@ -101,7 +108,7 @@ export function ResultsDisplay({ outcomes }: Props) {
             </label>
           )}
           <div className="flex gap-1">
-            {(['probability', 'label'] as SortKey[]).map(k => (
+            {(['probability', 'traits', 'label'] as SortKey[]).map(k => (
               <button
                 key={k}
                 onClick={() => setSortKey(k)}
@@ -111,7 +118,7 @@ export function ResultsDisplay({ outcomes }: Props) {
                     : 'bg-white/5 text-slate-500 border border-white/5 hover:text-slate-300 hover:bg-white/10'
                 }`}
               >
-                {k === 'probability' ? 'By %' : 'A–Z'}
+                {k === 'probability' ? 'By %' : k === 'traits' ? 'By traits' : 'A–Z'}
               </button>
             ))}
           </div>
@@ -142,7 +149,7 @@ export function ResultsDisplay({ outcomes }: Props) {
                       {outcome.comboNames.map(name => (
                         <span
                           key={name}
-                          className="inline-block px-2 py-px rounded-md text-[11px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/25"
+                          className="inline-block px-2 py-px rounded-md text-[11px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/25"
                         >
                           {name}
                         </span>

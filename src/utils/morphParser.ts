@@ -141,6 +141,12 @@ export interface MorphParseResult {
   genotype: ParentGenotype;
   /** Tokens we couldn't match to any known gene */
   unrecognized: string[];
+  /**
+   * Gene names flagged as "pos het" in the source string.
+   * These are NOT added to the genotype — het status is unconfirmed.
+   * Each entry is the display name of the gene (or raw token if unrecognized).
+   */
+  possibleHets: string[];
 }
 
 /**
@@ -152,6 +158,7 @@ export interface MorphParseResult {
 export function parseMorphString(traits: string): MorphParseResult {
   const genotype: ParentGenotype = {};
   const unrecognized: string[] = [];
+  const possibleHets: string[] = [];
 
   // Normalize the full string before splitting so hyphenated names (e.g. "G-Stripe")
   // are treated as multi-word tokens matching their lookup entries ("g stripe").
@@ -161,14 +168,20 @@ export function parseMorphString(traits: string): MorphParseResult {
   while (i < words.length) {
     const w = words[i]; // already lowercased by norm()
 
-    // ── "Pos Het <gene>" — possible het, skip (not representable as 0/1/2) ──
+    // ── "Pos Het <gene>" — possible het, not confirmed; collect separately ──
     if (w === 'pos') {
       i++; // consume "pos"
       if (i < words.length && words[i] === 'het') i++; // consume "het"
-      const [consumed] = tryMatchGene(words, i);
-      const geneWords = consumed > 0 ? words.slice(i, i + consumed).join(' ') : words[i];
-      unrecognized.push(`pos het ${geneWords}`);
-      i += consumed > 0 ? consumed : 1;
+      const [consumed, geneId] = tryMatchGene(words, i);
+      if (consumed > 0 && geneId) {
+        const gene = geneById(geneId);
+        possibleHets.push(gene?.name ?? words.slice(i, i + consumed).join(' '));
+        i += consumed;
+      } else {
+        // Gene not in registry — still a pos het, just record the raw token
+        possibleHets.push(words[i] ?? '');
+        i += 1;
+      }
       continue;
     }
 
@@ -255,5 +268,5 @@ export function parseMorphString(traits: string): MorphParseResult {
     }
   }
 
-  return { genotype, unrecognized };
+  return { genotype, unrecognized, possibleHets };
 }

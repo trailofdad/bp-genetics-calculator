@@ -35,13 +35,6 @@ export interface ParentGenotype {
   [geneId: string]: CopyCount;
 }
 
-/** A single gene outcome from an individual Punnett cross. */
-export interface GeneOutcome {
-  geneId: string;
-  copies: CopyCount;
-  probability: number;
-}
-
 /** An interaction rule that fired on an offspring outcome. */
 export interface MatchedInteraction {
   ruleId: string;

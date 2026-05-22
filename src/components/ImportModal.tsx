@@ -78,6 +78,22 @@ function AnimalCard({
         </div>
       )}
 
+      {/* Possible hets (pos het — unconfirmed) */}
+      {animal.possibleHets.length > 0 && (
+        <div className="flex flex-wrap gap-1 items-center">
+          <span className="text-[10px] text-yellow-500/70">Pos het (unconfirmed):</span>
+          {animal.possibleHets.map((name, i) => (
+            <span
+              key={i}
+              className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-yellow-900/20 text-yellow-400 border border-yellow-700/20"
+            >
+              {name}
+            </span>
+          ))}
+          <span className="text-[10px] text-yellow-600/60 ml-0.5">· not saved to genotype</span>
+        </div>
+      )}
+
       {/* Unrecognized tokens */}
       {animal.unrecognized.length > 0 && (
         <div className="flex flex-wrap gap-1 items-center">

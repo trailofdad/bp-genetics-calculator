@@ -17,6 +17,11 @@ export interface ImportedAnimal {
   genotype: ParentGenotype;
   /** Tokens we couldn't match to any known gene */
   unrecognized: string[];
+  /**
+   * Genes flagged as "pos het" — not added to genotype since het status is unconfirmed.
+   * Shown as an informational note in the UI.
+   */
+  possibleHets: string[];
 }
 
 // ─── RFC-4180 CSV parser ────────────────────────────────────────────────────────
@@ -75,8 +80,13 @@ function parseCSVText(text: string): string[][] {
 
 type CSVFormat = 'cltch' | 'morphmarket';
 
+/** Strip trailing asterisks and lowercase — normalizes both CLTCH and MM headers. */
+function normalizeHeader(h: string): string {
+  return h.trim().replace(/\*+$/, '').trim().toLowerCase();
+}
+
 function detectFormat(headers: string[]): CSVFormat | null {
-  const h = headers.map(s => s.trim().toLowerCase());
+  const h = headers.map(normalizeHeader);
   if (h.includes('animal_id') && h.includes('morphs')) return 'cltch';
   if (h.includes('category') && h.includes('traits')) return 'morphmarket';
   return null;
@@ -97,20 +107,21 @@ function makeColtchRow(
 ): ImportedAnimal | null {
   const get = (col: string) => cells[headers.indexOf(col)]?.trim() ?? '';
 
-  const sourceId = get('Animal_Id') || get('animal_id');
-  const rawTraits = get('Morphs') || get('morphs');
+  const sourceId = get('animal_id');
+  const rawTraits = get('morphs');
   if (!sourceId && !rawTraits) return null;
 
-  const { genotype, unrecognized } = parseMorphString(rawTraits);
+  const { genotype, unrecognized, possibleHets } = parseMorphString(rawTraits);
 
   return {
     sourceId,
-    name: get('Nickname') || get('nickname') || sourceId,
-    sex: parseSex(get('Sex') || get('sex')),
-    dob: get('Dob') || get('dob'),
+    name: get('nickname') || sourceId,
+    sex: parseSex(get('sex')),
+    dob: get('dob'),
     rawTraits,
     genotype,
     unrecognized,
+    possibleHets,
   };
 }
 
@@ -120,20 +131,28 @@ function makeMorphMarketRow(
 ): ImportedAnimal | null {
   const get = (col: string) => cells[headers.indexOf(col)]?.trim() ?? '';
 
-  const sourceId = get('Animal_ID') || get('animal_id');
-  const rawTraits = get('Traits') || get('traits');
+  // Animal_Id* is often blank in MM exports; fall back to the numeric listing ID
+  // extracted from the listing URL (Mm_Url**), then to the title.
+  const rawId = get('animal_id');
+  const mmUrl = get('mm_url');
+  const urlId = mmUrl ? (mmUrl.split('/').filter(Boolean).pop() ?? '') : '';
+  const title = get('title');
+  const sourceId = rawId || urlId || title;
+
+  const rawTraits = get('traits');
   if (!sourceId && !rawTraits) return null;
 
-  const { genotype, unrecognized } = parseMorphString(rawTraits);
+  const { genotype, unrecognized, possibleHets } = parseMorphString(rawTraits);
 
   return {
     sourceId,
-    name: get('Title') || get('title') || sourceId,
-    sex: parseSex(get('Sex') || get('sex')),
-    dob: get('DOB') || get('dob'),
+    name: title || sourceId,
+    sex: parseSex(get('sex')),
+    dob: get('dob'),
     rawTraits,
     genotype,
     unrecognized,
+    possibleHets,
   };
 }
 
@@ -159,8 +178,9 @@ export function importCSV(text: string): CSVImportResult | { error: string } {
     };
   }
 
-  // Normalize headers to match our field accessors (preserve original casing)
-  const headers = rawHeaders;
+  // Normalize headers: strip trailing asterisks and lowercase so row mappers
+  // work uniformly across both CLTCH and MorphMarket column naming conventions.
+  const headers = rawHeaders.map(normalizeHeader);
 
   const animals: ImportedAnimal[] = [];
   let skipped = 0;

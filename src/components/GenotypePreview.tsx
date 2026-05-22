@@ -8,7 +8,11 @@ function geneBadgeClass(type: string, lethalSuper?: boolean, copies?: number): s
   if (type === 'codominant') {
     return 'bg-sky-500/15 text-sky-300 border border-sky-500/25';
   }
-  // recessive
+  // recessive het
+  if (copies === 1) {
+    return 'bg-amber-500/15 text-amber-300 border border-amber-500/25';
+  }
+  // recessive visual
   return 'bg-violet-500/15 text-violet-300 border border-violet-500/25';
 }
 

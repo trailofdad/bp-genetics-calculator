@@ -29,6 +29,7 @@ interface AppContextValue {
     parent2AnimalId?: string,
   ) => void;
   removePairing: (id: string) => void;
+  updatePairingNotes: (id: string, notes: string) => void;
 
   saveProject: ReturnType<typeof usePlaygroundProjects>['saveProject'];
 }
@@ -37,7 +38,7 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const { animals, saveAnimal, updateAnimal, removeAnimal } = useSavedAnimals();
-  const { pairings, save, update, remove } = useSavedPairings();
+  const { pairings, save, update, updateNotes, remove } = useSavedPairings();
   const { saveProject } = usePlaygroundProjects();
 
   return (
@@ -50,6 +51,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       savePairing: save,
       updatePairing: update,
       removePairing: remove,
+      updatePairingNotes: updateNotes,
       saveProject,
     }}>
       {children}

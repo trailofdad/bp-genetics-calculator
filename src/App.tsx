@@ -6,6 +6,7 @@ import { AnimalsPage } from './pages/AnimalsPage';
 import { PairingsPage } from './pages/PairingsPage';
 import { CalculatorPage } from './pages/CalculatorPage';
 import { PlaygroundPage } from './pages/PlaygroundPage';
+import { HelpPage } from './pages/HelpPage';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="/pairings" element={<PairingsPage />} />
             <Route path="/calculator" element={<CalculatorPage />} />
             <Route path="/playground" element={<PlaygroundPage />} />
+            <Route path="/help" element={<HelpPage />} />
           </Routes>
         </Layout>
       </AppProvider>

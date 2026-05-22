@@ -4,7 +4,6 @@ export type {
   Gene,
   CopyCount,
   ParentGenotype,
-  GeneOutcome,
   OffspringOutcome,
   MatchedInteraction,
 } from './types';

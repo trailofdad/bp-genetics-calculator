@@ -4,8 +4,9 @@ import { NavLink, useLocation } from 'react-router-dom';
 const NAV_LINKS = [
   { to: '/', label: 'Dashboard', emoji: '🏠' },
   { to: '/animals', label: 'Animals', emoji: '🐍' },
-  { to: '/pairings', label: 'Pairings', emoji: '⇄' },
   { to: '/calculator', label: 'Calculator', emoji: '🧬' },
+  { to: '/pairings', label: 'Pairings', emoji: '⇄' },
+  { to: '/help', label: 'Help', emoji: '?' },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {

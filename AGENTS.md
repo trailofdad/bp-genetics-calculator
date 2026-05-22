@@ -56,6 +56,11 @@ packages/bp-genetics/src/
     data.ts                 ← built-in rules (BEL complex, neurological notes)
     registry.ts             ← InteractionRegistry — indexes rules by gene for fast lookup
     index.ts                ← default registry + re-exports
+  combos/
+    types.ts                ← ComboCondition, ComboName types
+    data.ts                 ← COMBO_NAMES array of well-known trade name combos (e.g. "Bumblebee")
+    registry.ts             ← ComboRegistry — matches a genotype against all combo conditions
+    index.ts                ← default registry + re-exports
   index.ts                  ← public API barrel (fully backward compatible)
 ```
 
@@ -63,23 +68,61 @@ packages/bp-genetics/src/
 
 ```
 src/
-  App.tsx                        ← root component, holds parent state + save-pairing modal
+  App.tsx                        ← router shell; wraps the whole app in HashRouter + AppProvider
+  main.tsx                       ← entry point
+  context/
+    AppContext.tsx                ← global state provider: exposes animals, pairings, playground projects
+  pages/
+    DashboardPage.tsx            ← overview / home
+    AnimalsPage.tsx              ← saved-animals CRUD (add, edit, delete, CSV import)
+    PairingsPage.tsx             ← saved-pairings list with load/delete/notes
+    CalculatorPage.tsx           ← gene cross calculator: holds parent state + reactive calculation
+    PlaygroundPage.tsx           ← visual breeding tree (ReactFlow canvas)
+    HelpPage.tsx                 ← documentation / reference
   components/
+    Layout.tsx                   ← nav sidebar + page container
     ParentSelector.tsx           ← gene picker UI for each parent (recent genes, sorted list)
     ResultsDisplay.tsx           ← offspring outcome cards with notes
-    SavedPairingsPanel.tsx       ← slide-over panel listing saved pairings
+    GenotypePreview.tsx          ← compact read-only genotype chip display
+    ImportModal.tsx              ← CSV import modal (used in AnimalsPage)
+    ui/                          ← base UI components (badge, button, card, dialog, scroll-area, tabs)
   hooks/
+    useSavedAnimals.ts           ← CRUD hook for localStorage-backed saved animals
     useSavedPairings.ts          ← CRUD hook for localStorage-backed saved pairings
+  playground/
+    PlaygroundView.tsx           ← ReactFlow canvas for the visual breeding tree
+    usePlaygroundState.ts        ← per-canvas node/edge state
+    usePlaygroundProjects.ts     ← project save/load (localStorage)
+    dialogs/
+      PairOffspringDialog.tsx    ← pick an offspring to breed further within the canvas
+    edges/
+      BranchEdge.tsx             ← custom ReactFlow edge renderer
+    nodes/
+      PairingNode.tsx            ← custom ReactFlow node renderer
+    types.ts                     ← playground-specific types
+    utils/
+      compactLabel.ts            ← shorten outcome labels for canvas display
+  utils/
+    csvImport.ts                 ← parse exported CSVs into SavedAnimal[]
+    formatDate.ts                ← date formatting helpers
+    morphParser.ts               ← parse free-text morph strings into ParentGenotype
+  lib/
+    utils.ts                     ← cn() class-name helper (tailwind-merge + clsx)
+  assets/                        ← static assets (hero image, favicon)
 ```
 
 #### Key front-end behaviours
 
 | Behaviour | Where |
 |-----------|-------|
-| **Reactive calculation** | `App.tsx` — `calculateOffspring` runs via `useMemo` on every parent change; no manual Calculate button. |
+| **Reactive calculation** | `CalculatorPage.tsx` — `calculateOffspring` runs via `useMemo` on every parent change; no Calculate button. |
 | **Recent genes** | `ParentSelector.tsx` — `useRecentGenes` hook, last 5 selected gene IDs per parent, persisted in `localStorage` under `recent-genes:<parentLabel>`. Clicking a recent chip adds the gene as Het if not already selected. Chips are colour-coded by gene type (violet = recessive, sky = codominant, rose = lethal). |
 | **Selected-first sorting** | `ParentSelector.tsx` — genes with copies > 0 are sorted to the top of the filtered list so copy-count buttons are immediately reachable. |
-| **Save pairing** | `App.tsx` + `useSavedPairings` hook — saves a named `{ parent1, parent2 }` snapshot to `localStorage` under key `saved-pairings`. `SavedPairingsPanel` renders a slide-over with load/delete per entry. |
+| **Save pairing** | `CalculatorPage.tsx` + `useSavedPairings` hook (via `AppContext`) — saves a named pairing snapshot to `localStorage` under key `saved-pairings`. `PairingsPage` renders the list with load/delete/notes editing. |
+| **Save animal** | `CalculatorPage.tsx` + `AnimalsPage.tsx` + `useSavedAnimals` hook (via `AppContext`) — saves a named genotype to `localStorage` under key `saved-animals`. Animals can be loaded into either parent slot in `CalculatorPage`. |
+| **Global state** | `AppContext.tsx` — bridges `useSavedAnimals`, `useSavedPairings`, and `usePlaygroundProjects` into a single React context consumed by all pages. |
+| **CSV import** | `AnimalsPage.tsx` + `ImportModal.tsx` + `utils/csvImport.ts` — parses a structured CSV (name, morphs columns) into `SavedAnimal[]` objects. |
+| **Visual playground** | `PlaygroundPage.tsx` + `playground/` — ReactFlow canvas where users build a visual breeding tree; each pairing node runs `calculateOffspring` and lets users select offspring to pair further. |
 
 ---
 
@@ -93,12 +136,13 @@ Edit `packages/bp-genetics/src/genes/data.ts` and append a `Gene` object to the 
 {
   id: 'my_gene',          // snake_case, unique
   name: 'My Gene',        // human-readable display name
-  shortName: 'MyGn',      // abbreviation used in compact contexts (recent-gene chips for names > 6 chars, active-gene chips in older UI)
-  type: 'recessive',      // 'recessive' | 'codominant'
+  shortName: 'MyGn',      // abbreviation used in compact contexts (recent-gene chips for names > 6 chars)
+  type: 'recessive',      // 'recessive' | 'codominant' | 'dominant'
   category: 'Recessive',  // groups genes in the UI picker
   // For codominant genes, also add:
   // superName: 'Super My Gene',
   // lethalSuper: true,   // only if homozygous form is lethal
+  // For dominant genes, lethalSuper applies if homozygous is lethal (e.g. Spider).
 }
 ```
 
@@ -184,9 +228,12 @@ interface OffspringOutcome {
   genotype: Record<string, CopyCount>;
   probability: number;           // 0–1
   label: string;                 // e.g. "Pastel Clown [BEL]"
-  hasLethal: boolean;
+  hasLethal: boolean;            // true if any gene in this outcome has a lethal super combination
+  hasRisk: boolean;              // true if any gene or interaction is individually flagged as risky
+  risks: string[];               // aggregated risk messages from genes + interaction rules
   interactions: MatchedInteraction[];
-  notes: string[];
+  notes: string[];               // informational notes from matched interaction rules
+  comboNames: string[];          // well-known trade names matching this genotype (most specific first)
 }
 ```
 
@@ -199,7 +246,8 @@ The app uses `localStorage` for client-side persistence. No server or auth is in
 | Key | Type | Owner | Description |
 |-----|------|-------|-------------|
 | `recent-genes:<parentLabel>` | `string[]` (gene IDs) | `useRecentGenes` in `ParentSelector.tsx` | Last 5 gene IDs selected for a given parent (e.g. `recent-genes:Parent 1`). Updated on every non-zero `setGene` call. |
-| `saved-pairings` | `SavedPairing[]` (JSON) | `useSavedPairings` in `hooks/useSavedPairings.ts` | Array of named `{ id, name, parent1, parent2, savedAt }` pairing snapshots. Newest first. |
+| `saved-animals` | `SavedAnimal[]` (JSON) | `useSavedAnimals` in `hooks/useSavedAnimals.ts` | Array of named `{ id, name, genotype, savedAt }` animal snapshots. Newest first. |
+| `saved-pairings` | `SavedPairing[]` (JSON) | `useSavedPairings` in `hooks/useSavedPairings.ts` | Array of named `{ id, name, parent1, parent2, parent1AnimalId?, parent2AnimalId?, notes?, savedAt }` pairing snapshots. Newest first. |
 
 ---
 
@@ -210,6 +258,7 @@ The app uses `localStorage` for client-side persistence. No server or auth is in
 - **Gene IDs must be unique** — duplicates in `genes/data.ts` will silently produce incorrect registry lookups.
 - **Interaction rule IDs must be unique** — duplicates are silently ignored by the registry.
 - **Always run `npm run build` from the repo root** before assuming changes are correct — the TypeScript compiler catches most mistakes.
+- **Changes to `packages/bp-genetics/src/` require rebuilding the library first.** The app resolves `bp-genetics` from `dist/`, not source. Run `npm run build` inside `packages/bp-genetics/` before rebuilding the app, otherwise source changes will have no effect at runtime.
 - **Do not modify `dist/`** — these are build artifacts. Always regenerate from source.
 
 ---

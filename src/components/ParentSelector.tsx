@@ -74,11 +74,15 @@ function geneTypeChip(type: string, lethal?: boolean) {
   return 'bg-violet-500/15 text-violet-300 border border-violet-500/20';
 }
 
-/** Pastel chip style for active-gene copy count */
-function copyChip(copies: CopyCount) {
-  if (copies === 2) return 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/20';
+/** Chip style for active-gene chips, matching the badge colour scheme */
+function copyChip(copies: CopyCount, type: string, lethalSuper?: boolean) {
+  if (type === 'codominant') {
+    if (lethalSuper && copies === 2) return 'bg-rose-500/20 text-rose-300 border border-rose-500/30';
+    return 'bg-sky-500/15 text-sky-300 border border-sky-500/25';
+  }
+  // recessive
   if (copies === 1) return 'bg-amber-500/15 text-amber-300 border border-amber-500/20';
-  return 'bg-white/5 text-slate-500 border border-white/5';
+  return 'bg-violet-500/15 text-violet-300 border border-violet-500/25';
 }
 
 export function ParentSelector({ parentLabel, parentSex, genotype, onChange, headerAction }: Props) {
@@ -184,7 +188,7 @@ export function ParentSelector({ parentLabel, parentSex, genotype, onChange, hea
           return (
             <span
               key={geneId}
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${copyChip(copies as CopyCount)}`}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${copyChip(copies as CopyCount, gene.type, gene.lethalSuper)}`}
             >
               {gene.type === 'recessive' && copies === 1 && (
                 <span className="opacity-60">het</span>
@@ -299,17 +303,17 @@ export function ParentSelector({ parentLabel, parentSex, genotype, onChange, hea
               <div
                 key={`combo:${combo.id}`}
                 className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                  isApplied ? 'bg-amber-500/5 border border-amber-500/10' : 'hover:bg-white/5'
+                  isApplied ? 'bg-emerald-500/5 border border-emerald-500/10' : 'hover:bg-white/5'
                 }`}
               >
                 <div className="flex flex-col min-w-0 mr-3">
                   <div className="flex items-center gap-1.5">
                     <span className="text-sm font-medium text-slate-200 truncate">{combo.name}</span>
-                    <span className="shrink-0 px-1.5 py-px rounded text-[10px] font-medium bg-amber-500/15 text-amber-300 border border-amber-500/20">
+                    <span className="shrink-0 px-1.5 py-px rounded text-[10px] font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">
                       combo
                     </span>
                     {isApplied && (
-                      <span className="shrink-0 text-[10px] text-amber-400/70">✓ applied</span>
+                      <span className="shrink-0 text-[10px] text-emerald-400/70">✓ applied</span>
                     )}
                   </div>
                   <span className="text-[11px] text-slate-500 truncate">{constituents}</span>
@@ -319,8 +323,8 @@ export function ParentSelector({ parentLabel, parentSex, genotype, onChange, hea
                   disabled={isApplied}
                   className={`shrink-0 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                     isApplied
-                      ? 'bg-amber-500/10 text-amber-500/50 cursor-default'
-                      : 'bg-amber-500/15 text-amber-300 border border-amber-500/20 hover:bg-amber-500/25 hover:text-amber-200'
+                      ? 'bg-emerald-500/10 text-emerald-500/50 cursor-default'
+                      : 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/25 hover:text-emerald-200'
                   }`}
                 >
                   {isApplied ? '✓' : 'Apply'}

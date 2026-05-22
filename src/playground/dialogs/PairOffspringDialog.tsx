@@ -9,19 +9,18 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ParentSelector } from '../../components/ParentSelector';
-import type { SavedPairing } from '../../hooks/useSavedPairings';
 import type { SavedAnimal } from '../../hooks/useSavedAnimals';
 
 interface Props {
   open: boolean;
   offspring: OffspringOutcome | null;
-  savedPairings: SavedPairing[];
   savedAnimals: SavedAnimal[];
+  onSaveAnimal: (name: string, genotype: ParentGenotype) => void;
   onConfirm: (pairedWith: ParentGenotype, pairedWithName: string) => void;
   onClose: () => void;
 }
 
-type TabId = 'saved' | 'animals' | 'custom';
+type TabId = 'animals' | 'custom';
 
 function genotypePreview(genotype: ParentGenotype): string {
   const parts = Object.entries(genotype)
@@ -35,23 +34,13 @@ function genotypePreview(genotype: ParentGenotype): string {
   return parts.length ? parts.join(', ') : 'Normal';
 }
 
-export function PairOffspringDialog({ open, offspring, savedPairings, savedAnimals, onConfirm, onClose }: Props) {
-  // Default tab: animals if any, else saved pairings if any, else custom
-  const defaultTab: TabId =
-    savedAnimals.length > 0 ? 'animals' :
-    savedPairings.length > 0 ? 'saved' : 'custom';
+export function PairOffspringDialog({ open, offspring, savedAnimals, onSaveAnimal, onConfirm, onClose }: Props) {
+  const defaultTab: TabId = savedAnimals.length > 0 ? 'animals' : 'custom';
 
   const [tab, setTab] = useState<TabId>(defaultTab);
-  const [selectedPairingId, setSelectedPairingId] = useState<string | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<'parent1' | 'parent2'>('parent2');
   const [selectedAnimalId, setSelectedAnimalId] = useState<string | null>(null);
   const [customGenotype, setCustomGenotype] = useState<ParentGenotype>({});
   const [customName, setCustomName] = useState('');
-
-  const selectedPairing = useMemo(
-    () => savedPairings.find(p => p.id === selectedPairingId) ?? null,
-    [savedPairings, selectedPairingId],
-  );
 
   const selectedAnimal = useMemo(
     () => savedAnimals.find(a => a.id === selectedAnimalId) ?? null,
@@ -60,27 +49,22 @@ export function PairOffspringDialog({ open, offspring, savedPairings, savedAnima
 
   function handleConfirm() {
     if (!offspring) return;
-    if (tab === 'saved' && selectedPairing) {
-      const mate = selectedSlot === 'parent1' ? selectedPairing.parent1 : selectedPairing.parent2;
-      const mateName = `${selectedPairing.name} (${selectedSlot === 'parent1' ? 'Sire' : 'Dam'})`;
-      onConfirm(mate, mateName);
-    } else if (tab === 'animals' && selectedAnimal) {
+    if (tab === 'animals' && selectedAnimal) {
       onConfirm(selectedAnimal.genotype, selectedAnimal.name);
     } else if (tab === 'custom') {
-      const name = customName.trim() || genotypePreview(customGenotype) || 'Unknown';
+      const name = customName.trim();
+      onSaveAnimal(name, customGenotype);
       onConfirm(customGenotype, name);
     }
   }
 
   const canConfirm =
-    tab === 'saved' ? !!selectedPairing :
     tab === 'animals' ? !!selectedAnimal :
-    true;
+    customName.trim() !== '';
 
   const tabs: { id: TabId; label: string }[] = [
     ...(savedAnimals.length > 0 ? [{ id: 'animals' as TabId, label: '🐍 Saved Animals' }] : []),
-    ...(savedPairings.length > 0 ? [{ id: 'saved' as TabId, label: '⇄ Saved Pairings' }] : []),
-    { id: 'custom', label: '✎ Custom' },
+    { id: 'custom', label: '✎ New Animal' },
   ];
 
   return (
@@ -142,67 +126,16 @@ export function PairOffspringDialog({ open, offspring, savedPairings, savedAnima
             </ScrollArea>
           )}
 
-          {/* Saved Pairings */}
-          {tab === 'saved' && (
-            <>
-              <ScrollArea className="h-40">
-                <div className="flex flex-col gap-1.5 pr-2">
-                  {savedPairings.map(p => (
-                    <button
-                      key={p.id}
-                      onClick={() => setSelectedPairingId(p.id)}
-                      className={`text-left rounded-xl px-3 py-2.5 border transition-colors ${
-                        selectedPairingId === p.id
-                          ? 'bg-indigo-500/15 border-indigo-500/40'
-                          : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.06]'
-                      }`}
-                    >
-                      <p className="text-xs font-medium text-slate-200">{p.name}</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">
-                        P1: {genotypePreview(p.parent1)} · P2: {genotypePreview(p.parent2)}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </ScrollArea>
-
-              {selectedPairing && (
-                <div className="p-3 bg-white/[0.03] rounded-xl border border-white/5">
-                  <p className="text-[10px] text-slate-500 mb-2">
-                    Which parent from <span className="text-slate-300">{selectedPairing.name}</span>?
-                  </p>
-                  <div className="flex gap-2">
-                    {(['parent1', 'parent2'] as const).map(slot => (
-                      <button
-                        key={slot}
-                        onClick={() => setSelectedSlot(slot)}
-                        className={`flex-1 rounded-lg px-2 py-2 text-[11px] border transition-colors text-left ${
-                          selectedSlot === slot
-                            ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
-                        }`}
-                      >
-                        <span className="font-semibold block">{slot === 'parent1' ? '♂ Sire' : '♀ Dam'}</span>
-                        <span className="text-[10px] opacity-70 block mt-0.5 truncate">
-                          {genotypePreview(selectedPairing[slot])}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Custom */}
+          {/* New Animal */}
           {tab === 'custom' && (
             <>
               <input
                 type="text"
-                placeholder="Animal name (optional)…"
+                placeholder="Animal name (required)…"
                 value={customName}
                 onChange={e => setCustomName(e.target.value)}
                 className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-colors"
+                autoFocus
               />
               <ScrollArea className="h-44">
                 <div className="pr-2">
