@@ -12,8 +12,8 @@ import type { ProjectGoal } from '../hooks/useProjectGoals'
 
 interface AppContextValue {
   animals: SavedAnimal[]
-  saveAnimal: (name: string, genotype: ParentGenotype, sex?: AnimalSex) => void
-  updateAnimal: (id: string, name: string, genotype: ParentGenotype, sex?: AnimalSex) => void
+  saveAnimal: (name: string, genotype: ParentGenotype, sex?: AnimalSex, birthYear?: number) => void
+  updateAnimal: (id: string, name: string, genotype: ParentGenotype, sex?: AnimalSex, birthYear?: number) => void
   removeAnimal: (id: string) => void
 
   pairings: SavedPairing[]

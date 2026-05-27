@@ -9,6 +9,7 @@ export interface SavedAnimal {
   name: string
   sex?: AnimalSex
   genotype: ParentGenotype
+  birthYear?: number
   savedAt: string
 }
 
@@ -19,12 +20,13 @@ export function useSavedAnimals() {
     loadFromStorage<SavedAnimal>(STORAGE_KEY)
   )
 
-  const saveAnimal = useCallback((name: string, genotype: ParentGenotype, sex?: AnimalSex) => {
+  const saveAnimal = useCallback((name: string, genotype: ParentGenotype, sex?: AnimalSex, birthYear?: number) => {
     const entry: SavedAnimal = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       name: name.trim() || 'Untitled Animal',
       sex,
       genotype,
+      birthYear,
       savedAt: new Date().toISOString(),
     }
     setAnimals((prev) => {
@@ -35,11 +37,11 @@ export function useSavedAnimals() {
   }, [])
 
   const updateAnimal = useCallback(
-    (id: string, name: string, genotype: ParentGenotype, sex?: AnimalSex) => {
+    (id: string, name: string, genotype: ParentGenotype, sex?: AnimalSex, birthYear?: number) => {
       setAnimals((prev) => {
         const next = prev.map((a) =>
           a.id === id
-            ? { ...a, name: name.trim() || 'Untitled Animal', sex, genotype }
+            ? { ...a, name: name.trim() || 'Untitled Animal', sex, genotype, birthYear }
             : a
         )
         persistToStorage(STORAGE_KEY, next)

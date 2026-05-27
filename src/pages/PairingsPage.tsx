@@ -92,7 +92,7 @@ export function PairingsPage() {
         </div>
         <button
           onClick={() => navigate('/calculator')}
-          className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
+          className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
         >
           <span>New Pairing</span>
           <PlusIcon className="h-4 w-4" />
@@ -108,7 +108,7 @@ export function PairingsPage() {
           </p>
           <button
             onClick={() => navigate('/calculator')}
-            className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-500"
           >
             Go to Calculator
             <ArrowRightIcon className="h-3.5 w-3.5" />
@@ -352,7 +352,7 @@ export function PairingsPage() {
                   </button>
                   <button
                     onClick={saveNotes}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
                   >
                     Save Notes
                     <FloppyDiskIcon className="h-4 w-4" />
@@ -395,7 +395,7 @@ export function PairingsPage() {
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-rose-500"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-500"
               >
                 Delete
                 <TrashCanIcon className="h-4 w-4" />

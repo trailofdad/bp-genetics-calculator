@@ -10,7 +10,9 @@ import {
   FaSnakeIcon,
   MarsIcon,
   VenusIcon,
+  CopyIcon,
 } from '../components/icons/index'
+import { geneById } from 'bp-genetics'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
 import { ParentSelector } from '../components/ParentSelector'
@@ -26,6 +28,35 @@ interface AnimalModalState {
   name: string
   sex?: AnimalSex
   genotype: ParentGenotype
+  birthYear?: number
+  idPrefix: string
+  generatedId: string | null
+}
+
+function generateAnimalId(
+  genotype: ParentGenotype,
+  sex: AnimalSex | undefined,
+  birthYear: number | undefined,
+  prefix: string
+): string {
+  const parts: string[] = []
+
+  const cleanPrefix = prefix.trim().toUpperCase().replace(/[^A-Z0-9\-\/._]/g, '')
+  if (cleanPrefix) parts.push(cleanPrefix)
+
+  let yearSex = ''
+  if (birthYear) yearSex += String(birthYear).slice(-2)
+  if (sex === 'male') yearSex += 'M'
+  else if (sex === 'female') yearSex += 'F'
+  if (yearSex) parts.push(yearSex)
+
+  const geneAbbrevs = Object.entries(genotype)
+    .filter(([, copies]) => copies > 0)
+    .map(([geneId]) => (geneById(geneId)?.shortName ?? geneId).toUpperCase())
+    .sort()
+  parts.push(...geneAbbrevs)
+
+  return parts.join('-')
 }
 
 export function AnimalsPage() {
@@ -37,6 +68,7 @@ export function AnimalsPage() {
   const [importOpen, setImportOpen] = useState(
     !!(location.state as { openImport?: boolean } | null)?.openImport
   )
+  const [copied, setCopied] = useState(false)
   const nameInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -53,7 +85,7 @@ export function AnimalsPage() {
   }, [modal])
 
   function openAdd() {
-    setModal({ mode: 'add', name: '', sex: undefined, genotype: {} })
+    setModal({ mode: 'add', name: '', sex: undefined, genotype: {}, idPrefix: '', generatedId: null })
   }
 
   function openEdit(animal: SavedAnimal) {
@@ -63,15 +95,18 @@ export function AnimalsPage() {
       name: animal.name,
       sex: animal.sex,
       genotype: { ...animal.genotype },
+      birthYear: animal.birthYear,
+      idPrefix: '',
+      generatedId: null,
     })
   }
 
   function handleSave() {
     if (!modal) return
     if (modal.mode === 'add') {
-      saveAnimal(modal.name, modal.genotype, modal.sex)
+      saveAnimal(modal.name, modal.genotype, modal.sex, modal.birthYear)
     } else if (modal.animal) {
-      updateAnimal(modal.animal.id, modal.name, modal.genotype, modal.sex)
+      updateAnimal(modal.animal.id, modal.name, modal.genotype, modal.sex, modal.birthYear)
     }
     setModal(null)
   }
@@ -103,7 +138,7 @@ export function AnimalsPage() {
           </button>
           <button
             onClick={openAdd}
-            className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
+            className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
           >
             <span>Add Animal</span>
             <PlusIcon className="h-4 w-4" />
@@ -121,7 +156,7 @@ export function AnimalsPage() {
           </p>
           <button
             onClick={openAdd}
-            className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-indigo-500"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-500"
           >
             Add Animal
             <PlusIcon className="h-3.5 w-3.5" />
@@ -308,6 +343,24 @@ export function AnimalsPage() {
                   </button>
                 </div>
               </div>
+
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium text-muted-foreground">
+                  Birth Year
+                </span>
+                <input
+                  type="number"
+                  placeholder="e.g. 2024"
+                  min={1990}
+                  max={new Date().getFullYear() + 1}
+                  value={modal.birthYear ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.value ? parseInt(e.target.value, 10) : undefined
+                    setModal((m) => m && { ...m, birthYear: val })
+                  }}
+                  className="w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-foreground transition-colors placeholder:text-muted-foreground/40 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
+                />
+              </label>
             </div>
 
             <div className="px-6">
@@ -323,6 +376,64 @@ export function AnimalsPage() {
               </div>
             </div>
 
+            {/* ID Generator */}
+            <div className="px-6">
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                Generate Animal ID
+              </p>
+              <div className="rounded-xl border border-border bg-card p-4">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Prefix (optional)"
+                    maxLength={20}
+                    value={modal.idPrefix}
+                    onChange={(e) =>
+                      setModal((m) => m && { ...m, idPrefix: e.target.value, generatedId: null })
+                    }
+                    className="min-w-0 flex-1 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-foreground transition-colors placeholder:text-muted-foreground/40 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const id = generateAnimalId(modal.genotype, modal.sex, modal.birthYear, modal.idPrefix)
+                      setModal((m) => m && { ...m, generatedId: id })
+                      setCopied(false)
+                    }}
+                    className="shrink-0 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-500"
+                  >
+                    Generate
+                  </button>
+                </div>
+                {modal.generatedId && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <code className="flex-1 overflow-x-auto rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm font-mono text-foreground">
+                      {modal.generatedId}
+                    </code>
+                    <button
+                      type="button"
+                      title={copied ? 'Copied!' : 'Copy to clipboard'}
+                      onClick={() => {
+                        navigator.clipboard.writeText(modal.generatedId!)
+                        setCopied(true)
+                        setTimeout(() => setCopied(false), 2000)
+                      }}
+                      className={`shrink-0 rounded-lg border px-2.5 py-2 text-xs transition-colors ${
+                        copied
+                          ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-400'
+                          : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
+                      }`}
+                    >
+                      <CopyIcon className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
+                <p className="mt-2 text-xs text-muted-foreground/50">
+                  Uses genetics short names, birth year, and sex to build a readable ID.
+                </p>
+              </div>
+            </div>
+
             <div className="flex justify-end gap-2 px-6 pb-6">
               <button
                 onClick={() => setModal(null)}
@@ -333,7 +444,7 @@ export function AnimalsPage() {
               </button>
               <button
                 onClick={handleSave}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-indigo-500"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
               >
                 {modal.mode === 'add' ? (
                   <>
@@ -383,7 +494,7 @@ export function AnimalsPage() {
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-rose-500"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-500"
               >
                 Delete
                 <TrashCanIcon className="h-4 w-4" />
